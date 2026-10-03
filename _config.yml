@@ -1,0 +1,34 @@
+# NB6018CEM courseware portal - GitHub Pages (Jekyll 3.10 on Pages; tested locally on 4.3).
+# Keep this file stable: session threads never edit it.
+title: "Data Recovery and Advanced Digital Forensic Analysis"
+short_title: "NB6018CEM Courseware"
+module_code: "NB6018CEM"
+programme: "BSc (Hons) Ethical Hacking and Network Security"
+institution: "National Institute of Business Management"
+school: "School of Computing & Engineering"
+lecturer: "Niranga Dharmaratna"
+lecturer_email: "niranga@nibm.lk"
+description: "Self-study courseware for NB6018CEM Data Recovery and Advanced Digital Forensic Analysis: full session notes, interactive demos and slides for a Level 6 digital forensics module."
+url: "https://nirangadh.github.io"
+baseurl: "/BScEHNS-Data-Recovery-and-Advanced-Digital-Forensic-Analysis"
+lang: en-GB
+markdown: kramdown
+kramdown:
+  input: GFM
+  auto_ids: true
+  hard_wrap: false
+  # House rules: no em or en dashes, three dots never the ellipsis character, and command flags such as --verbose must survive.
+  typographic_symbols: { hellip: "...", mdash: "---", ndash: "--" }
+highlighter: rouge
+plugins: []
+exclude:
+  - README.md
+  - LICENSE-CONTENT.md
+  - LICENSE-CODE.md
+  - _templates
+  - lecturer-only
+  - instructor
+  - private
+defaults:
+  - scope: { path: "sessions" }
+    values: { layout: session }

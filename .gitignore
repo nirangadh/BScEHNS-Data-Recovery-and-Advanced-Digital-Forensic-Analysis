@@ -1,0 +1,56 @@
+# PUBLIC REPOSITORY. Everything committed here is public, including its history.
+# Instructor material lives in the private repository, assessment items on the LMS.
+# These rules are a second line of defence, not the first.
+
+# Instructor and assessment material: never here
+lecturer-only/
+lecturer/
+instructor/
+private/
+# (specific names only: a broad pattern such as *marking* would silently drop a demo like s04-d2-watermarking.html)
+*answer-key*
+*ground-truth*
+*marking-scheme*
+*marking-rubric*
+*model-answers*
+*phase-test-paper*
+*viva-probes*
+
+# Evidence and binaries: the portal hosts teaching, never evidence (lab share / LMS)
+*.E01
+*.e01
+*.Ex01
+*.dd
+*.raw
+*.img
+*.mem
+*.vmem
+*.dmp
+*.aff
+*.aff4
+*.ad1
+*.pcap
+*.pcapng
+*.plaso
+*.ova
+*.vmdk
+*.vdi
+*.qcow2
+*.exe
+*.dll
+*.bin
+*.zip
+*.7z
+*.rar
+*.gz
+
+# Documents that should not be published here (textbooks, scanned handouts)
+*.pdf
+
+# Local build and OS files
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+.DS_Store
+Thumbs.db

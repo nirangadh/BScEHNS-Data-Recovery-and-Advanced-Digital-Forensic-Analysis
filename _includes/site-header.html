@@ -1,0 +1,22 @@
+{%- if page.session_code -%}{%- assign s = site.data.module.sessions | where: "code", page.session_code | first -%}{%- endif -%}
+<header class="site-header">
+  <div class="{% if page.wide %}wrap-wide{% else %}wrap{% endif %}">
+    {%- if page.url == "/" %}
+    <p class="eyebrow">{{ site.institution }} | {{ site.school }}</p>
+    {%- else %}
+    <p class="eyebrow"><a href="{{ '/' | relative_url }}">{{ site.module_code }} | {{ site.title }}</a></p>
+    {%- endif %}
+    {%- if s %}
+    <h1>{% if s.n == 0 %}{{ s.title }}{% else %}Session {{ s.n }}: {{ s.title }}{% endif %}</h1>
+    <p class="sub">{% if s.day > 0 %}Day {{ s.day }}, {{ s.slot }} session{% else %}A self-study task to finish before the module starts{% endif %}</p>
+    {%- elsif page.url == "/" %}
+    <h1>{{ site.title }}</h1>
+    <p class="sub">{{ site.module_code }} | {{ site.programme }} | NIBM</p>
+    <p class="sub">Level 6, 20 credits. Coursework 25%, phase test 75%.</p>
+    {%- else %}
+    <h1>{{ page.title }}</h1>
+    {%- if page.subtitle %}<p class="sub">{{ page.subtitle }}</p>{% endif %}
+    {%- endif %}
+    <div class="bars" aria-hidden="true"><i></i><i></i></div>
+  </div>
+</header>

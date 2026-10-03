@@ -1,0 +1,41 @@
+# Module structure - the single source for the portal home page, badges and navigation.
+# Fixed in the planning thread. Session threads never edit this file.
+days:
+  - { n: 1, title: "Foundations and forensic readiness" }
+  - { n: 2, title: "Advanced data recovery and anti-forensics" }
+  - { n: 3, title: "Host depth: Windows and memory" }
+  - { n: 4, title: "Network forensics" }
+  - { n: 5, title: "Malware analysis (defensive, fully isolated)" }
+  - { n: 6, title: "Cloud forensics I: the coursework domain" }
+  - { n: 7, title: "Cloud forensics II and Internet forensics" }
+  - { n: 8, title: "Mobile forensics and reporting" }
+  - { n: 9, title: "Integration and assessment readiness" }
+sessions:
+  - { n: 0, code: "S00", title: "Set up your lab environment", day: 0, slot: "pre", los: [], feeds: [], day_closing: false, url: "/sessions/s00/" }
+  - { n: 1, code: "S01", title: "Forensic readiness and the investigation lifecycle", day: 1, slot: "first", los: [1, 4], feeds: ["CW", "PT"], day_closing: false, url: "/sessions/s01/" }
+  - { n: 2, code: "S02", title: "Storage, file systems and first recoveries", day: 1, slot: "second", los: [1, 2], feeds: ["PT", "CW"], day_closing: true, url: "/sessions/s02/" }
+  - { n: 3, code: "S03", title: "Advanced data recovery and carving", day: 2, slot: "first", los: [1, 2], feeds: ["PT"], day_closing: false, url: "/sessions/s03/" }
+  - { n: 4, code: "S04", title: "Data protection and anti-forensics", day: 2, slot: "second", los: [1, 2], feeds: ["PT", "CW"], day_closing: true, url: "/sessions/s04/" }
+  - { n: 5, code: "S05", title: "Windows artefacts and timelining", day: 3, slot: "first", los: [1, 4], feeds: ["PT", "CW"], day_closing: false, url: "/sessions/s05/" }
+  - { n: 6, code: "S06", title: "Memory forensics", day: 3, slot: "second", los: [1, 2, 5], feeds: ["CW", "PT"], day_closing: true, url: "/sessions/s06/" }
+  - { n: 7, code: "S07", title: "Network evidence and exfiltration", day: 4, slot: "first", los: [1, 2, 5], feeds: ["CW", "PT"], day_closing: false, url: "/sessions/s07/" }
+  - { n: 8, code: "S08", title: "Intrusion detection and log correlation", day: 4, slot: "second", los: [2, 5], feeds: ["CW", "PT"], day_closing: true, url: "/sessions/s08/" }
+  - { n: 9, code: "S09", title: "Malware triage: static analysis", day: 5, slot: "first", los: [1, 2, 5], feeds: ["PT"], day_closing: false, url: "/sessions/s09/" }
+  - { n: 10, code: "S10", title: "Malware triage: behavioural analysis", day: 5, slot: "second", los: [2, 5], feeds: ["PT", "CW"], day_closing: true, url: "/sessions/s10/" }
+  - { n: 11, code: "S11", title: "Cloud forensics: readiness and architecture", day: 6, slot: "first", los: [1, 4, 5], feeds: ["CW"], day_closing: false, url: "/sessions/s11/" }
+  - { n: 12, code: "S12", title: "Cloud forensics: collection and preservation", day: 6, slot: "second", los: [1, 2, 5], feeds: ["CW"], day_closing: true, url: "/sessions/s12/" }
+  - { n: 13, code: "S13", title: "Cloud log analysis and timeline reconstruction", day: 7, slot: "first", los: [2, 4, 5], feeds: ["CW"], day_closing: false, url: "/sessions/s13/" }
+  - { n: 14, code: "S14", title: "Internet-based forensics", day: 7, slot: "second", los: [4, 5], feeds: ["PT", "CW"], day_closing: true, url: "/sessions/s14/" }
+  - { n: 15, code: "S15", title: "Mobile forensics: file systems and examination", day: 8, slot: "first", los: [1, 3], feeds: ["PT"], day_closing: false, url: "/sessions/s15/" }
+  - { n: 16, code: "S16", title: "Mobile app data and professional reporting", day: 8, slot: "second", los: [2, 3, 4], feeds: ["PT", "CW"], day_closing: true, url: "/sessions/s16/" }
+  - { n: 17, code: "S17", title: "End-to-end investigation, ethics and law", day: 9, slot: "first", los: [4, 5], feeds: ["CW", "PT"], day_closing: false, url: "/sessions/s17/" }
+  - { n: 18, code: "S18", title: "Capstone workshop: coursework and viva preparation", day: 9, slot: "second", los: [1, 2, 4, 5], feeds: ["CW"], day_closing: false, url: "/sessions/s18/" }
+los:
+  - { n: 1, text: "Explain the principles of data recovery and data protection techniques in a forensically sound manner in networked and mobile device environments." }
+  - { n: 2, text: "Apply data recovery techniques to forensic investigation in networked and mobile device environments." }
+  - { n: 3, text: "Explain the principles of mobile device file systems and examine mobile devices for data artefacts." }
+  - { n: 4, text: "Apply forensic methodology to digital corporate and crime investigation in an ethical and professional context and employ appropriate technical writing skills in its report presentation." }
+  - { n: 5, text: "Acquire, analyse digital evidence, and determine appropriate incident response procedures on networks and the Internet." }
+feeds:
+  CW: "Coursework"
+  PT: "Phase test"

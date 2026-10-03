@@ -1,0 +1,2 @@
+{%- assign key = include.t -%}{%- assign hit = nil -%}{%- for f in site.data.glossary -%}{%- if f[1][key] -%}{%- assign hit = f[1][key] -%}{%- break -%}{%- endif -%}{%- endfor -%}
+{%- if hit -%}<span class="term" tabindex="0">{{ include.text | default: hit.term }}<span class="term-def" role="tooltip"><b>{{ hit.term }}:</b> {{ hit.def }}</span></span>{%- else -%}<span class="term missing" title="Glossary key not found: {{ key }}">{{ include.text | default: key }}</span>{%- endif -%}

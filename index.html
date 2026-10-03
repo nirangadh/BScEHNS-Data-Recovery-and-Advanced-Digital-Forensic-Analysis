@@ -1,0 +1,62 @@
+---
+layout: default
+wide: true
+description: "Self-study courseware for NB6018CEM Data Recovery and Advanced Digital Forensic Analysis: full session notes, interactive demos and slides for a Level 6 digital forensics module at NIBM."
+---
+<div class="wrap-wide">
+  <img class="hero" src="{{ '/assets/img/hero.svg' | relative_url }}" width="840" height="300" alt="The module as one investigation: the case sits at the centre, linked to the evidence you will learn to examine - disks, memory, network traffic, malware, cloud logs, the web and a phone.">
+  <div>
+    <p class="intro">This site is your courseware for the whole module. Every session has full notes you can study on your own, interactive demos that show how things work inside, and the slides used in class. The notes are written so you can learn from them without a lecture, so use them before class, after class, and when you revise.</p>
+    <ul class="quicklinks">
+      <li><a href="{{ '/how-to-use/' | relative_url }}">How to use this courseware</a></li>
+      <li><a href="{{ '/case/' | relative_url }}">The case</a></li>
+      <li><a href="{{ '/assessment/' | relative_url }}">Assessment</a></li>
+      <li><a href="{{ '/glossary/' | relative_url }}">Words to know</a></li>
+    </ul>
+  </div>
+
+  {%- assign sessions = site.data.module.sessions -%}
+  {%- assign s0 = sessions | where: "n", 0 | first -%}
+  {%- assign p0 = site.pages | where: "session_code", s0.code | first %}
+  <section class="day pre" aria-labelledby="h-pre">
+    <h2 id="h-pre">Before Day 1</h2>
+    <p class="when">Set up your lab environment at home or in the lab before the first session.</p>
+    <div class="slot" data-slot="{{ s0.code }}">
+      <h3>{% if p0 %}<a href="{{ s0.url | relative_url }}">{{ s0.title }}</a>{% else %}{{ s0.title }}{% endif %}<span class="done-mark">Done</span></h3>
+      {%- unless p0 %}<p class="soon">Coming soon.</p>{% endunless %}
+    </div>
+  </section>
+
+  {%- for d in site.data.module.days %}
+  {%- assign ds = sessions | where: "day", d.n %}
+  <section class="day" aria-labelledby="h-day{{ d.n }}">
+    <h2 id="h-day{{ d.n }}">Day {{ d.n }}: {{ d.title }}</h2>
+    <p class="when">Sessions {{ ds[0].n }} and {{ ds[1].n }}{% if ds[1].day_closing %}, with an end-of-day quiz{% endif %}.</p>
+    <div class="cols">
+    {%- for s in ds %}
+      {%- assign p = site.pages | where: "session_code", s.code | first %}
+      <div class="slot" data-slot="{{ s.code }}">
+        <span class="slot-label">{% if s.slot == "first" %}FIRST SESSION{% else %}SECOND SESSION{% endif %}</span>
+        <h3>{% if p %}<a href="{{ s.url | relative_url }}">Session {{ s.n }}: {{ s.title }}</a>{% else %}Session {{ s.n }}: {{ s.title }}{% endif %}<span class="done-mark">Done</span></h3>
+        <div class="meta" style="margin:.3rem 0 0">{% include lo-badges.html los=s.los %}</div>
+        {%- if p %}
+        <ul>
+          <li><a href="{{ s.url | relative_url }}">Notes for Session {{ s.n }}</a></li>
+          {%- for dm in p.demos %}<li><a href="{{ s.url | relative_url }}demos/{{ dm.file }}">{{ dm.id }} {{ dm.title }}</a></li>{% endfor %}
+          {%- if p.slides %}<li><a href="{{ s.url | relative_url }}slides/{{ p.slides }}">Slides (PowerPoint)</a></li>{% endif %}
+        </ul>
+        {%- else %}
+        <p class="soon">Coming soon.</p>
+        {%- endif %}
+      </div>
+    {%- endfor %}
+    </div>
+  </section>
+  {%- endfor %}
+
+  <section class="day" aria-labelledby="h-exam">
+    <h2 id="h-exam">Exam preparation</h2>
+    <p class="when">A one-hour session after Day 9.</p>
+    <p>A practice paper in the format of your phase test, with advice on how to answer for marks. The practice paper and its instructions are issued on the LMS. To prepare, go back over the end-of-day quizzes and the quick checks in each session.</p>
+  </section>
+</div>

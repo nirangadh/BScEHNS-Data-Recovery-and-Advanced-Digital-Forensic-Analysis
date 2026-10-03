@@ -1,0 +1,6 @@
+{%- assign d = page.demos | where: "id", include.id | first -%}
+{%- if d -%}
+<div class="demo-card"><span class="demo-id">{{ d.id }}</span><div><p class="demo-title"><a href="demos/{{ d.file }}">{{ d.title }}</a></p><p class="demo-teaches">{{ d.teaches }}</p></div></div>
+{%- else -%}
+<div class="demo-card"><span class="demo-id">?</span><div><p class="demo-title">Demo not listed in this page's front matter: {{ include.id }}</p></div></div>
+{%- endif -%}

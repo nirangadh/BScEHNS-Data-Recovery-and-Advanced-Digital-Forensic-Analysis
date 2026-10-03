@@ -1,0 +1,24 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{%- if page.session_code -%}{%- assign s = site.data.module.sessions | where: "code", page.session_code | first -%}{%- endif -%}
+{%- capture ptitle -%}{%- if s -%}Session {{ s.n }}: {{ s.title }}{%- elsif page.title -%}{{ page.title }}{%- else -%}{{ site.title }}{%- endif -%}{%- endcapture -%}
+<title>{% if page.url == "/" %}{{ site.title }} ({{ site.module_code }}) | NIBM{% else %}{{ ptitle }} | {{ site.module_code }}{% endif %}</title>
+<meta name="description" content="{{ page.description | default: site.description | strip_html | strip_newlines | escape }}">
+<meta name="author" content="{{ site.lecturer }}">
+<link rel="canonical" href="{{ page.url | absolute_url }}">
+<meta name="theme-color" content="#31423B">
+<link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{ '/assets/img/apple-touch-icon.png' | relative_url }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.module_code }} {{ site.title }}">
+<meta property="og:title" content="{{ ptitle | escape }}">
+<meta property="og:description" content="{{ page.description | default: site.description | strip_html | strip_newlines | escape }}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:image" content="{{ '/assets/img/og-card.png' | absolute_url }}">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ site.title }}, {{ site.module_code }}, National Institute of Business Management">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="{{ '/assets/fonts/open-sans-latin-400-normal.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+<script>document.documentElement.classList.add('js')</script>

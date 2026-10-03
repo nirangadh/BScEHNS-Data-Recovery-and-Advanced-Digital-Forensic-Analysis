@@ -1,0 +1,21 @@
+---
+layout: page
+title: Words to know
+subtitle: Every word the module defines, and where it is first taught.
+description: "Glossary of NB6018CEM terms in plain English, linked to the session that first teaches each one."
+---
+{%- capture rows -%}{%- for f in site.data.glossary -%}{%- for e in f[1] -%}{{ e[1].term | downcase }}@@{{ e[1].term }}@@{{ e[1].def }}@@{{ f[0] }}##{%- endfor -%}{%- endfor -%}{%- endcapture -%}
+{%- assign arr = rows | split: "##" | sort -%}
+<p>Each word has one meaning in this module, the same on every page. The session column shows where the word is first taught: go back there for the full explanation.</p>
+{%- if arr.size == 0 %}
+<p><em>Words are added as each session is published.</em></p>
+{%- else %}
+<table>
+<thead><tr><th scope="col">Word</th><th scope="col">Meaning</th><th scope="col">First taught</th></tr></thead>
+<tbody>
+{%- for r in arr %}{%- assign c = r | split: "@@" -%}{%- if c.size == 4 %}
+<tr><td><strong>{{ c[1] }}</strong></td><td>{{ c[2] }}</td><td><a href="{{ '/sessions/' | append: c[3] | append: '/' | relative_url }}">{{ c[3] | upcase }}</a></td></tr>
+{%- endif %}{%- endfor %}
+</tbody>
+</table>
+{%- endif %}

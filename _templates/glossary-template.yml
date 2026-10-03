@@ -1,0 +1,11 @@
+# _data/glossary/sNN.yml - the words FIRST taught in session NN (rename to the session code, lower case).
+# One file per session; never edit another session's file.
+# Key: lower-case words joined by hyphens. Use it in pages as {% include term.html t="forensic-image" %}.
+# A word already defined by an earlier session is used, never redefined.
+# term: the word as it should appear. def: one plain-English sentence, CEFR B2, no new jargon inside it.
+forensic-image:
+  term: "forensic image"
+  def: "An exact copy of a whole storage device, bit for bit, including deleted data and unused space."
+hash-value:
+  term: "hash value"
+  def: "A short code calculated from data. If even one bit of the data changes, the code changes completely."

@@ -1,0 +1,56 @@
+---
+layout: default
+---
+{%- assign s = site.data.module.sessions | where: "code", page.session_code | first -%}
+{%- assign all = site.data.module.sessions -%}
+<div class="wrap prose">
+  <div class="meta">
+    {% include lo-badges.html los=s.los %}
+    {%- if s.feeds.size > 0 %}<span class="feeds">Helps with: {% for f in s.feeds %}{{ site.data.module.feeds[f] }}{% unless forloop.last %}, {% endunless %}{% endfor %}</span>{% endif %}
+    {%- if s.day_closing %}<span class="tag">End-of-day quiz</span>{% endif %}
+  </div>
+
+  {%- if page.hook %}
+  <div class="case-hook"><span class="label">THE CASE TODAY</span>{{ page.hook | markdownify }}</div>
+  {%- endif %}
+
+  {%- if page.outcomes %}
+  <section class="outcomes" aria-labelledby="h-outcomes"><h2 id="h-outcomes">By the end of this session you will be able to</h2>
+    <ol>{% for o in page.outcomes %}<li>{{ o | markdownify | remove: '<p>' | remove: '</p>' | strip }}</li>{% endfor %}</ol>
+  </section>
+  {%- endif %}
+
+  {%- if page.before %}
+  <section class="before" aria-labelledby="h-before"><h2 id="h-before">Before you start, check that you can</h2>
+    <ul>{% for b in page.before %}<li>{{ b | markdownify | remove: '<p>' | remove: '</p>' | strip }}</li>{% endfor %}</ul>
+  </section>
+  {%- endif %}
+
+  {{ content }}
+
+  <section class="resources" aria-labelledby="h-res">
+    <h2 id="h-res">Everything for this session</h2>
+    <ul>
+      {%- for d in page.demos %}<li><a href="demos/{{ d.file }}">{{ d.id }} {{ d.title }}</a> - {{ d.teaches }}</li>{% endfor %}
+      {%- if page.slides %}<li><a href="slides/{{ page.slides }}">Slides for this session (PowerPoint)</a></li>{% endif %}
+      {%- if page.evidence %}<li>Evidence for the lab: {{ page.evidence | markdownify | remove: '<p>' | remove: '</p>' | strip }}</li>{% endif %}
+    </ul>
+  </section>
+
+  <div class="progress-box">
+    <button class="btn" type="button" data-progress="{{ s.code }}">Mark this session as done</button>
+    <span class="progress-note">Saved only on this device, as a record for you. It never locks or unlocks anything.</span>
+  </div>
+
+  {%- assign prev = nil -%}{%- assign next = nil -%}{%- assign found = false -%}
+  {%- for x in all -%}
+    {%- assign xp = site.pages | where: "session_code", x.code | first -%}
+    {%- if x.code == s.code -%}{%- assign found = true -%}{%- continue -%}{%- endif -%}
+    {%- if xp -%}{%- if found -%}{%- if next == nil -%}{%- assign next = x -%}{%- endif -%}{%- else -%}{%- assign prev = x -%}{%- endif -%}{%- endif -%}
+  {%- endfor %}
+  <nav class="pager" aria-label="Session navigation">
+    <span>{% if prev %}<a href="{{ prev.url | relative_url }}">Previous: {% if prev.n > 0 %}Session {{ prev.n }}{% else %}Before Day 1{% endif %}</a>{% endif %}</span>
+    <span><a href="{{ '/' | relative_url }}">All sessions</a></span>
+    <span>{% if next %}<a href="{{ next.url | relative_url }}">Next: Session {{ next.n }}</a>{% endif %}</span>
+  </nav>
+</div>

@@ -1,0 +1,199 @@
+/* NB6018CEM courseware portal
+   Palette: NB6018_presentation_style.yaml (sage-modern). Contrast follows D27:
+   base sage and plum are decorative or large-text only; small text uses sage-dark / plum-dark.
+   Typeface: Open Sans, self-hosted (SIL OFL 1.1, see assets/fonts/OFL.txt). Never Arial. */
+
+@font-face{font-family:"Open Sans";font-style:normal;font-weight:400;font-display:swap;src:url("../fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-style:italic;font-weight:400;font-display:swap;src:url("../fonts/open-sans-latin-400-italic.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-style:normal;font-weight:600;font-display:swap;src:url("../fonts/open-sans-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-style:italic;font-weight:600;font-display:swap;src:url("../fonts/open-sans-latin-600-italic.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-style:normal;font-weight:700;font-display:swap;src:url("../fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-style:normal;font-weight:800;font-display:swap;src:url("../fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+
+:root{
+  --bg:#F7F8F4; --surface:#E8F0EA; --card:#FFFFFF; --ink:#31423B;
+  --sage:#6E8472; --sage-dark:#4F6356; --sage-surface:#DCE6DE;
+  --plum:#8A4E8F; --plum-dark:#6E3D72; --plum-tint:#F1E8F2; --plum-light:#C9A6CC;
+  --stone:#5C6B63; --hairline:#CBD6CE;
+  --lo1:#627866; --lo2:#4F6356; /* web LO1 is sage darkened to 627866: white text needs 4.5:1 at badge size (D27 web note) */ --lo3:#31423B; --lo4:#8A4E8F; --lo5:#6E3D72;
+  --font:"Open Sans","Segoe UI",Roboto,Calibri,"Helvetica Neue",sans-serif;
+  --mono:Consolas,"Cascadia Mono",Menlo,"DejaVu Sans Mono",monospace;
+  --radius:14px; --measure:46rem;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:1rem}
+body{margin:0;font-family:var(--font);font-size:1.0625rem;line-height:1.65;color:var(--ink);background:var(--bg);-webkit-text-size-adjust:100%}
+img,svg{max-width:100%;height:auto}
+a{color:var(--sage-dark);font-weight:600;text-underline-offset:.18em}
+a:hover{color:var(--plum-dark)}
+:focus-visible{outline:3px solid var(--plum);outline-offset:2px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:0;background:var(--ink);color:#fff;padding:.5rem 1rem;z-index:10}
+.skip:focus{left:1rem}
+.wrap{max-width:var(--measure);margin:0 auto;padding:0 1.1rem}
+.wrap-wide{max-width:60rem;margin:0 auto;padding:0 1.1rem}
+
+/* Header band with the module's signature bars (sage long, plum short) */
+.site-header{background:var(--ink);color:#fff;padding:1.6rem 0 1.4rem}
+.site-header .eyebrow{margin:0;color:var(--surface);font-size:.85rem;font-weight:600;letter-spacing:.04em}
+.site-header .eyebrow a{color:var(--surface);font-weight:600;text-decoration:none}
+.site-header .eyebrow a:hover{text-decoration:underline;color:#fff}
+.site-header h1{margin:.35rem 0 0;font-size:clamp(1.45rem,4vw,2rem);line-height:1.2;font-weight:800}
+.site-header p.sub{margin:.4rem 0 0;color:var(--surface);font-size:.95rem}
+.bars{display:flex;gap:6px;margin-top:.9rem}
+.bars i{display:block;height:6px;border-radius:2px}
+.bars i:first-child{width:56px;background:var(--sage)}
+.bars i:last-child{width:26px;background:var(--plum)}
+
+main{padding:1.6rem 0 3rem}
+.card{background:var(--card);border:1px solid var(--hairline);border-radius:var(--radius);padding:1.25rem 1.4rem;margin:0 0 1rem}
+
+/* Prose */
+.prose h2{font-size:1.45rem;line-height:1.3;margin:2.4rem 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid var(--hairline)}
+.prose h3{font-size:1.15rem;margin:1.6rem 0 .4rem}
+.prose h4{font-size:1rem;margin:1.2rem 0 .3rem;color:var(--sage-dark)}
+.prose p,.prose li{max-width:var(--measure)}
+.prose ul,.prose ol{padding-left:1.3rem}
+.prose li{margin:.25rem 0}
+.prose blockquote{margin:1rem 0;padding:.7rem 1rem;background:var(--surface);border-left:4px solid var(--sage);border-radius:0 10px 10px 0}
+.prose hr{border:0;border-top:1px solid var(--hairline);margin:2rem 0}
+.table-scroll,.prose table{display:block;overflow-x:auto}
+.prose table{border-collapse:collapse;margin:1rem 0;font-size:.95rem;width:max-content;max-width:100%}
+.prose th{background:var(--ink);color:#fff;text-align:left;font-weight:700}
+.prose th,.prose td{padding:.5rem .7rem;border:1px solid var(--hairline);vertical-align:top}
+.prose tr:nth-child(even) td{background:#F2F5F1}
+code{font-family:var(--mono);font-size:.92em;background:var(--surface);padding:.08em .32em;border-radius:5px}
+pre{font-family:var(--mono);font-size:.88rem;line-height:1.5;background:#F2F5F1;border:1px solid var(--hairline);border-radius:10px;padding:.9rem 1rem;overflow-x:auto}
+pre code{background:none;padding:0}
+
+/* Session meta */
+.meta{display:flex;flex-wrap:wrap;gap:.45rem .8rem;align-items:center;margin:.2rem 0 1.2rem;color:var(--stone);font-size:.92rem}
+.badge{display:inline-block;color:#fff;font-weight:700;font-size:.8rem;line-height:1;padding:.38rem .55rem;border-radius:6px;letter-spacing:.02em}
+.badge.lo1{background:var(--lo1)}.badge.lo2{background:var(--lo2)}.badge.lo3{background:var(--lo3)}.badge.lo4{background:var(--lo4)}.badge.lo5{background:var(--lo5)}
+.feeds{font-weight:600;color:var(--stone)}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;color:var(--plum-dark);background:var(--plum-tint);border-radius:999px;padding:.2rem .6rem}
+
+/* The case hook */
+.case-hook{background:var(--card);border:1px solid var(--hairline);border-left:6px solid var(--ink);border-radius:var(--radius);padding:1rem 1.25rem;margin:0 0 1.4rem}
+.case-hook .label{display:block;font-size:.78rem;font-weight:800;letter-spacing:.12em;color:var(--sage-dark);margin-bottom:.25rem}
+.case-hook p{margin:.2rem 0}
+
+/* Box family. Label text is generated so every box reads the same way. */
+.box{border-radius:0 12px 12px 0;padding:.9rem 1.1rem .9rem 1.2rem;margin:1.3rem 0;border-left:5px solid}
+.box>*:first-child{margin-top:0}.box>*:last-child{margin-bottom:0}
+.box::before{display:block;font-size:.78rem;font-weight:800;letter-spacing:.12em;margin-bottom:.35rem}
+.metaphor{background:var(--surface);border-color:var(--sage)}
+.metaphor::before{content:"COMPARISON";color:var(--sage-dark)}
+.lens{background:var(--plum-tint);border-color:var(--plum)}
+.lens::before{content:"THROUGH ANOTHER LENS";color:var(--plum-dark)}
+.key{background:var(--card);border:1px solid var(--hairline);border-left:5px solid var(--ink)}
+.key::before{content:"KEY IDEA";color:var(--ink)}
+.mixups{background:var(--card);border:1px solid var(--hairline);border-left:5px solid var(--sage-dark)}
+.mixups::before{content:"COMMON MIX-UPS";color:var(--sage-dark)}
+.safety{background:var(--plum-tint);border-color:var(--plum-dark)}
+.safety::before{content:"SAFETY RULE";color:var(--plum-dark)}
+.expect{background:#F2F5F1;border-color:var(--sage-dark)}
+.expect::before{content:"YOU SHOULD SEE";color:var(--sage-dark)}
+.trouble{background:var(--card);border:1px dashed var(--hairline);border-left:5px solid var(--stone)}
+.trouble::before{content:"IF SOMETHING IS DIFFERENT";color:var(--stone)}
+.lms{background:var(--card);border:1px solid var(--hairline);border-left:5px solid var(--plum)}
+.lms::before{content:"ON THE LMS";color:var(--plum-dark)}
+
+/* Layer 3: going deeper */
+details{margin:1rem 0}
+details.deeper{background:var(--card);border:1px solid var(--hairline);border-radius:12px;padding:.2rem 1rem}
+details.deeper>summary{cursor:pointer;font-weight:700;color:var(--sage-dark);padding:.6rem 0;list-style-position:outside}
+details.deeper>summary::before{content:"GOING DEEPER  ";font-size:.75rem;letter-spacing:.12em;color:var(--plum-dark)}
+details.deeper[open]>summary{border-bottom:1px solid var(--hairline);margin-bottom:.6rem}
+details.answer{background:#F2F5F1;border-radius:10px;padding:.15rem .9rem;margin:.4rem 0 1.2rem}
+details.answer>summary{cursor:pointer;font-weight:700;color:var(--sage-dark);padding:.45rem 0}
+
+/* Words to know (glossary term). Works with hover, keyboard focus and tap, no script needed. */
+.term{position:relative;border-bottom:2px dotted var(--sage);cursor:help;outline-offset:1px}
+.term .term-def{display:none;position:absolute;left:0;top:calc(100% + 6px);z-index:5;width:min(20rem,80vw);background:var(--ink);color:#fff;font-size:.88rem;font-weight:400;line-height:1.45;padding:.6rem .75rem;border-radius:8px;box-shadow:0 6px 18px rgba(49,66,59,.25)}
+.term:hover .term-def,.term:focus .term-def,.term:focus-within .term-def{display:block}
+/* Phones: a word-anchored box cannot fit, so the meaning opens as a bottom sheet */
+@media (max-width:40rem){.term .term-def{position:fixed;left:.75rem;right:.75rem;bottom:.75rem;top:auto;width:auto;font-size:.95rem;padding:.8rem 1rem}}
+.term .term-def b{color:var(--plum-light)}
+.term.missing{border-bottom-color:#B00020}
+
+/* Quick check (tap-to-answer). Without script the answer shows underneath. */
+.qc{background:var(--card);border:1px solid var(--hairline);border-radius:12px;padding:.9rem 1.1rem;margin:1.3rem 0}
+.qc::before{content:"QUICK CHECK";display:block;font-size:.78rem;font-weight:800;letter-spacing:.12em;color:var(--plum-dark);margin-bottom:.3rem}
+.qc-q{font-weight:700;margin:.1rem 0 .6rem}
+.qc-opts,.prose .qc-opts{list-style:none;padding:0;margin:0;display:grid;gap:.45rem}
+.qc-opts li{margin:0}
+.qc-opts button{width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--hairline);border-radius:9px;padding:.55rem .8rem;cursor:pointer}
+.qc-opts button:hover{border-color:var(--sage)}
+.qc-opts button.right{background:var(--surface);border-color:var(--sage-dark);font-weight:700}
+.qc-opts button.wrong{background:var(--plum-tint);border-color:var(--plum)}
+.qc-feedback{font-weight:700;margin:.6rem 0 0}
+.qc-why{margin-top:.5rem;color:var(--ink)}
+.js .qc-why{display:none}.js .qc.answered .qc-why{display:block}
+.qc-retry{font:inherit;font-size:.9rem;margin-top:.5rem;background:none;border:0;color:var(--sage-dark);font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+.no-js-answer{font-weight:700;color:var(--sage-dark)}.js .no-js-answer{display:none}
+
+/* End-of-day quiz */
+.quiz{background:var(--card);border:1px solid var(--hairline);border-top:6px solid var(--plum);border-radius:var(--radius);padding:1rem 1.3rem;margin:2rem 0}
+.quiz>h2:first-child{margin-top:.4rem;border:0}
+.sa{border-top:1px solid var(--hairline);padding-top:.6rem;margin-top:.8rem}
+
+/* Demo cards */
+.demo-card{display:flex;gap:1rem;align-items:flex-start;background:var(--card);border:1px solid var(--hairline);border-left:5px solid var(--plum);border-radius:0 12px 12px 0;padding:.85rem 1.1rem;margin:1.3rem 0}
+.demo-card .demo-id{flex:none;font-weight:800;font-size:.8rem;letter-spacing:.06em;color:#fff;background:var(--plum-dark);border-radius:6px;padding:.35rem .5rem;margin-top:.15rem}
+.demo-card p{margin:.15rem 0}
+.demo-card .demo-title{font-weight:700}
+.demo-card .demo-teaches{color:var(--stone);font-size:.95rem}
+
+/* Lists of outcomes / prerequisites */
+.outcomes,.before{background:var(--card);border:1px solid var(--hairline);border-radius:var(--radius);padding:.9rem 1.3rem;margin:0 0 1rem}
+.outcomes h2,.before h2{font-size:1rem;margin:0 0 .3rem;border:0;padding:0;letter-spacing:.02em}
+.outcomes ol,.before ul{margin:.2rem 0;padding-left:1.25rem}
+
+/* Session end: resources, progress, navigation */
+.resources{margin-top:2.4rem}
+.progress-box{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;background:var(--surface);border-radius:var(--radius);padding:1rem 1.2rem;margin:2rem 0 1rem}
+.btn{font:inherit;font-weight:700;color:#fff;background:var(--sage-dark);border:0;border-radius:9px;padding:.6rem 1rem;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.done{background:var(--plum-dark)}
+.progress-note{font-size:.88rem;color:var(--stone)}
+.pager{display:flex;justify-content:space-between;gap:1rem;margin-top:1.5rem;font-size:.95rem}
+.pager a{max-width:48%}
+
+/* Home page */
+.hero{display:block;margin:0 auto 1.2rem;max-width:52rem;width:100%}
+.intro{font-size:1.05rem;max-width:var(--measure)}
+.quicklinks{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0 1.6rem;padding:0;list-style:none}
+.quicklinks a{display:inline-block;background:var(--card);border:1px solid var(--hairline);border-radius:999px;padding:.45rem .95rem;text-decoration:none}
+.quicklinks a:hover{border-color:var(--sage-dark)}
+.day{background:var(--card);border:1px solid var(--hairline);border-radius:var(--radius);padding:1.1rem 1.3rem;margin:0 0 1rem}
+.day h2{margin:0;font-size:1.2rem}
+.day .when{margin:.15rem 0 .8rem;color:var(--stone);font-size:.9rem}
+.cols{display:grid;gap:1rem}
+@media (min-width:44rem){.cols{grid-template-columns:1fr 1fr}}
+.slot h3{margin:0 0 .3rem;font-size:1rem;line-height:1.35}
+.slot .slot-label{display:block;font-size:.75rem;font-weight:800;letter-spacing:.1em;color:var(--plum-dark)}
+.slot ul{margin:.4rem 0 0;padding-left:1.1rem;font-size:.95rem}
+.slot .soon{color:var(--stone);font-style:italic;font-size:.92rem;margin:.4rem 0 0}
+.slot .done-mark{display:none;font-size:.8rem;font-weight:700;color:var(--sage-dark);margin-left:.3rem}
+.slot.is-done .done-mark{display:inline}
+.pre{border-style:dashed}
+
+/* Footer */
+.site-footer{border-top:1px solid var(--hairline);color:var(--stone);font-size:.85rem;padding:1.4rem 0 2.2rem;text-align:center}
+.site-footer p{margin:.25rem 0}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* Print: grayscale, everything expanded, no interface (keeps the intent of D16) */
+@media print{
+  html{filter:grayscale(1)}
+  body{background:#fff;font-size:11pt;color:#000}
+  .site-header{background:#fff;color:#000;border-bottom:2px solid #000;padding:.5rem 0}
+  .site-header .eyebrow,.site-header .eyebrow a,.site-header p.sub{color:#333}
+  .bars,.skip,.progress-box,.pager,.qc-opts,.qc-retry,.quicklinks{display:none!important}
+  .qc-why,.js .qc-why{display:block!important}.no-js-answer,.js .no-js-answer{display:inline!important}
+  .term .term-def{display:none}
+  a{color:#000;text-decoration:underline}
+  .card,.day,.box,.qc,.quiz,details.deeper,.demo-card,.case-hook{break-inside:avoid;border-color:#999}
+  .prose th{background:#ddd;color:#000}
+}
