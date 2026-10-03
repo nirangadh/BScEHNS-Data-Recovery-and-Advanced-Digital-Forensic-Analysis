@@ -1,0 +1,90 @@
+# _data/glossary/s01.yml - the words first taught in Session 1 (forensic readiness and the investigation lifecycle).
+# Evidence handling
+digital-evidence:
+  term: "digital evidence"
+  def: "Information stored or sent in digital form that can help to show what happened in a case."
+forensically-sound:
+  term: "forensically sound"
+  def: "Collected and handled in a way that keeps the evidence unchanged and lets another person check every step."
+forensic-image:
+  term: "forensic image"
+  def: "An exact copy of a whole storage device, bit for bit, including deleted data and unused space."
+acquisition:
+  term: "acquisition"
+  def: "The act of making a forensic image of a device, or of collecting other digital evidence."
+working-copy:
+  term: "working copy"
+  def: "A checked copy of a forensic image that the examiner uses for the examination, so that the first image stays untouched."
+write-blocker:
+  term: "write blocker"
+  def: "A device or program that lets a computer read a storage device but stops it from writing anything to it."
+hash-value:
+  term: "hash value"
+  def: "A short code calculated from data, which changes completely if even one bit of the data changes."
+hash-algorithm:
+  term: "hash algorithm"
+  def: "The fixed method, such as SHA-256, that calculates a hash value from data."
+verification:
+  term: "verification"
+  def: "Calculating a hash value again and comparing it with the recorded value, to show that the data has not changed."
+chain-of-custody:
+  term: "chain of custody"
+  def: "The unbroken history of who held an item of evidence, when, where and why, from collection to court."
+custody-record:
+  term: "custody record"
+  def: "The document in which each person who receives, uses or hands over an item of evidence writes it down at that moment."
+evidence-register:
+  term: "evidence register"
+  def: "The unit's list of every item of evidence in a case, with its identifier, description and recorded hash values."
+# The investigation and response lifecycle
+digital-forensics:
+  term: "digital forensics"
+  def: "The work of finding, collecting and studying digital evidence so that the results can be trusted in an investigation or in court."
+dfir:
+  term: "DFIR"
+  def: "Digital forensics and incident response working together, so that an attack is both stopped and understood."
+collection:
+  term: "collection"
+  def: "The first forensic stage: finding, labelling and copying data while keeping it unchanged."
+examination:
+  term: "examination"
+  def: "The second forensic stage: processing the collected data with tools to pull out the parts that matter to the case."
+analysis:
+  term: "analysis"
+  def: "The third forensic stage: studying the examined data to answer the questions of the case and reach conclusions."
+reporting:
+  term: "reporting"
+  def: "The fourth forensic stage: presenting the findings, the methods and their limits in a form the reader can act on."
+incident:
+  term: "incident"
+  def: "An event that harms, or threatens to harm, the security of an organisation's systems or data."
+incident-response:
+  term: "incident response"
+  def: "The organised work of detecting an incident, limiting the damage, removing the cause and learning from it."
+containment:
+  term: "containment"
+  def: "Action that stops an incident from spreading or doing more damage."
+eradication:
+  term: "eradication"
+  def: "Removing the cause of an incident, such as malware or an attacker's account, from the affected systems."
+system-recovery:
+  term: "system recovery"
+  def: "Returning affected systems to normal, trusted operation after an incident."
+post-incident-activity:
+  term: "post-incident activity"
+  def: "The review after an incident that finds what went wrong, what worked and what must change."
+lessons-learned:
+  term: "lessons learned"
+  def: "The agreed findings of a post-incident review, written down with actions to improve."
+playbook:
+  term: "playbook"
+  def: "A written step-by-step plan for handling one type of incident."
+csf-function:
+  term: "CSF Function"
+  def: "One of the six top-level groups of activity in the NIST Cybersecurity Framework 2.0: Govern, Identify, Protect, Detect, Respond and Recover."
+disaster-recovery:
+  term: "disaster recovery"
+  def: "The plan and the work to restore IT services after a major disruption of any cause, such as fire, flood or hardware failure."
+forensic-readiness:
+  term: "forensic readiness"
+  def: "An organisation's ability to collect trustworthy digital evidence quickly and at low cost when an incident happens."

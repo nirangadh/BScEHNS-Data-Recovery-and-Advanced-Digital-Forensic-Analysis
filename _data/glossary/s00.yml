@@ -1,0 +1,25 @@
+# _data/glossary/s00.yml - the words first taught in Session 0 (set up your lab environment).
+host-machine:
+  term: "host machine"
+  def: "The real computer that runs your virtual machines."
+virtual-machine:
+  term: "virtual machine"
+  def: "A complete computer made of software, which runs in a window on your real computer."
+hypervisor:
+  term: "hypervisor"
+  def: "The program, such as VirtualBox, that creates and runs virtual machines."
+snapshot:
+  term: "snapshot"
+  def: "A saved state of a virtual machine that you can return to later."
+ova-file:
+  term: "OVA file"
+  def: "A single file that holds a ready-made virtual machine, which a hypervisor can import."
+nat-network:
+  term: "NAT network"
+  def: "A network setting that lets a virtual machine reach the internet through the host machine."
+isolated-network:
+  term: "isolated network"
+  def: "A network setting that lets chosen virtual machines talk only to each other, with no path to the internet."
+lab-share:
+  term: "lab share"
+  def: "The shared folder on the lab network where the lecturer places evidence files and other large files."
