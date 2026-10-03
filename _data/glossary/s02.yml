@@ -1,0 +1,86 @@
+# _data/glossary/s02.yml - the words first taught in Session 2 (storage, file systems and first recoveries).
+# The disk and its map
+sector:
+  term: "sector"
+  def: "The smallest numbered block of a storage device, usually 512 bytes."
+partition:
+  term: "partition"
+  def: "A continuous range of sectors on a disk that is set aside to be used as one separate area."
+partition-table:
+  term: "partition table"
+  def: "The small list near the start of a disk that records where each partition begins and how large it is."
+mbr:
+  term: "MBR"
+  def: "The Master Boot Record: the older kind of partition table, kept in the first sector of the disk, with room for four partitions."
+gpt:
+  term: "GPT"
+  def: "The GUID Partition Table: the newer kind of partition table, which allows many partitions and very large disks, and keeps a second copy of itself at the end of the disk."
+volume:
+  term: "volume"
+  def: "A partition that holds a file system, which the operating system shows to the user as a drive."
+unpartitioned-space:
+  term: "unpartitioned space"
+  def: "Sectors on a disk that no entry in the partition table covers."
+# The file system
+file-system:
+  term: "file system"
+  def: "The method and the records that a volume uses to keep track of files: their names, their dates and the places where their content is stored."
+cluster:
+  term: "cluster"
+  def: "A fixed group of sectors that a file system gives out as one unit of storage."
+metadata:
+  term: "metadata"
+  def: "The information about a file, such as its name, size, dates and location, as opposed to its content."
+allocated:
+  term: "allocated"
+  def: "Marked by the file system as in use by a current file."
+unallocated-space:
+  term: "unallocated space"
+  def: "The clusters of a volume that the file system has marked as free, which may still hold old data."
+directory-entry:
+  term: "directory entry"
+  def: "The record inside a folder that holds the name of one file and points to where the rest of its information is."
+file-allocation-table:
+  term: "file allocation table"
+  def: "The table in a FAT file system that has one entry for each cluster and links the clusters of each file into a chain."
+master-file-table:
+  term: "master file table"
+  def: "The main table of an NTFS file system, which holds one record for every file and folder on the volume."
+inode:
+  term: "inode"
+  def: "The record in an ext file system that holds everything about one file except its name: its size, its dates and where its content is."
+# Deletion and recovery
+data-recovery:
+  term: "data recovery"
+  def: "Getting data back from storage after it was deleted, lost or damaged."
+quick-format:
+  term: "quick format"
+  def: "A format that writes a new, empty set of file system records and does not clear the area where the content is stored."
+orphan-file:
+  term: "orphan file"
+  def: "A deleted file whose own record still exists but whose folder can no longer be found."
+file-slack:
+  term: "file slack"
+  def: "The space between the end of a file and the end of the last cluster given to that file."
+ram-slack:
+  term: "RAM slack"
+  def: "The first part of file slack, from the end of the file to the end of the sector in which the file ends."
+drive-slack:
+  term: "drive slack"
+  def: "The second part of file slack: the whole sectors that remain in the last cluster after the sector in which the file ends."
+overwrite:
+  term: "overwrite"
+  def: "To store new data in the same place as old data, so that the old data no longer exists there."
+solid-state-drive:
+  term: "solid-state drive"
+  def: "A storage device, often called an SSD, that keeps data in memory chips and has no moving parts."
+trim:
+  term: "TRIM"
+  def: "The command with which an operating system tells a solid-state drive which blocks are no longer in use, so that the drive can clear them."
+# The lab
+ingest:
+  term: "ingest"
+  def: "The step in which a forensic tool reads a data source and runs its chosen modules over every file."
+hash-set:
+  term: "hash set"
+  def: "A list of hash values of known files, which a tool compares with the hash value of every file it reads."

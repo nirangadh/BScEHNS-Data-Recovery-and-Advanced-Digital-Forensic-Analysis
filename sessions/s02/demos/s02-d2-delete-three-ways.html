@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- NB6018CEM demo S02-D2. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     One file, no external scripts, works offline. One mechanism; keyboard operable; respects reduced motion. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S02-D2 Delete one file in FAT, NTFS and ext4 | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+
+.fsname{display:inline-block;background:var(--ink);color:#fff;font-weight:800;border-radius:8px;padding:.25rem .7rem;margin-bottom:.7rem}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.5rem;margin-bottom:1rem}
+.field{border:2px solid var(--hairline);border-radius:10px;padding:.5rem .6rem;background:#fff;transition:background .25s,border-color .25s}
+.field .k{font-size:.72rem;font-weight:800;letter-spacing:.06em;color:var(--stone)}
+.field .v{font-family:var(--mono);font-size:.92rem;word-break:break-word}
+.field.changed{border-color:var(--plum);background:var(--plum-tint)}
+.field.changed .k::after{content:"  CHANGED";color:var(--plum-dark)}
+.field.kept{border-color:var(--sage-dark);background:var(--surface)}
+.clusters{display:flex;gap:.5rem;flex-wrap:wrap}
+.clu{flex:1 1 7rem;border:2px solid var(--sage-dark);border-radius:10px;padding:.6rem;text-align:center;background:var(--surface)}
+.clu b{display:block;font-family:var(--mono)}.clu span{font-size:.8rem}
+.clu.free{border-style:dashed}
+.sum{width:100%;border-collapse:collapse;font-size:.88rem}
+.sum th,.sum td{border:1px solid var(--hairline);padding:.4rem .5rem;text-align:left;vertical-align:top}
+.sum th{background:var(--ink);color:#fff}
+
+.tryit{border:1px solid var(--hairline);border-radius:12px;background:#fff;padding:.8rem 1rem;margin:0 0 1rem}
+.tryit[hidden]{display:none}
+.tryit label{display:block;font-weight:700;margin-bottom:.4rem}
+.tryit input[type=range]{width:100%;accent-color:var(--plum)}
+.tryit input[type=range]:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.lbl{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--stone);margin:.2rem 0 .35rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 2 notes</a>
+  <h1>S02-D2: Delete one file in FAT, NTFS and ext4</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> deletion rewrites a few fields in the index, different ones in each file system, while the clusters keep their content.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div id="one">
+      <span class="fsname" id="fsname"></span>
+      <p class="lbl">THE INDEX</p>
+      <div class="fields" id="fields"></div>
+      <p class="lbl">THE STORAGE AREA</p>
+      <div class="clusters" id="clusters"></div>
+    </div>
+    <table class="sum" id="sum" hidden><thead><tr><th>After deletion</th><th>FAT32</th><th>NTFS</th><th>ext4</th></tr></thead><tbody>
+      <tr><td>Name</td><td>Kept, first character lost</td><td>Kept</td><td>Kept for a while</td></tr>
+      <tr><td>Size and dates</td><td>Kept</td><td>Kept</td><td>Dates kept</td></tr>
+      <tr><td>Where the content is</td><td>First cluster only</td><td>The full list of runs</td><td>Cleared</td></tr>
+      <tr><td>The content</td><td>Unchanged</td><td>Unchanged</td><td>Unchanged</td></tr>
+    </tbody></table>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The same file was deleted three times. Each file system changed a few small fields in its index and marked three clusters as free. None of them touched the content. That is why deletion takes a moment, however large the file is.</p>
+    <p>The fields that each file system keeps decide how recovery starts. NTFS keeps the full list of runs, so a tool can follow it. FAT32 keeps only the first cluster, so a tool must assume that the file was stored in one run. ext4 clears the list, so a tool must look in the journal or search the unallocated space. In every case the content waits in unallocated space until something else is written there.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+
+  var C=["Cluster 500","Cluster 501","Cluster 502"], T=["Proposal, part 1","Proposal, part 2","Proposal, part 3"];
+  function F(k,v,m){ return {k:k,v:v,m:m||""}; }
+  var STEPS = [
+    { caption: "A file called PROPOSAL.DOC, 10,000 bytes long, is stored in clusters 500, 501 and 502 of a FAT32 volume. The directory entry holds the name, the size and the first cluster. The file allocation table links the three clusters into a chain.",
+      state: { fs:"FAT32: before deletion", free:false, f:[F("Directory entry: name","PROPOSAL.DOC"),F("Directory entry: size","10,000"),F("Directory entry: first cluster","500"),F("Table entry 500","next is 501"),F("Table entry 501","next is 502"),F("Table entry 502","end of file")] } },
+    { caption: "The user deletes the file. FAT32 changes four small things. The first byte of the name becomes the deletion mark E5. The three table entries become 0, which means free. The size and the first cluster stay. The three clusters still hold the proposal.",
+      state: { fs:"FAT32: after deletion", free:true, f:[F("Directory entry: name","?ROPOSAL.DOC","c"),F("Directory entry: size","10,000","k"),F("Directory entry: first cluster","500","k"),F("Table entry 500","0 (free)","c"),F("Table entry 501","0 (free)","c"),F("Table entry 502","0 (free)","c")] } },
+    { caption: "Now the same file on an NTFS volume. One record in the master file table holds the name, the size, the dates and the list of runs. A separate bitmap marks clusters 500 to 502 as in use.",
+      state: { fs:"NTFS: before deletion", free:false, f:[F("MFT record: in use","yes"),F("MFT record: name","Proposal.doc"),F("MFT record: size","10,000"),F("MFT record: runs","start 500, length 3"),F("Bitmap: 500 to 502","1 1 1 (in use)")] } },
+    { caption: "The user deletes the file. NTFS clears the in-use flag of the record and clears three bits in the bitmap. The name, the size, the dates and the full list of runs stay in the record. The three clusters still hold the proposal.",
+      state: { fs:"NTFS: after deletion", free:true, f:[F("MFT record: in use","no","c"),F("MFT record: name","Proposal.doc","k"),F("MFT record: size","10,000","k"),F("MFT record: runs","start 500, length 3","k"),F("Bitmap: 500 to 502","0 0 0 (free)","c")] } },
+    { caption: "Now the same file on an ext4 volume. The directory entry holds only the name and the number of an inode. The inode holds the size, the dates and the range of blocks. ext4 calls a cluster a block.",
+      state: { fs:"ext4: before deletion", free:false, f:[F("Directory entry","proposal.doc, inode 1234"),F("Inode 1234: size","10,000"),F("Inode 1234: range","start 500, length 3"),F("Inode 1234: deletion time","none"),F("Bitmap: 500 to 502","1 1 1 (in use)")] } },
+    { caption: "The user deletes the file. ext4 clears the range in the inode and writes a deletion time. It clears the bitmap bits and makes the folder skip over the name. The name is still readable for a while, but nothing says where the content is. The three blocks still hold the proposal.",
+      state: { fs:"ext4: after deletion", free:true, f:[F("Directory entry","skipped: proposal.doc","c"),F("Inode 1234: size","0","c"),F("Inode 1234: range","cleared","c"),F("Inode 1234: deletion time","written","c"),F("Bitmap: 500 to 502","0 0 0 (free)","c")] } },
+    { caption: "Compare the three results. The content is unchanged in all of them. What differs is how much the index still says about where the content is. Read what you just saw below.", state: { summary:true } }
+  ];
+  function render(st){
+    var one=document.getElementById("one"), sum=document.getElementById("sum");
+    one.hidden=!!st.summary; sum.hidden=!st.summary; if(st.summary){ return; }
+    document.getElementById("fsname").textContent=st.fs;
+    var fl=document.getElementById("fields"); fl.innerHTML="";
+    st.f.forEach(function(x){ var d=document.createElement("div"); d.className="field"+(x.m==="c"?" changed":x.m==="k"?" kept":""); d.innerHTML='<div class="k"></div><div class="v"></div>'; d.children[0].textContent=x.k; d.children[1].textContent=x.v; fl.appendChild(d); });
+    var cl=document.getElementById("clusters"); cl.innerHTML="";
+    C.forEach(function(n,k){ var d=document.createElement("div"); d.className="clu"+(st.free?" free":""); d.innerHTML="<b></b><span></span><br><span></span>"; d.children[0].textContent=n; d.children[1].textContent=T[k]; d.children[3].textContent=st.free?"unallocated, content unchanged":"allocated"; cl.appendChild(d); });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

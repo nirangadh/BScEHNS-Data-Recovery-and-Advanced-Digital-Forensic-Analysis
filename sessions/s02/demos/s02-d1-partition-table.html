@@ -1,0 +1,166 @@
+<!doctype html>
+<!-- NB6018CEM demo S02-D1. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     One file, no external scripts, works offline. One mechanism; keyboard operable; respects reduced motion. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S02-D1 Reading a partition table | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+
+.ptable{width:100%;border-collapse:collapse;font-size:.9rem;margin-bottom:1rem}
+.ptable th,.ptable td{border:1px solid var(--hairline);padding:.35rem .5rem;text-align:left}
+.ptable th{background:var(--ink);color:#fff;font-size:.8rem}
+.ptable td{font-family:var(--mono)}
+.ptable tr.unread td{color:transparent;background:#f1f3ef}
+.ptable tr.active td{background:var(--plum-tint);outline:2px solid var(--plum)}
+.ptable tr.removed td{color:var(--stone);text-decoration:line-through;background:#fff}
+.strip{display:flex;gap:3px}
+@media (max-width:640px){.strip{flex-direction:column}.seg{min-height:0!important;flex:0 0 auto!important}}
+.seg{border:2px solid var(--hairline);border-radius:8px;padding:.5rem .35rem;text-align:center;font-size:.78rem;min-height:5.2rem;display:flex;flex-direction:column;justify-content:center;transition:background .25s,border-color .25s}
+.seg b{display:block;font-size:.82rem}.seg span{font-family:var(--mono);font-size:.72rem}
+.seg.unknown{background:#f1f3ef;color:var(--stone)}
+.seg.part{background:var(--surface);border-color:var(--sage-dark)}
+.seg.active{background:var(--plum-tint);border-color:var(--plum)}
+.seg.gap{background:#fff;border-style:dashed;border-color:var(--stone)}
+.seg.lost{background:repeating-linear-gradient(45deg,var(--surface),var(--surface) 8px,#fff 8px,#fff 16px);border-style:dashed;border-color:var(--plum)}
+.scale{font-size:.78rem;color:var(--stone);margin:.4rem 0 0}
+
+.tryit{border:1px solid var(--hairline);border-radius:12px;background:#fff;padding:.8rem 1rem;margin:0 0 1rem}
+.tryit[hidden]{display:none}
+.tryit label{display:block;font-weight:700;margin-bottom:.4rem}
+.tryit input[type=range]{width:100%;accent-color:var(--plum)}
+.tryit input[type=range]:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.lbl{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--stone);margin:.2rem 0 .35rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 2 notes</a>
+  <h1>S02-D1: Reading a partition table</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a partition table is a small map of sector ranges. Removing an entry changes the map, and leaves every sector as it was.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl">SECTOR 0: THE PARTITION TABLE (MBR)</p>
+    <table class="ptable"><thead><tr><th>Entry</th><th>Type</th><th>First sector</th><th>Number of sectors</th></tr></thead>
+    <tbody id="rows"></tbody></table>
+    <p class="lbl">THE DISK: 41,943,040 SECTORS</p>
+    <div class="strip" id="strip"></div>
+    <p class="scale">The strip is not drawn to scale.</p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The partition table is a few bytes in one sector. It lists ranges of sectors, and the operating system believes it completely. When an entry is removed, the operating system stops showing that range, but not one sector inside the range changes.</p>
+    <p>For the investigation this means two things. Sectors that the table does not cover, at the start, at the end or in the middle of a disk, must be examined and not assumed empty. And a volume that has "disappeared" can often be found again, because its file system still starts where it always did. Session 3 shows the tool that does this.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+
+  var ENT=[["1","07 (NTFS)","2,048","204,800"],["2","07 (NTFS)","206,848","41,734,144"],["3","00 (empty)","0","0"],["4","00 (empty)","0","0"]];
+  var SEG=[{f:1,t:"Sectors 0 to 2,047",s:"1 MB"},{f:2,t:"Sectors 2,048 to 206,847",s:"100 MB"},{f:6,t:"Sectors 206,848 to 41,940,991",s:"19.9 GB"},{f:1,t:"Sectors 41,940,992 to 41,943,039",s:"1 MB"}];
+  var STEPS = [
+    { caption: "This is the disk of the suspect's computer: one long row of 41,943,040 sectors. Before the tool reads anything, it knows nothing about how the row is used.", state: { read:false, lit:[], active:0, removed:false, found:false } },
+    { caption: "The tool reads sector 0. This disk uses an MBR, so the sector holds four partition entries. Two are filled and two are empty. Each filled entry gives a type, a first sector and a number of sectors.", state: { read:true, lit:[], active:0, removed:false } },
+    { caption: "Entry 1 says: start at sector 2,048 and continue for 204,800 sectors. That range is partition 1, a small NTFS volume of 100 MB that Windows uses to start.", state: { read:true, lit:[1], active:1, removed:false } },
+    { caption: "Entry 2 says: start at sector 206,848 and continue for 41,734,144 sectors. That range is partition 2, the suspect's C: drive, 19.9 GB.", state: { read:true, lit:[1,2], active:2, removed:false } },
+    { caption: "Two ranges are left over: 2,048 sectors at the start, which include the table itself, and 2,048 sectors at the end. No entry covers them. They are unpartitioned space. They are on the disk and in the image, but the operating system never shows them.", state: { read:true, lit:[1,2], active:0, gaps:true, removed:false } },
+    { caption: "Now suppose someone removes entry 2 from the table. Only 16 bytes in sector 0 change. The operating system now shows 19.9 GB of this disk as empty space.", state: { read:true, lit:[1], active:2, gaps:true, removed:true } },
+    { caption: "Look at the sectors of the old partition 2. Nothing in them has changed. The NTFS file system still begins at sector 206,848, with every file in place. Only the map has lost them.", state: { read:true, lit:[1], active:0, gaps:true, removed:true, stress:true } },
+    { caption: "An examiner's tool searches the unpartitioned space for the start of a file system. It finds one at sector 206,848, and the volume can be read again. Read what you just saw below.", state: { read:true, lit:[1,2], active:0, gaps:true, removed:true, found:true } }
+  ];
+  function render(st){
+    var rows=document.getElementById("rows"); rows.innerHTML="";
+    ENT.forEach(function(e,k){
+      var tr=document.createElement("tr"), n=k+1;
+      if(!st.read){ tr.className="unread"; }
+      else if(st.removed && n===2){ tr.className="removed"; }
+      if(st.read && st.active===n && !(st.removed&&n===2&&!st.active)){ tr.className+=(tr.className?" ":"")+"active"; }
+      e.forEach(function(v){ var td=document.createElement("td"); td.textContent=v; tr.appendChild(td); });
+      rows.appendChild(tr);
+    });
+    var strip=document.getElementById("strip"); strip.innerHTML="";
+    SEG.forEach(function(g,k){
+      var d=document.createElement("div"), cls="seg", name="Not read yet";
+      if(k===1||k===2){
+        var n=k; 
+        if(st.lit.indexOf(n)!==-1){ cls+=" part"; name="Partition "+n+(st.found&&n===2?" (found again)":""); if(st.active===n){cls+=" active";} }
+        else if(st.removed&&n===2){ cls+=" lost"; name=st.stress?"Not on the map. Content unchanged":"Shown as empty"; }
+        else { cls+=" unknown"; }
+      } else {
+        if(st.gaps){ cls+=" gap"; name="Unpartitioned"; } else { cls+=" unknown"; if(st.read&&k===0){name="Sector 0 is here";} }
+      }
+      d.className=cls; d.style.flex=g.f+" 1 0";
+      d.innerHTML="<b></b><span></span><span></span>"; d.children[0].textContent=name; d.children[1].textContent=g.t; d.children[2].textContent=g.s;
+      strip.appendChild(d);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
