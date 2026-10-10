@@ -1,0 +1,352 @@
+<!doctype html>
+<!-- NB6018CEM demo S05-D4. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S05-D4 Merge, sort, filter: what a super-timeline buries | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+table.t{border-collapse:collapse;width:100%;font-size:.92rem}
+table.t th,table.t td{border:1px solid var(--hairline);padding:.4rem .5rem;text-align:left;vertical-align:top}
+table.t th{background:var(--ink);color:#fff;font-weight:700}
+tr.hot td{background:var(--plum-tint);box-shadow:inset 4px 0 0 var(--plum)}
+tr.ok td{background:var(--surface)}
+tr.gone td{color:#8a958e;text-decoration:line-through}
+.note{font-size:.85rem;color:var(--stone);margin:.6rem 0 0}
+.pill{display:inline-block;border-radius:999px;padding:.1rem .6rem;font-size:.8rem;font-weight:700;border:1px solid var(--sage-dark);color:var(--sage-dark);background:#fff}
+.pill.local{border-color:var(--plum-dark);color:var(--plum-dark);background:var(--plum-tint)}
+.flag{font-weight:800;color:var(--plum-dark)}
+
+.srcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.4rem;margin-bottom:.7rem}
+.src{border:1px solid var(--hairline);border-radius:8px;padding:.35rem .5rem;font-size:.82rem;background:#fff}
+.src b{display:block;font-family:var(--mono);font-size:.95rem}
+.src.merged{background:var(--surface);border-color:var(--sage-dark)}
+.count{display:block}
+.big{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem;margin:.2rem 0 .6rem}
+.big b{font-family:var(--mono);font-size:1.7rem;color:var(--plum-dark)}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 .6rem;min-height:1.6rem}
+tr.hid td{color:#8a958e;background:#f3f3f1}
+tr.hid td:first-child::after{content:" (hidden by the filter)";font-family:var(--font);font-size:.78rem}
+td.time{font-family:var(--mono);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 5 notes</a>
+  <h1>S05-D4: Merge, sort, filter: what a super-timeline buries</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> merging every source gives the order of events and a flood of rows, and the filter that removes the flood can also remove an event that matters.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+<div class="srcs" id="srcs"></div>
+    <div class="big"><span>Rows in view:</span> <b id="n"></b></div>
+    <div class="chips" id="chips"></div>
+    <table class="t" id="tbl"><thead><tr><th>Time (UTC)</th><th>Artefact</th><th>Description</th></tr></thead><tbody id="rows"></tbody></table>
+    <p class="note">The five rows are real events of 24 March 2015 in the case. The row counts are invented for this demo, to show the proportions.</p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Merging and sorting gave what no single artefact could: the order of events across sources. It also gave 146,560 rows, and the events that mattered were five of them. Filtering made the list readable, and one careless filter removed the most important row without any warning. This is what a super-timeline adds and what it buries: use it to find the order, record every filter, and confirm each row that you rely on in the artefact behind it.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var STEPS = [
+    {
+      "caption": "Seven kinds of record from one computer, each in its own file and its own format. Each box shows how many dated events that source holds. Read separately, they are seven short stories that never meet.",
+      "state": {
+        "merged": false,
+        "n": "",
+        "chips": [],
+        "show": [],
+        "hid": [],
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "caption": "Merge. The tool reads every source, normalises each time to UTC and puts all events into one list: 146,560 rows. Nothing is in order yet, and no person can read this many rows.",
+      "state": {
+        "merged": true,
+        "n": "146,560",
+        "chips": [
+          "merged, not sorted"
+        ],
+        "show": [
+          3,
+          0,
+          4,
+          2,
+          1
+        ],
+        "hid": [],
+        "order": [
+          3,
+          0,
+          4,
+          2,
+          1
+        ]
+      }
+    },
+    {
+      "caption": "Sort by time. Now events from different sources stand side by side in the order in which they happened. This is what a super-timeline adds: the order across sources. The list is still 146,560 rows long.",
+      "state": {
+        "merged": true,
+        "n": "146,560",
+        "chips": [
+          "sorted by time"
+        ],
+        "show": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "hid": [],
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "caption": "Filter to one day, 24 March. 18,300 rows remain. Most of them are Windows at work: services, updates, the system reading its own files. The five rows that matter are in there, among thousands that do not.",
+      "state": {
+        "merged": true,
+        "n": "18,300",
+        "chips": [
+          "sorted by time",
+          "day = 24 March"
+        ],
+        "show": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "hid": [],
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "caption": "Filter to a window of twenty minutes around an anchor, the connection of the stick. 240 rows remain, and a person can read them all. The story is visible: two renames, the stick, a folder on it, a file opened from it.",
+      "state": {
+        "merged": true,
+        "n": "240",
+        "chips": [
+          "sorted by time",
+          "13:45 to 14:05"
+        ],
+        "show": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "hid": [],
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "caption": "Now a tempting shortcut: filter for the word Secret. Only 12 rows remain. But look at the third row. The connection of the stick names a device, not a folder, so the filter removed it, and the list no longer shows how the files left.",
+      "state": {
+        "merged": true,
+        "n": "12",
+        "chips": [
+          "sorted by time",
+          "13:45 to 14:05",
+          "text contains: Secret"
+        ],
+        "show": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "hid": [
+          2
+        ],
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "caption": "Remove the text filter and the row returns. A filter hides without saying so. The examiner who writes down each filter knows what she chose not to see, and another examiner can repeat her steps.",
+      "state": {
+        "merged": true,
+        "n": "240",
+        "chips": [
+          "sorted by time",
+          "13:45 to 14:05"
+        ],
+        "show": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "hid": [],
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "caption": "Merge, sort, filter: the order appears, and so does the risk. Read what you just saw below.",
+      "state": {
+        "merged": true,
+        "n": "240",
+        "chips": [
+          "sorted by time",
+          "13:45 to 14:05"
+        ],
+        "show": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "hid": [],
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    }
+  ];
+  var SRC = [["Event logs", "41,200"], ["Registry", "96,400"], ["Prefetch", "310"], ["LNK and jump lists", "1,150"], ["Shellbags", "420"], ["Browsers", "6,900"], ["setupapi log", "180"]];
+  var EV = [
+    ["13:49:51", "change journal", "Rename: a presentation in Secret Project Data becomes winter_whether_advisory.zip"],
+    ["13:56:20", "change journal", "Rename: the last of twenty files in Secret Project Data"],
+    ["13:58:32", "setupapi log", "SanDisk Cruzer Fit, serial 4C530012550531106501, driver installed"],
+    ["14:00:19", "shellbag", "Folder opened: E:\\Secret Project Data"],
+    ["14:01:23", "jump list", "File opened: E:\\Secret Project Data\\design\\winter_whether_advisory.zip"]
+  ];
+  var built = false;
+  function render(state){
+    var s = document.getElementById("srcs");
+    if (!built) {
+      SRC.forEach(function(x){ var d = document.createElement("div"); d.className = "src"; d.textContent = x[0]; var b = document.createElement("b"); b.textContent = x[1]; d.appendChild(b); s.appendChild(d); });
+      built = true;
+    }
+    Array.prototype.forEach.call(s.children, function(c){ c.classList.toggle("merged", state.merged); });
+    document.getElementById("n").textContent = state.n || "not merged";
+    var ch = document.getElementById("chips"); ch.textContent = "";
+    state.chips.forEach(function(x){ var p = document.createElement("span"); p.className = "pill" + (x.indexOf("text") === 0 ? " local" : ""); p.textContent = x; ch.appendChild(p); });
+    var body = document.getElementById("rows"); body.textContent = "";
+    document.getElementById("tbl").style.display = state.show.length ? "" : "none";
+    state.order.forEach(function(k){
+      if (state.show.indexOf(k) === -1) { return; }
+      var tr = document.createElement("tr"); if (state.hid.indexOf(k) !== -1) { tr.className = "hid"; }
+      EV[k].forEach(function(x, c){ var td = document.createElement("td"); td.textContent = x; if (c === 0) { td.className = "time"; } tr.appendChild(td); });
+      body.appendChild(tr);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
