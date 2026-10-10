@@ -1,0 +1,49 @@
+# _data/glossary/s03.yml - the words first taught in Session 3 (advanced data recovery and carving).
+# Carving
+file-carving:
+  term: "file carving"
+  def: "Finding files in raw data by the known patterns of their content, without any help from a file system."
+file-signature:
+  term: "file signature"
+  def: "A fixed pattern of bytes that marks the start, and sometimes the end, of every file of one type."
+header:
+  term: "header"
+  def: "The first bytes of a file, which usually show what type of file it is."
+footer:
+  term: "footer"
+  def: "The last bytes of a file, in a file type that marks its end with a fixed pattern."
+size-limit:
+  term: "size limit"
+  def: "The largest number of bytes that a carving tool takes for one file when it finds no end."
+false-positive:
+  term: "false positive"
+  def: "A result that a tool reports as a find although it is not one, such as a pattern that matched by chance."
+fragmentation:
+  term: "fragmentation"
+  def: "The state of a file whose content is stored in two or more separate runs of clusters and not in one."
+# Features
+feature:
+  term: "feature"
+  def: "A short piece of data with a form that a tool can recognise, such as an email address, a web address or a telephone number."
+feature-file:
+  term: "feature file"
+  def: "A text file written by bulk_extractor that lists each feature it found, with its position and the bytes around it."
+# Partitions and disk sets
+boot-sector:
+  term: "boot sector"
+  def: "The first sector of a volume, in which the file system records its own type, size and layout."
+raid:
+  term: "RAID"
+  def: "A way of joining several disks so that they work as one volume, for speed, for safety against the failure of a disk, or for both."
+striping:
+  term: "striping"
+  def: "Cutting data into equal pieces and writing the pieces to the disks of a RAID set in turn."
+stripe-size:
+  term: "stripe size"
+  def: "The number of bytes that a RAID set writes to one disk before it moves on to the next disk."
+mirroring:
+  term: "mirroring"
+  def: "Writing the same data to two disks at once, so that each disk is a full copy of the other."
+parity:
+  term: "parity"
+  def: "Extra data calculated from the data on the other disks, from which the content of one missing disk can be worked out."

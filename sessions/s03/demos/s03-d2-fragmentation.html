@@ -1,0 +1,153 @@
+<!doctype html>
+<!-- NB6018CEM demo S03-D2. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     One file, no external scripts, works offline. One mechanism; keyboard operable; respects reduced motion. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S03-D2 Fragmentation breaks the carve | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+
+.lbl{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--stone);margin:.2rem 0 .35rem}
+.row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px}
+.c{border:2px solid var(--hairline);border-radius:7px;height:3.4rem;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;background:#fff;transition:background .2s,border-color .2s}
+.c small{font-family:var(--font);font-weight:400;font-size:.62rem;color:var(--stone)}
+.c.pic{background:var(--surface);border-color:var(--sage-dark)}
+.c.oth{background:var(--plum-tint);border-color:var(--plum)}
+.c.got{outline:3px solid var(--ink);outline-offset:-1px}
+.c.now{outline:3px solid var(--plum);outline-offset:1px}
+.outrow{display:flex;flex-wrap:wrap;gap:3px;min-height:2.6rem}
+.o{border:2px solid var(--sage-dark);background:var(--surface);border-radius:7px;padding:.45rem .55rem;font-family:var(--mono);font-size:.8rem;font-weight:700}
+.o.oth{border-color:var(--plum);background:var(--plum-tint)}
+.verdict{margin:.7rem 0 0;font-size:.92rem;font-weight:700;min-height:1.5em}
+.verdict.ok{color:var(--sage-dark)}.verdict.bad{color:var(--plum-dark)}
+.rec{font-size:.86rem;border:1px dashed var(--stone);border-radius:8px;padding:.35rem .6rem;margin:.6rem 0 0;display:inline-block;background:#fff}
+.rec.gone{text-decoration:line-through;color:var(--stone)}
+.rec[hidden]{display:none}
+.legend{display:flex;flex-wrap:wrap;gap:.9rem;font-size:.82rem;margin:.6rem 0 0}
+.legend span::before{content:"";display:inline-block;width:.9rem;height:.9rem;border-radius:3px;margin-right:.35rem;vertical-align:-2px;border:2px solid var(--stone)}
+.legend .l-pic::before{background:var(--surface);border-color:var(--sage-dark)}.legend .l-oth::before{background:var(--plum-tint);border-color:var(--plum)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 3 notes</a>
+  <h1>S03-D2: Fragmentation breaks the carve</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a carving tool reads straight on, so a file stored in two runs comes back with another file's clusters in the middle and a different hash value.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl" id="title2"></p>
+    <div class="row" id="row"></div>
+    <div class="legend"><span class="l-pic">Clusters of the picture (P1 holds the header, P6 the footer)</span><span class="l-oth">Clusters of another file</span></div>
+    <p class="rec" id="rec" hidden></p>
+    <p class="lbl" style="margin-top:.9rem">WHAT THE CARVING TOOL WRITES</p>
+    <div class="outrow" id="out"></div>
+    <p class="verdict" id="verdict"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The same picture was carved twice. Stored in one run, it came back as its own six clusters, and its hash value matched. Stored in two runs, it came back as eight clusters: the tool reached the end of the first run and read straight on, through two clusters of another file, until it met the footer.</p>
+    <p>The tool reported a complete JPEG both times. In the second case the file is too long by exactly two clusters, it is damaged from the fourth cluster onwards, and its hash value does not match. The record that listed the two runs was the only thing that knew where the picture continued. This is why you never report a carved file as recovered until you have tested it.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var ONE = [null,null,"P1","P2","P3","P4","P5","P6",null,null,null,null];
+  var TWO = [null,null,"P1","P2","P3","X1","X2","P4","P5","P6",null,null];
+  /* state: lay = layout; got = number of clusters taken from cluster 3 onwards; rec = text of the record, recGone = struck out; v = verdict */
+  var STEPS = [
+    { caption: "This is part of a volume, drawn as 12 clusters. A deleted picture lies in clusters 3 to 8, in one run. Its record is gone, so only a carving tool can find it.", state: { t:"THE PICTURE IS STORED IN ONE RUN", lay:ONE, got:0 } },
+    { caption: "The tool finds the header of a JPEG at the start of cluster 3. It takes cluster after cluster, in order, until it meets the footer in cluster 8.", state: { t:"THE PICTURE IS STORED IN ONE RUN", lay:ONE, got:6, now:7 } },
+    { caption: "It writes six clusters, P1 to P6. They are exactly the picture. The hash value of the carved file matches the original.", state: { t:"THE PICTURE IS STORED IN ONE RUN", lay:ONE, got:6, v:["ok","6 clusters. The hash value matches the original."] } },
+    { caption: "Now the same picture on another volume. When it was saved, the free space was in two pieces, so the file system stored it in two runs: clusters 3 to 5, and clusters 8 to 10. Two clusters of another file lie between them.", state: { t:"THE SAME PICTURE, STORED IN TWO RUNS", lay:TWO, got:0 } },
+    { caption: "While the file existed, this was no problem. Its record listed both runs, and the file system followed the list.", state: { t:"THE SAME PICTURE, STORED IN TWO RUNS", lay:TWO, got:0, rec:"Record of the picture: run 1 = clusters 3 to 5, run 2 = clusters 8 to 10" } },
+    { caption: "The picture is deleted and its record is reused. The list of runs is gone. The content is still in the same eight places.", state: { t:"THE SAME PICTURE, STORED IN TWO RUNS", lay:TWO, got:0, rec:"Record of the picture: run 1 = clusters 3 to 5, run 2 = clusters 8 to 10", recGone:true } },
+    { caption: "The carving tool finds the header in cluster 3 and takes clusters 3, 4 and 5. So far it is right.", state: { t:"THE SAME PICTURE, STORED IN TWO RUNS", lay:TWO, got:3, now:4 } },
+    { caption: "The first run has ended, but nothing tells the tool so. It has not met a footer, so it reads straight on and takes clusters 6 and 7. They belong to another file.", state: { t:"THE SAME PICTURE, STORED IN TWO RUNS", lay:TWO, got:5, now:6 } },
+    { caption: "It reads on through clusters 8, 9 and 10, which are the true second run, and meets the footer in cluster 10. It stops and writes the file.", state: { t:"THE SAME PICTURE, STORED IN TWO RUNS", lay:TWO, got:8, now:9 } },
+    { caption: "The carved file has eight clusters and should have six. It is correct for three clusters and damaged after that, and its hash value does not match. Read what you just saw below.", state: { t:"THE SAME PICTURE, STORED IN TWO RUNS", lay:TWO, got:8, v:["bad","8 clusters, 2 too many. The hash value does not match."] } }
+  ];
+  var row = document.getElementById("row"), out = document.getElementById("out"), rec = document.getElementById("rec"), verdict = document.getElementById("verdict");
+  function render(st){
+    document.getElementById("title2").textContent = st.t;
+    row.innerHTML = ""; out.innerHTML = "";
+    st.lay.forEach(function(v, k){
+      var d = document.createElement("div"), taken = v && k >= 2 && k < 2 + st.got;
+      d.className = "c" + (v ? (v.charAt(0) === "P" ? " pic" : " oth") : "") + (taken ? " got" : "") + (k === st.now ? " now" : "");
+      d.textContent = v || "";
+      var s = document.createElement("small"); s.textContent = (k + 1); d.appendChild(s); row.appendChild(d);
+      if (taken) { var o = document.createElement("div"); o.className = "o" + (v.charAt(0) === "X" ? " oth" : ""); o.textContent = v; out.appendChild(o); }
+    });
+    if (!st.got) { out.textContent = "Nothing yet."; }
+    rec.hidden = !st.rec; rec.textContent = st.rec || ""; rec.className = "rec" + (st.recGone ? " gone" : "");
+    verdict.className = "verdict" + (st.v ? " " + st.v[0] : ""); verdict.textContent = st.v ? st.v[1] : "";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

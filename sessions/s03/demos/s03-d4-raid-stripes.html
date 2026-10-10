@@ -1,0 +1,181 @@
+<!doctype html>
+<!-- NB6018CEM demo S03-D4. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     One file, no external scripts, works offline. One mechanism; keyboard operable; respects reduced motion. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S03-D4 Putting the stripes back in order | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+
+.lbl{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--stone);margin:.6rem 0 .3rem}
+.lbl:first-child{margin-top:.1rem}
+.line{display:flex;flex-wrap:wrap;gap:3px;min-height:2.2rem}
+.s{font-family:var(--mono);font-size:.86rem;font-weight:700;white-space:pre;border:2px solid var(--hairline);border-radius:6px;padding:.28rem .3rem;background:#fff}
+.s.d1{background:var(--surface);border-color:var(--sage-dark)}
+.s.d2{background:var(--plum-tint);border-color:var(--plum)}
+.plain{font-family:var(--mono);font-size:.95rem;font-weight:700;white-space:pre-wrap;word-break:break-all;border:2px solid var(--hairline);border-radius:8px;padding:.45rem .6rem;background:#fff;min-height:2.4rem}
+.plain.ok{border-color:var(--sage-dark);background:var(--surface)}
+.plain.bad{border-color:var(--plum);background:var(--plum-tint)}
+.part[hidden]{display:none}
+.tryit{border:1px solid var(--hairline);border-radius:12px;background:#fff;padding:.7rem 1rem;margin:0 0 1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.6rem}
+.tryit[hidden]{display:none}
+.tryit fieldset{border:0;padding:0;margin:0}
+.tryit legend{font-weight:700;padding:0;margin-bottom:.3rem}
+.tryit label{display:inline-block;margin-right:.9rem;padding:.2rem 0}
+.tryit input{accent-color:var(--plum);margin-right:.3rem}
+.tryit input:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 3 notes</a>
+  <h1>S03-D4: Putting the stripes back in order</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> striped data can be read only when the disks are taken in the right order with the right stripe size.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="part" id="pmsg"><p class="lbl">THE DATA, AS IT WAS WRITTEN</p><div class="line" id="msg"></div></div>
+    <div class="part" id="pd1"><p class="lbl">DISK 1</p><div class="line" id="d1"></div></div>
+    <div class="part" id="pd2"><p class="lbl">DISK 2</p><div class="line" id="d2"></div></div>
+    <div class="part" id="pout"><p class="lbl" id="outl"></p><div class="plain" id="out"></div></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="tryit" id="tryit" hidden>
+    <fieldset><legend>Order of the disks</legend>
+      <label><input type="radio" name="ord" value="12" checked>Disk 1, then disk 2</label>
+      <label><input type="radio" name="ord" value="21">Disk 2, then disk 1</label>
+    </fieldset>
+    <fieldset><legend>Stripe size</legend>
+      <label><input type="radio" name="sz" value="2">2</label>
+      <label><input type="radio" name="sz" value="4" checked>4</label>
+      <label><input type="radio" name="sz" value="8">8</label>
+    </fieldset>
+  </div>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The message was cut into stripes of four characters, and the stripes were written to two disks in turn. Each disk alone held every second stripe and could not be read. Reading the disks back in the order and with the stripe size that were used to write them gave the message exactly. Every other setting gave a wrong result. With the wrong stripe size, the first characters were still right, so the result looked like a good start and was wrong after that.</p>
+    <p>A stripe carries no number and no sign of where it belongs. The order of the disks and the stripe size are facts about the set, kept outside the data. For the investigation this means that you record which slot each disk came from before you remove it, you image every disk separately, and you rebuild the set from the images.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var MSG = "THE ORDER OF THE DISKS IS EVIDENCE NOW.", MSG40 = MSG + " ", SIZE = 4;
+  var PIECES = [], D1 = "", D2 = "";
+  for (var a = 0; a < MSG40.length; a += SIZE) { PIECES.push(MSG40.substr(a, SIZE)); }
+  PIECES.forEach(function(p, k){ if (k % 2 === 0) { D1 += p; } else { D2 += p; } });
+  function rebuild(order, size){
+    var disks = order === "12" ? [D1, D2] : [D2, D1], pos = [0, 0], out = "", k = 0;
+    while (pos[0] < disks[0].length || pos[1] < disks[1].length) { out += disks[k].substr(pos[k], size); pos[k] += size; k = 1 - k; }
+    return out;
+  }
+  /* state: show = which parts are visible; cut = show the message as stripes; out = [order, size] to rebuild with; free = show the controls */
+  var STEPS = [
+    { caption: "This is the data that the operating system wants to store: one line of 40 characters. In a real RAID set it would be a whole volume, with its partition table at the start.", state: { show:["pmsg"], cut:false } },
+    { caption: "A striped set cuts the data into equal pieces. Here the stripe size is 4 characters, so there are 10 stripes. In a real set a stripe is often 64 KB.", state: { show:["pmsg"], cut:true } },
+    { caption: "The stripes are written to the disks in turn: the first to disk 1, the second to disk 2, the third to disk 1 again, and so on. Sage stripes are on disk 1 and plum stripes are on disk 2.", state: { show:["pmsg","pd1","pd2"], cut:true, colour:true } },
+    { caption: "Now look at each disk alone, as you would see it in one forensic image. Disk 1 holds every second stripe. Neither disk can be read by itself, and a file longer than one stripe is in pieces on both.", state: { show:["pd1","pd2"], colour:true } },
+    { caption: "To read the data, take stripes from the disks in the order in which they were written: 4 characters from disk 1, 4 from disk 2, and so on. The right order and the right stripe size give the message back exactly.", state: { show:["pd1","pd2","pout"], colour:true, out:["12",4] } },
+    { caption: "Now take the same two disks in the wrong order: disk 2 first. The stripe size is right, but every pair of stripes is swapped. Nothing can be read, not even the start.", state: { show:["pd1","pd2","pout"], colour:true, out:["21",4] } },
+    { caption: "Now the right order with the wrong stripe size, 8 in place of 4. The first four characters are in their true place, so the result begins correctly. Everything after them is wrong. This is the trap: a wrong setting can look like a good start.", state: { show:["pd1","pd2","pout"], colour:true, out:["12",8] } },
+    { caption: "Your turn. Choose an order and a stripe size, and read the result. Only one of the six settings gives the message. Then read what you just saw below.", state: { show:["pd1","pd2","pout"], colour:true, out:["12",4], free:true } }
+  ];
+  var tryit = document.getElementById("tryit");
+  function stripes(el, text, cls){
+    el.innerHTML = "";
+    for (var a = 0; a < text.length; a += SIZE) {
+      var s = document.createElement("span"); s.className = "s" + (typeof cls === "function" ? cls(a / SIZE) : cls); s.textContent = text.substr(a, SIZE); el.appendChild(s);
+    }
+  }
+  function showOut(order, size){
+    var text = rebuild(order, size), ok = text === MSG40, out = document.getElementById("out");
+    document.getElementById("outl").textContent = "READ BACK: " + (order === "12" ? "DISK 1, THEN DISK 2" : "DISK 2, THEN DISK 1") + ", STRIPE SIZE " + size;
+    out.textContent = text; out.className = "plain " + (ok ? "ok" : "bad");
+    return { text: text, ok: ok };
+  }
+  function render(st){
+    ["pmsg","pd1","pd2","pout"].forEach(function(id){ document.getElementById(id).hidden = st.show.indexOf(id) === -1; });
+    var msg = document.getElementById("msg");
+    if (st.cut) { stripes(msg, MSG40, function(k){ return st.colour ? (k % 2 === 0 ? " d1" : " d2") : ""; }); }
+    else { msg.innerHTML = ""; var one = document.createElement("span"); one.className = "s"; one.textContent = MSG; msg.appendChild(one); }
+    stripes(document.getElementById("d1"), D1, " d1"); stripes(document.getElementById("d2"), D2, " d2");
+    if (st.out) { showOut(st.out[0], st.out[1]); }
+    tryit.hidden = !st.free;
+    if (st.free) {
+      Array.prototype.forEach.call(tryit.querySelectorAll("input"), function(r){ r.checked = (r.name === "ord" ? r.value === "12" : r.value === "4"); });
+    }
+  }
+  tryit.addEventListener("change", function(){
+    var order = tryit.querySelector("input[name=ord]:checked").value, size = +tryit.querySelector("input[name=sz]:checked").value;
+    var r = showOut(order, size);
+    document.getElementById("caption").textContent = "Read back with " + (order === "12" ? "disk 1 first" : "disk 2 first") + " and a stripe size of " + size + ": " + r.text.trim() +
+      (r.ok ? " This is the message. It is the setting that was used to write the disks." : " This is not the message." + (order === "12" ? " The first " + Math.min(size, 4) + " characters are in their true place, and the rest is in the wrong order." : ""));
+  });
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
