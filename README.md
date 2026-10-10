@@ -22,7 +22,7 @@ Everything here, including its history, is public. Instructor material lives in 
 | `_templates/` | Templates for session builds (not published) | The planning thread only |
 | `CLAUDE.md` | Rules for Claude threads working in this repository (not published) | The planning thread only |
 
-A session build never edits a shared file. It writes only its own paths, passes the pre-push gate kept in the private repository, and pushes after the lecturer approves. The home page finds each published session by itself. `CLAUDE.md` holds the rules for any Claude thread working here.
+A session build never edits a shared file. It writes only its own paths, passes the pre-push gate kept in the private repository, and pushes to the `dev` branch. The lecturer merges `dev` into `main` (a merge commit or fast-forward, never a squash), and GitHub Pages publishes `main`. The home page finds each published session by itself. `CLAUDE.md` holds the rules for any Claude thread working here.
 
 ## Licences
 
