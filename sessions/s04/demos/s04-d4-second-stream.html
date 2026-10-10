@@ -1,0 +1,133 @@
+<!doctype html>
+<!-- NB6018CEM demo S04-D4. Code: MIT licence. Content: CC BY-NC-SA 4.0. One file, no external scripts, works offline. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S04-D4 A second stream in one MFT record | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.lbl{font-size:.74rem;font-weight:800;letter-spacing:.1em;color:var(--stone);margin:0 0 .4rem}
+.card{border:2px solid var(--hairline);border-radius:10px;padding:.6rem .75rem;background:#fff;margin:0 0 .8rem}
+.kv{display:grid;grid-template-columns:minmax(7.5rem,auto) 1fr;gap:.2rem .7rem;font-size:.88rem;margin:0}
+.kv dt{color:var(--stone);font-weight:700}.kv dd{margin:0;font-family:var(--mono);overflow-wrap:anywhere}
+.hot{background:var(--plum-tint);outline:2px solid var(--plum);border-radius:4px}
+.good{color:var(--sage-dark);font-weight:700}.bad{color:var(--plum-dark);font-weight:700}
+.verdict{margin:.6rem 0 0;font-size:.92rem;font-weight:700;min-height:1.5em}
+.attr{border:2px solid var(--hairline);border-radius:8px;padding:.4rem .6rem;margin:0 0 .35rem;font-size:.86rem;display:flex;flex-wrap:wrap;gap:.3rem .8rem;background:#fff}
+.attr b{font-family:var(--mono)}.attr.new{border-color:var(--plum);background:var(--plum-tint)}.attr[hidden]{display:none}
+.cols{display:grid;grid-template-columns:1fr;gap:.7rem}@media(min-width:44rem){.cols{grid-template-columns:1fr 1fr}}
+.view{font-family:var(--mono);font-size:.82rem;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.card.dim{opacity:.45}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 4 notes</a>
+  <h1>S04-D4: A second stream in one MFT record</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a second content attribute is added to the record while the size that a normal listing shows stays the same.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl">THE MFT RECORD OF ONE FILE</p>
+    <div class="attr"><b>$STANDARD_INFORMATION</b><span>the dates that Windows shows</span></div>
+    <div class="attr"><b>$FILE_NAME</b><span>quarterly-summary.txt</span></div>
+    <div class="attr"><b>$DATA</b><span>no name</span><span>6,000 bytes</span><span>the normal content</span></div>
+    <div class="attr new" id="ads" hidden><b>$DATA</b><span>name: hidden-notes.txt</span><span>1,800 bytes</span><span>a second content</span></div>
+    <div class="cols">
+      <div class="card" id="win"><p class="lbl">WHAT WINDOWS SHOWS</p><p class="view" id="winv"></p></div>
+      <div class="card" id="tool"><p class="lbl">WHAT A FORENSIC TOOL LISTS</p><p class="view" id="toolv"></p></div>
+    </div>
+    <p class="verdict" id="verdict"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>A second content was added to the record of a file, as a named $DATA attribute. The ordinary views did not change: the listed size, the content that opens and the hash value of the file all describe the first content only.</p>
+    <p>A forensic tool reads the record and lists both. So on an NTFS volume you list the streams of every file as a routine step, you hash a stream as its own item, and you remember that two files with the same hash value can still differ in their streams. Most streams are ordinary: Windows adds one to every file that comes from the internet.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var W = "quarterly-summary.txt - 6,000 bytes\nSHA-256 begins 55283f15", TL2 = "quarterly-summary.txt - 6,000 bytes\nquarterly-summary.txt:hidden-notes.txt - 1,800 bytes";
+  var STEPS = [
+    { caption: "This is the MFT record of a text file on an NTFS volume. It is made of attributes. One holds dates, one holds the name, and one, called $DATA, holds the content: 6,000 bytes.", state: { ads:false, win:W, tool:"", dimTool:true } },
+    { caption: "Windows shows the file in the usual way: its name, a size of 6,000 bytes, and the content when you open it. A hash tool reads those 6,000 bytes.", state: { ads:false, win:W, tool:"", dimTool:true } },
+    { caption: "Now a second $DATA attribute is added to the same record. Unlike the first one, it has a name: hidden-notes.txt. It holds 1,800 bytes of other content. NTFS allows this. It is called an alternate data stream.", state: { ads:true, win:W, tool:"", dimTool:true } },
+    { caption: "Look at what Windows shows now. Nothing has changed: the same name, still 6,000 bytes, the same content when you open it, and the same hash value. The second content is in the record and in no ordinary list.", state: { ads:true, win:W, tool:"", dimTool:true, v:["bad","Explorer, the size and the file's hash value: unchanged."] } },
+    { caption: "A forensic tool does not ask Windows. It reads the record itself, so it lists every $DATA attribute. The stream appears as its own line, with the name of the file, a colon and the name of the stream.", state: { ads:true, win:W, tool:TL2, v:["good","Two contents in one record. The tool lists both."] } },
+    { caption: "One more fact. If this file is copied to a USB stick with a FAT file system, sent by email or put in a ZIP archive, only the normal content travels. FAT has no place to store a second stream, so it is left behind. Read what you just saw below.", state: { ads:true, win:W, tool:TL2 } }
+  ];
+  function render(st){
+    document.getElementById("ads").hidden = !st.ads;
+    document.getElementById("winv").textContent = st.win.replace(/\\n/g, "\n");
+    document.getElementById("toolv").textContent = (st.tool || "(not asked yet)").replace(/\\n/g, "\n");
+    document.getElementById("tool").className = "card" + (st.dimTool ? " dim" : "");
+    var v = document.getElementById("verdict"); v.className = "verdict" + (st.v ? " " + st.v[0] : ""); v.textContent = st.v ? st.v[1] : "";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
