@@ -1,0 +1,154 @@
+<!doctype html>
+<!-- NB6018CEM demo S04-D3. Code: MIT licence. Content: CC BY-NC-SA 4.0. One file, no external scripts, works offline. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S04-D3 Hiding a letter in the last bits of a picture | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.lbl{font-size:.74rem;font-weight:800;letter-spacing:.1em;color:var(--stone);margin:0 0 .4rem}
+.card{border:2px solid var(--hairline);border-radius:10px;padding:.6rem .75rem;background:#fff;margin:0 0 .8rem}
+.kv{display:grid;grid-template-columns:minmax(7.5rem,auto) 1fr;gap:.2rem .7rem;font-size:.88rem;margin:0}
+.kv dt{color:var(--stone);font-weight:700}.kv dd{margin:0;font-family:var(--mono);overflow-wrap:anywhere}
+.hot{background:var(--plum-tint);outline:2px solid var(--plum);border-radius:4px}
+.good{color:var(--sage-dark);font-weight:700}.bad{color:var(--plum-dark);font-weight:700}
+.verdict{margin:.6rem 0 0;font-size:.92rem;font-weight:700;min-height:1.5em}
+.px{display:flex;gap:.6rem;flex-wrap:wrap}
+.p{flex:1 1 11rem;border:2px solid var(--hairline);border-radius:10px;padding:.5rem;background:#fff}
+.sw{display:flex;gap:4px;margin:0 0 .4rem}.sw span{flex:1;height:1.6rem;border-radius:5px;border:1px solid var(--hairline)}
+.sw small{font-size:.66rem;color:var(--stone)}
+.v{display:grid;grid-template-columns:3.2rem 1fr 2.6rem;gap:.15rem .4rem;font-family:var(--mono);font-size:.8rem;align-items:center}
+.v b{font-family:var(--font);font-size:.72rem;color:var(--stone)}
+.v .bit{font-weight:800}
+.v .chg{background:var(--plum-tint);outline:2px solid var(--plum);border-radius:3px}
+.v .same{background:var(--surface);border-radius:3px}
+.msg{font-family:var(--mono);font-size:.95rem;margin:0 0 .7rem}.msg span{display:inline-block;width:1.25rem;text-align:center;border-bottom:2px solid var(--hairline);margin-right:2px}
+.msg span.done{border-color:var(--sage-dark);color:var(--sage-dark);font-weight:800}.msg span.cur{border-color:var(--plum);background:var(--plum-tint);font-weight:800}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 4 notes</a>
+  <h1>S04-D3: Hiding a letter in the last bits of a picture</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> writing message bits into the least significant bit changes a colour value by at most one, which no eye sees and a comparison shows at once.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl">THE MESSAGE: THE LETTER H, AS EIGHT BITS</p>
+    <p class="msg" id="msg"></p>
+    <p class="lbl">THREE PIXELS OF THE PICTURE (THE BAR SHOWS THE COLOUR BEFORE AND AFTER)</p>
+    <div class="px" id="px"></div>
+    <p class="verdict" id="verdict"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>One letter, eight bits, went into the last bits of eight colour values. Each value either stayed the same or moved by one. The three pixels look exactly as they did before.</p>
+    <p>This is why the method is hard to see and easy to prove. The picture's hash value has changed, a comparison with the original shows every changed value, and anyone who reads the last bits in the same order gets the message back. In the lab you use all three facts: the hash value, the comparison, and a tool that tries the common orders.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var BITS = [0,1,0,0,1,0,0,0];
+  var ORIG = [[200,120,57],[198,121,60],[201,119,58]];
+  var STEPS = [
+    { caption: "Three pixels from a picture. Each pixel is stored as three numbers from 0 to 255, for red, green and blue. Each number is shown in decimal and in binary. The last binary digit is the least significant bit.", state: { done:0 } },
+    { caption: "The message is one letter, H. A computer stores it as eight bits: 0 1 0 0 1 0 0 0. Each bit will replace the last bit of one colour value, in order.", state: { done:0, showMsg:true } },
+    { caption: "First pixel. Red 200 already ends in 0, and the first message bit is 0, so nothing changes. Green 120 ends in 0 and must carry a 1, so it becomes 121. Blue 57 ends in 1 and must carry a 0, so it becomes 56.", state: { done:3, showMsg:true } },
+    { caption: "Second pixel. The next three message bits are 0, 1 and 0. By chance, red 198, green 121 and blue 60 already end in exactly those bits. Nothing changes in this pixel at all.", state: { done:6, showMsg:true } },
+    { caption: "Third pixel. The last two message bits are 0 and 0. Red 201 becomes 200, and green 119 becomes 118. Blue is not needed. The whole letter is now inside the picture.", state: { done:8, showMsg:true } },
+    { caption: "Look at the colour bars. The left half of each bar is the pixel before, and the right half is the pixel after. You cannot see a difference, because no value moved by more than one step out of 256. Four of the eight values changed, and four were already right.", state: { done:8, showMsg:true, v:["good","To the eye: the same picture. Largest change: 1."] } },
+    { caption: "Now the examiner's side. With the original picture, a comparison shows four values that differ, each by exactly one. Without it, reading the last bits in order gives 0 1 0 0 1 0 0 0, which is the letter H. Read what you just saw below.", state: { done:8, showMsg:true, v:["bad","To a comparison: 4 values differ. The file's hash value has changed."] } }
+  ];
+  var msg = document.getElementById("msg"), px = document.getElementById("px");
+  function bin(n){ var s = n.toString(2); while (s.length < 8) { s = "0" + s; } return s; }
+  function render(st){
+    msg.innerHTML = "";
+    BITS.forEach(function(b, k){ var s = document.createElement("span"); s.textContent = st.showMsg ? b : "?"; s.className = k < st.done ? "done" : (k === st.done && st.showMsg ? "cur" : ""); msg.appendChild(s); });
+    px.innerHTML = "";
+    ORIG.forEach(function(p, i){
+      var now = p.map(function(val, c){ var idx = i * 3 + c; return idx < st.done && idx < 8 ? (val & 254) | BITS[idx] : val; });
+      var box = document.createElement("div"); box.className = "p";
+      var sw = document.createElement("div"); sw.className = "sw";
+      [p, now].forEach(function(col){ var s = document.createElement("span"); s.style.background = "rgb(" + col.join(",") + ")"; sw.appendChild(s); });
+      box.appendChild(sw);
+      var grid = document.createElement("div"); grid.className = "v";
+      ["Red","Green","Blue"].forEach(function(nm, c){
+        var idx = i * 3 + c, touched = idx < st.done && idx < 8, changed = touched && now[c] !== p[c];
+        var a = document.createElement("b"); a.textContent = nm;
+        var m = document.createElement("span"); var bs = bin(now[c]);
+        m.innerHTML = bs.slice(0, 7) + '<span class="bit">' + bs.slice(7) + "</span>"; m.className = changed ? "chg" : (touched ? "same" : "");
+        var d = document.createElement("span"); d.textContent = now[c];
+        grid.appendChild(a); grid.appendChild(m); grid.appendChild(d);
+      });
+      box.appendChild(grid); px.appendChild(box);
+    });
+    var v = document.getElementById("verdict"); v.className = "verdict" + (st.v ? " " + st.v[0] : ""); v.textContent = st.v ? st.v[1] : "";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

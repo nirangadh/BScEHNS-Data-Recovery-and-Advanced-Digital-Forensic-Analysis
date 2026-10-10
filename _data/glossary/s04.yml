@@ -1,0 +1,65 @@
+# _data/glossary/s04.yml - the words first taught in Session 4 (data protection and anti-forensics).
+# The frame, and wiping
+anti-forensics:
+  term: "anti-forensics"
+  def: "Actions that a person takes to hide, change or destroy digital evidence, or to make its examination harder."
+wiping:
+  term: "wiping"
+  def: "Overwriting the content of a file, or of free space, on purpose, so that the old data cannot be recovered."
+# Encryption
+encryption:
+  term: "encryption"
+  def: "Changing data with a secret value so that it cannot be read until the change is reversed with the right secret value."
+encryption-key:
+  term: "encryption key"
+  def: "The secret value that encrypts data and is needed to make the data readable again."
+full-disk-encryption:
+  term: "full-disk encryption"
+  def: "Encryption of a whole volume or disk, so that every file, every name and the free space are unreadable without the key."
+file-level-encryption:
+  term: "file-level encryption"
+  def: "Encryption of single files or folders, which leaves the rest of the volume, and usually the file names, readable."
+recovery-key:
+  term: "recovery key"
+  def: "A second way to unlock encrypted data, made when the encryption is set up, for use when the normal way fails."
+key-escrow:
+  term: "key escrow"
+  def: "Keeping a copy of a key or recovery key with a trusted third party, such as an employer's IT department."
+encrypted-container:
+  term: "encrypted container"
+  def: "A single file that holds a whole encrypted volume inside it."
+entropy:
+  term: "entropy"
+  def: "A measure, from 0 to 8 for each byte, of how evenly the 256 possible byte values are used in a piece of data."
+# Steganography
+steganography:
+  term: "steganography"
+  def: "Hiding data inside an ordinary file, such as a picture, so that nobody notices that hidden data exists."
+cover-file:
+  term: "cover file"
+  def: "The ordinary file, such as a picture, inside which other data is hidden."
+payload:
+  term: "payload"
+  def: "The data that is hidden inside a cover file."
+least-significant-bit:
+  term: "least significant bit"
+  def: "The last bit of a binary number, which changes the value of the number by only one."
+steganalysis:
+  term: "steganalysis"
+  def: "The work of detecting that a file holds hidden data and, where possible, getting that data out."
+passphrase:
+  term: "passphrase"
+  def: "A secret word or sentence that a person types, from which a program works out a key."
+wordlist:
+  term: "wordlist"
+  def: "A text file of possible passphrases, one on each line, that a tool tries one after another."
+# NTFS
+mft-attribute:
+  term: "attribute"
+  def: "One named part of a record in the master file table, which holds one kind of information about the file, such as its dates, its name or its content."
+alternate-data-stream:
+  term: "alternate data stream"
+  def: "A second, named piece of content that NTFS stores in the same record as a file, beside the file's normal content."
+timestomping:
+  term: "timestomping"
+  def: "Changing the dates that a file system keeps for a file, so that the file seems to have been created or changed at another time."
