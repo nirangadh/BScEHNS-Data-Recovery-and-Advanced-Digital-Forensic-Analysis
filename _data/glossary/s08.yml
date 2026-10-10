@@ -1,0 +1,54 @@
+# _data/glossary/s08.yml - the words first taught in Session 8 (intrusion detection and log correlation).
+# What an IDS is
+intrusion-detection-system:
+  term: "intrusion detection system"
+  def: "A program or device that reads traffic or a computer's records, compares them with what an attack looks like, and raises an alert. It is written as IDS."
+intrusion-prevention-system:
+  term: "intrusion prevention system"
+  def: "An intrusion detection system that stands in the path of the traffic and can block what it detects. It is written as IPS."
+network-based-ids:
+  term: "network-based IDS"
+  def: "An intrusion detection system that reads the packets at one capture point of a network."
+host-based-ids:
+  term: "host-based IDS"
+  def: "An intrusion detection system that runs on one computer and watches that computer's own files, programs and logs."
+sensor:
+  term: "sensor"
+  def: "The computer or device at a capture point that receives the copied traffic for an intrusion detection system."
+# How it detects
+signature-based-detection:
+  term: "signature-based detection"
+  def: "Finding attacks by comparing traffic with written descriptions of patterns that are already known."
+anomaly-based-detection:
+  term: "anomaly-based detection"
+  def: "Finding attacks by measuring what is normal first and then reporting whatever departs from it."
+baseline:
+  term: "baseline"
+  def: "A record of what is normal for a computer or a network, measured over a period, against which later activity is compared."
+false-negative:
+  term: "false negative"
+  def: "A real attack or a real find that a tool did not report."
+# Rules and alerts
+rule:
+  term: "rule"
+  def: "One line of text that tells an intrusion detection system which traffic to look for and what to do when it sees it."
+rule-id:
+  term: "rule ID"
+  def: "The number that names one rule, so that every alert can be traced to the exact rule that raised it. Suricata writes it as sid."
+alert:
+  term: "alert"
+  def: "The record that an intrusion detection system writes when traffic matches a rule or departs from the baseline."
+# Correlation
+correlation:
+  term: "correlation"
+  def: "Setting records from two or more sources side by side to see whether they agree, complete each other or rule each other out."
+community-id:
+  term: "Community ID"
+  def: "A short code that different tools calculate in the same way from the addresses, ports and protocol of a flow, so that their records of that flow can be joined."
+# Indicators
+indicator-of-compromise:
+  term: "indicator of compromise"
+  def: "A piece of evidence from one attack, such as an address, a name or a hash value, that can be searched for elsewhere to recognise the same attack. It is written as IOC."
+pyramid-of-pain:
+  term: "pyramid of pain"
+  def: "A way of ordering indicators of compromise by how hard each kind is for an attacker to change."

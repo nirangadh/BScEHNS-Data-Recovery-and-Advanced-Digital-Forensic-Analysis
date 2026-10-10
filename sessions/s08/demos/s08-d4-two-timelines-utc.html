@@ -1,0 +1,282 @@
+<!doctype html>
+<!-- NB6018CEM demo S08-D4. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S08-D4 Two timelines on one clock | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+.lbl{margin:0 0 .45rem;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--stone)}
+table.tl{border-collapse:collapse;width:100%;table-layout:fixed;font-family:var(--mono);font-size:.7rem}
+table.tl th,table.tl td{border:1px solid var(--hairline);padding:.3rem .28rem;text-align:left;vertical-align:top;overflow-wrap:anywhere;transition:background .25s,color .25s}
+table.tl th{background:var(--ink);color:#fff;font-weight:700;font-size:.68rem}
+th.k-rec{width:10%}th.k-time{width:14%}th.k-desc{width:15%}th.k-src{width:10%}th.k-art{width:9%}th.k-what{width:23%}th.k-zone{width:13%}th.k-tag{width:6%}
+th.n-rec{width:14%}th.n-found{width:24%}th.n-add{width:12%}th.n-utc{width:26%}th.n-zone{width:24%}
+.pill{display:inline-block;font-family:var(--font);font-weight:800;font-size:.68rem;letter-spacing:.03em;border-radius:5px;padding:.05rem .3rem;line-height:1.35}
+.pill.al{background:var(--plum);color:#fff}
+.pill.inf{background:var(--sage-dark);color:#fff}
+.pill.sus{background:#fff;color:var(--ink);border:2px solid var(--ink)}
+tr.al td:first-child{box-shadow:inset 4px 0 0 var(--plum)}
+tr.inf td:first-child{box-shadow:inset 4px 0 0 var(--sage-dark)}
+tr.sus td:first-child{box-shadow:inset 4px 0 0 var(--ink)}
+tr.al td{background:var(--plum-tint)}
+tr.inf td{background:var(--surface)}
+tr.sus td{background:#fff}
+td .d{display:block;font-family:var(--font);font-size:.68rem;font-weight:700;color:var(--plum-dark)}
+td.loc{font-style:italic}
+td.new{font-weight:700;outline:2px solid var(--plum);outline-offset:-2px}
+tr.brk td{background:#fff;border:2px dashed var(--plum);color:var(--plum-dark);font-family:var(--font);font-weight:700;font-size:.78rem;text-align:center;padding:.55rem .4rem}
+tr.brk.ok td{border-color:var(--sage-dark);color:var(--sage-dark)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.7rem}
+.card{border:2px solid var(--sage-dark);background:var(--surface);border-radius:10px;padding:.6rem .7rem;font-size:.82rem;min-width:0}
+.card.ex{border-color:var(--plum);background:var(--plum-tint)}
+.card h3{margin:0 0 .3rem;font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;color:var(--stone)}
+.card p{margin:.2rem 0}
+.card .v{font-weight:800;font-size:.9rem}
+.note{font-size:.82rem;color:var(--stone);margin:.7rem 0 0;min-height:1.3em}
+@media (max-width:640px){
+  .x{display:none}
+  th.k-rec{width:25%}th.k-time{width:33%}th.k-what{width:42%}
+  th.n-found{width:34%}th.n-utc{width:36%}th.n-zone{width:30%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 8 notes</a>
+  <h1>S08-D4: Two timelines on one clock</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> when you put two records on one clock, merge them and sort them, the order of the rows shows whether they can be about the same events.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl" id="lbl"></p>
+    <div id="view"></div>
+    <p class="note" id="note"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Putting two records on one clock and sorting them is a test, not only a way to tidy rows. When the rows of the two records interleave within seconds, the records support each other. When they stay in two blocks, years apart, the comparison excludes a link. So correlation can exclude as well as confirm, and both results belong in your report, each with its limits.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* The data. Every number in the captions and on the stage is computed from these arrays. */
+  var PC = "192.0.2.10", OFFSET_H = -5, CASE_OFFSET_H = -4;
+  function zone(h){ return "local (UTC" + (h < 0 ? "-" : "+") + Math.abs(h) + ")"; }
+  var ALERTS = [
+    { utc: "2025-01-22T19:45:56Z", rule: 9000001, msg: "Request for update script", to: "203.0.113.80" },
+    { utc: "2025-01-22T19:46:20Z", rule: 9000002, msg: "Regular contact with one server", to: "198.51.100.25" },
+    { utc: "2025-01-22T19:47:20Z", rule: 9000002, msg: "Regular contact with one server", to: "198.51.100.25" }
+  ];
+  var B1 = [
+    { local: "2025-01-22 14:45:41", art: "browser", desc: "Page visited", what: "page opened: files.example.net" },
+    { local: "2025-01-22 14:45:58", art: "file system", desc: "File created", what: "file created: update.ps1 in the Downloads folder" },
+    { local: "2025-01-22 14:46:03", art: "prefetch", desc: "Program run", what: "program started: powershell.exe" },
+    { local: "2025-01-22 14:46:19", art: "event log", desc: "Connection allowed", what: "new outbound connection allowed, port 8080" }
+  ];
+  var B2 = [
+    { utc: "2015-03-24T13:58:32Z", art: "setupapi log", desc: "First connection", what: "First connection: SanDisk Cruzer Fit, driver installed", zone: zone(CASE_OFFSET_H), tag: "key-event" },
+    { utc: "2015-03-24T14:01:05Z", art: "shellbag", desc: "Folder opened", what: "folder opened on the removable drive", zone: "UTC", tag: "" },
+    { utc: "2015-03-24T14:02:40Z", art: "LNK file", desc: "File opened", what: "confidential document opened", zone: "UTC", tag: "" },
+    { utc: "2015-03-25T14:42:12Z", art: "prefetch", desc: "Program run", what: "wiping tool started", zone: "UTC", tag: "" }
+  ];
+  var COLS = ["timestamp_utc", "timestamp_desc", "source", "artefact", "description", "original_zone", "tag"];
+  var NAME = { al: "ALERT", inf: "INFECTED PC", sus: "SUSPECT PC" };
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function iso(ms){ return new Date(ms).toISOString().replace(".000Z", "Z"); }
+  function hms(ms){ return iso(ms).slice(11, 19); }
+  /* Rows in the seven columns. t is the true time in UTC; shown is the time as the source wrote it. */
+  var RA = ALERTS.map(function(a){
+    return { k: "al", t: Date.parse(a.utc), shown: Date.parse(a.utc), desc: "Alert raised", src: "IDS alert file", art: "ids alert",
+             what: "rule " + a.rule + " " + a.msg + " " + PC + " -> " + a.to, zone: "UTC", tag: "", rule: a.rule };
+  });
+  var R1 = B1.map(function(b){
+    var wall = Date.parse(b.local.replace(" ", "T") + "Z");          /* the clock value as written */
+    return { k: "inf", t: wall - OFFSET_H * 3600000, shown: wall, local: b.local, desc: b.desc, src: "infected computer", art: b.art,
+             what: b.what, zone: zone(OFFSET_H), tag: "" };
+  });
+  var R2 = B2.map(function(b){
+    return { k: "sus", t: Date.parse(b.utc), shown: Date.parse(b.utc), desc: b.desc, src: "suspect's computer", art: b.art,
+             what: b.what, zone: b.zone, tag: b.tag };
+  });
+  function sortBy(rows, key){ return rows.slice().sort(function(a, b){ return a[key] - b[key]; }); }
+  function span(rows){ var s = sortBy(rows, "t"); return [s[0].t, s[s.length - 1].t]; }
+  function inside(rows, other){ var s = span(other); return rows.filter(function(r){ return r.t >= s[0] && r.t <= s[1]; }).length; }
+  function dur(ms){
+    var s = Math.round(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    return h + " h " + m + " min " + (s % 60) + " s";
+  }
+  function secs(a, b){ return Math.round((b.t - a.t) / 1000); }
+  function plural(n, w){ return n + " " + w + (n === 1 ? "" : "s"); }
+  var NUM = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+  var ADD_H = -OFFSET_H;
+  /* Test 1: alerts with the infected computer. */
+  var M1 = sortBy(RA.concat(R1), "t");
+  var IN1 = inside(R1, RA), IN1B = inside(RA, R1);
+  var MAXGAP1 = 0; M1.forEach(function(r, n){ if (n) { MAXGAP1 = Math.max(MAXGAP1, secs(M1[n - 1], r)); } });
+  var SPAN1 = secs(M1[0], M1[M1.length - 1]);
+  var SWITCH1 = 0; M1.forEach(function(r, n){ if (n && r.k !== M1[n - 1].k) { SWITCH1 += 1; } });
+  var page = R1[0], made = R1[1], ran = R1[2], conn = R1[3], a1 = RA[0], a2 = RA[1];
+  /* The same rows without normalisation, sorted by the clock value as written. */
+  var RAW = sortBy(RA.concat(R1), "shown");
+  var RAWGAP = RA[0].shown - R1[R1.length - 1].shown;
+  var RAWGAP_H = Math.round(RAWGAP / 3600000);
+  /* Test 2: alerts with the suspect's timeline. */
+  var M2 = sortBy(RA.concat(R2), "t");
+  var IN2 = inside(R2, RA) + inside(RA, R2);
+  var LAST2 = span(R2)[1], FIRSTA = span(RA)[0];
+  var ALLBEFORE = R2.every(function(r){ return r.t < FIRSTA; });
+  var GAP_MS = FIRSTA - LAST2, GAP_DAYS = Math.floor(GAP_MS / 86400000), GAP_YEARS = (GAP_MS / 86400000 / 365.25).toFixed(1);
+  var SWITCH2 = 0; M2.forEach(function(r, n){ if (n && r.k !== M2[n - 1].k) { SWITCH2 += 1; } });
+  var Y2 = iso(R2[0].t).slice(0, 4), YA = iso(FIRSTA).slice(0, 4);
+  var GAPTXT = GAP_DAYS + " days, about " + GAP_YEARS + " years";
+
+  var STEPS = [
+    { caption: "An intrusion detection system raised " + NUM[RA.length] + " alerts about one computer, " + PC + ". They are written in the seven columns of the course timeline: " + COLS.join(", ") + ". The first alert is at " + iso(a1.t) + ", for a request for an update script. The other two, at " + hms(RA[1].t) + " and " + hms(RA[2].t) + ", are for regular contact with one server. All these times are already UTC.",
+      state: { mode: "tl", rows: RA, lbl: "On screen: the IDS alerts (" + RA.length + " rows)", note: "An alert is a hypothesis. You need a second record to test it." } },
+    { caption: "Now take a second record: " + NUM[R1.length] + " event records from the infected computer itself. Its sources wrote local time, and its clock is set to UTC" + OFFSET_H + ". As found, the rows read from " + B1[0].local.slice(11) + " to " + B1[B1.length - 1].local.slice(11) + ". Beside the alerts they seem to end about " + RAWGAP_H + " hours before the first alert. Without conversion, nothing seems to connect.",
+      state: { mode: "tl", rows: RAW, raw: true, brk: { after: R1[R1.length - 1], text: "Looks like a gap of " + dur(RAWGAP) + " - but the two clocks are different" }, lbl: "On screen: alerts (UTC) + infected computer (local time, not converted)", note: "Two clocks in one column: this order means nothing yet." } },
+    { caption: "This is normalisation. The offset is UTC" + OFFSET_H + ", so you add " + ADD_H + " hours to each local time. " + B1[0].local.slice(11) + " becomes " + hms(R1[0].t) + "Z, and " + B1[B1.length - 1].local.slice(11) + " becomes " + hms(R1[R1.length - 1].t) + "Z. The column original_zone keeps the words \"" + zone(OFFSET_H) + "\". So your timeline remembers that these times were converted.",
+      state: { mode: "norm", lbl: "On screen: infected computer, before and after normalisation", note: "Local time + " + ADD_H + " h = UTC. The original zone stays in its own column." } },
+    { caption: "Merge the alerts with the converted rows and sort by time. Now the rows interleave. The page opened at " + hms(page.t) + ", and the first alert came " + secs(page, a1) + " seconds later. The file was created " + secs(a1, made) + " seconds after that alert, and the program started " + secs(made, ran) + " seconds later. The connection was allowed at " + hms(conn.t) + ", and the alert for regular contact came " + plural(secs(conn, a2), "second") + " later.",
+      state: { mode: "tl", rows: M1, delta: true, lbl: "On screen: alerts + infected computer, merged and sorted (UTC)", note: "The source changes " + SWITCH1 + " times in " + M1.length + " rows. No two neighbours are more than " + MAXGAP1 + " s apart." } },
+    { caption: "Read this result. It is the same computer, and all " + M1.length + " rows fit inside " + SPAN1 + " seconds. " + IN1 + " of the " + R1.length + " computer rows fall inside the time span of the alerts. The two records explain each other, so this correlation supports the alerts. An independent source confirms them, and the alert can now become a finding.",
+      state: { mode: "tl", rows: M1, delta: true, brk: { end: true, ok: true, text: "INTERLEAVED - " + IN1 + " of " + R1.length + " computer rows inside the alert span - the records support each other" }, lbl: "On screen: alerts + infected computer, merged and sorted (UTC)", note: "Result of test 1: confirmed by an independent source." } },
+    { caption: "Now the question from the case. A defence may say that malware made the leak, not the suspect. So take " + NUM[R2.length] + " rows of the suspect's timeline, simplified, in the same seven columns. They are already UTC, from " + iso(R2[0].t) + " to " + iso(LAST2) + ". They show a removable drive connected, a folder and a document opened, and a wiping tool started. This is a different computer at the same client.",
+      state: { mode: "tl", rows: R2, lbl: "On screen: the suspect's timeline (" + R2.length + " rows, simplified)", note: "Same columns, same clock. Only then can you merge." } },
+    { caption: "Merge the alerts with the suspect's rows and sort by time. This time you get two blocks. " + (ALLBEFORE ? "Every row of the suspect's timeline sorts before every alert. " : "") + "Count the rows of one record that fall inside the time span of the other: " + NUM[IN2] + ". The gap between the last suspect row and the first alert is " + GAPTXT + ".",
+      state: { mode: "tl", rows: M2, brk: { after: R2[R2.length - 1], text: "GAP: " + GAPTXT + " - " + IN2 + " rows of one record inside the span of the other" }, lbl: "On screen: alerts + suspect's timeline, merged and sorted (UTC)", note: "The source changes " + plural(SWITCH2, "time") + " in " + M2.length + " rows: two blocks, " + Y2 + " and " + YA + "." } },
+    { caption: "Read it honestly. It is a different computer, and the two blocks are about " + GAP_YEARS + " years apart. This infection of " + YA + " cannot explain what happened on the suspect's computer in " + Y2 + ". The correlation excludes a link between the two. A negative result is a finding too, and it goes into your report.",
+      state: { mode: "tl", rows: M2, brk: { after: R2[R2.length - 1], text: "NO LINK - different computer, " + GAPTXT + " apart - the comparison excludes this infection" }, lbl: "On screen: alerts + suspect's timeline, merged and sorted (UTC)", note: "Result of test 2: a link is excluded. Report it." } },
+    { caption: "Know what this does not show. It does not show that the suspect's computer was free of malware in " + Y2 + ". Only an examination of his own disk answers that question, not this capture. Also, an exclusion needs both clocks to be right. Remember the false gap of about " + RAWGAP_H + " hours: check the normalisation before you trust a gap or a match.",
+      state: { mode: "tl", rows: M2, brk: { after: R2[R2.length - 1], text: "LIMITS - says nothing about malware on the suspect's computer in " + Y2 + " - and only as good as the two clocks" }, lbl: "On screen: alerts + suspect's timeline, merged and sorted (UTC)", note: "A wrong offset can make a false gap or a false match." } },
+    { caption: "You ran one test twice. With the infected computer, " + M1.length + " rows interleaved inside " + SPAN1 + " seconds, and the records support each other. With the suspect's timeline, " + NUM[IN2] + " rows overlapped and the gap was " + GAPTXT + ", so a link is excluded. Read what you just saw below.",
+      state: { mode: "sum", lbl: "On screen: the two results side by side", note: "Same method, two different results. Both go into the report." } }
+  ];
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) { e.className = cls; } if (text !== undefined) { e.textContent = text; } return e; }
+  function stamp(td, s){ var cut = s.indexOf("T") + 1 || s.indexOf(" ") + 1; td.appendChild(document.createTextNode(s.slice(0, cut))); td.appendChild(el("wbr")); td.appendChild(document.createTextNode(s.slice(cut))); }
+  function breakRow(b, n){ var tr = el("tr", "brk" + (b.ok ? " ok" : "")), td = el("td", "", b.text); td.colSpan = n; tr.appendChild(td); return tr; }
+  function timeline(state){
+    var t = el("table", "tl"), hr = el("tr"), tb = el("tbody");
+    var heads = [["k-rec", "record"], ["k-time", state.raw ? "time as written" : COLS[0]], ["k-desc x", COLS[1]], ["k-src x", COLS[2]], ["k-art x", COLS[3]], ["k-what", COLS[4]], ["k-zone x", COLS[5]], ["k-tag x", COLS[6]]];
+    heads.forEach(function(h){ hr.appendChild(el("th", h[0], h[1])); });
+    var th = el("thead"); th.appendChild(hr); t.appendChild(th);
+    state.rows.forEach(function(r, n){
+      var tr = el("tr", r.k), c = el("td");
+      c.appendChild(el("span", "pill " + r.k, NAME[r.k])); tr.appendChild(c);
+      var tm = el("td", state.raw && r.local ? "loc" : "");
+      stamp(tm, state.raw && r.local ? r.local : iso(r.t));
+      if (state.raw && r.local) { tm.appendChild(el("span", "d", "local time")); }
+      if (state.delta && n) { tm.appendChild(el("span", "d", "+" + secs(state.rows[n - 1], r) + " s")); }
+      tr.appendChild(tm);
+      tr.appendChild(el("td", "x", r.desc)); tr.appendChild(el("td", "x", r.src)); tr.appendChild(el("td", "x", r.art));
+      tr.appendChild(el("td", "", r.what));
+      tr.appendChild(el("td", "x", state.raw && r.local ? "(not yet recorded)" : r.zone)); tr.appendChild(el("td", "x", r.tag));
+      tb.appendChild(tr);
+      if (state.brk && state.brk.after === r) { tb.appendChild(breakRow(state.brk, heads.length)); }
+    });
+    if (state.brk && state.brk.end) { tb.appendChild(breakRow(state.brk, heads.length)); }
+    t.appendChild(tb); return t;
+  }
+  function normTable(){
+    var t = el("table", "tl"), hr = el("tr"), tb = el("tbody");
+    [["n-rec x", "record"], ["n-found", "as found (local time)"], ["n-add x", "add"], ["n-utc", COLS[0]], ["n-zone", COLS[5]]].forEach(function(h){ hr.appendChild(el("th", h[0], h[1])); });
+    var th = el("thead"); th.appendChild(hr); t.appendChild(th);
+    R1.forEach(function(r){
+      var tr = el("tr", "inf"), c = el("td", "x"); c.appendChild(el("span", "pill inf", NAME.inf)); tr.appendChild(c);
+      var f = el("td", "loc"); stamp(f, r.local); tr.appendChild(f);
+      tr.appendChild(el("td", "x", "+ " + ADD_H + " h"));
+      var u = el("td", "new"); stamp(u, iso(r.t)); tr.appendChild(u);
+      tr.appendChild(el("td", "", r.zone));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); return t;
+  }
+  function summary(){
+    var w = el("div", "cards"), a = el("div", "card"), b = el("div", "card ex");
+    a.appendChild(el("h3", "", "Test 1: alerts + infected computer"));
+    a.appendChild(el("p", "", M1.length + " rows inside " + SPAN1 + " seconds. The source changes " + SWITCH1 + " times."));
+    a.appendChild(el("p", "", IN1 + " of " + R1.length + " computer rows inside the alert span."));
+    a.appendChild(el("p", "v", "INTERLEAVED = the records support each other"));
+    b.appendChild(el("h3", "", "Test 2: alerts + suspect's timeline"));
+    b.appendChild(el("p", "", "Two blocks, " + Y2 + " and " + YA + ". Gap: " + GAPTXT + "."));
+    b.appendChild(el("p", "", IN2 + " rows of one record inside the span of the other."));
+    b.appendChild(el("p", "v", "TWO BLOCKS = a link is excluded"));
+    w.appendChild(a); w.appendChild(b); return w;
+  }
+  /* render(): draw the label, the table (or the summary cards) and the note for one state. */
+  function render(state){
+    document.getElementById("lbl").textContent = state.lbl;
+    var v = document.getElementById("view"); v.textContent = "";
+    v.appendChild(state.mode === "norm" ? normTable() : state.mode === "sum" ? summary() : timeline(state));
+    document.getElementById("note").textContent = state.note;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

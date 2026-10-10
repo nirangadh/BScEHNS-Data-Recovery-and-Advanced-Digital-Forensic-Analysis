@@ -1,0 +1,304 @@
+<!doctype html>
+<!-- NB6018CEM demo S08-D2. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S08-D2 A rule reads the traffic | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.lbl{margin:0 0 .35rem;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--stone)}
+.rule{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{flex:0 1 auto;max-width:100%;min-width:0;border:2px solid var(--hairline);border-radius:9px;padding:.3rem .5rem;background:#fff;transition:background .25s,border-color .25s,opacity .25s}
+.chip .role{display:block;font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--stone)}
+.chip code{display:block;font-family:var(--mono);font-size:.8rem;overflow-wrap:anywhere;color:var(--ink)}
+.chip .st{display:block;font-size:.7rem;font-weight:800;color:var(--stone);min-height:1.2em}
+.chip.lit{border-color:var(--plum);background:var(--plum-tint)}
+.chip.lit .st{color:var(--plum-dark)}
+.chip.match{border-color:var(--sage-dark);background:var(--surface)}
+.chip.match .st{color:var(--sage-dark)}
+.chip.nomatch{border:2px dashed var(--plum);background:var(--plum-tint)}
+.chip.nomatch .st{color:var(--plum-dark)}
+.chip.nottested{opacity:.6}
+.means{margin:.8rem 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.4rem}
+.means li{border-left:4px solid var(--plum);background:var(--plum-tint);border-radius:0 8px 8px 0;padding:.35rem .55rem;font-size:.8rem;min-width:0}
+.means code{display:block;font-family:var(--mono);font-weight:700;font-size:.76rem;overflow-wrap:anywhere}
+.means[hidden],.says[hidden]{display:none}
+.card{margin-top:.9rem;border:1px solid var(--hairline);border-radius:10px;padding:.6rem .7rem;min-width:0}
+.card.now{border:2px solid var(--plum)}
+.card dl{margin:0;display:grid;grid-template-columns:5.4rem 1fr;gap:.12rem .5rem;font-size:.8rem}
+.card dt{color:var(--stone)}
+.card dd{margin:0;font-family:var(--mono);overflow-wrap:anywhere;min-width:0}
+.empty{color:var(--stone);font-size:.82rem;margin:0}
+.verdict{margin:.5rem 0 0;font-weight:800;font-size:.84rem;color:var(--plum-dark)}
+.verdict.ok{color:var(--sage-dark)}
+.alertbox{border:2px dashed var(--hairline)}
+.alertbox.has{border:2px solid var(--sage-dark);background:var(--surface)}
+.log{margin:0;font-family:var(--mono);font-size:.74rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.log b{background:#fff;outline:2px solid var(--plum);border-radius:3px}
+.lognote{margin:.4rem 0 0;font-size:.78rem;color:var(--plum-dark);font-weight:700}
+.says{margin:.6rem 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.5rem;font-size:.8rem}
+.says div{background:#fff;border:1px solid var(--hairline);border-radius:8px;padding:.4rem .6rem;min-width:0}
+.says h3{margin:0 0 .2rem;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase}
+.says .y h3{color:var(--sage-dark)}.says .n h3{color:var(--plum-dark)}
+.says ul{margin:0;padding-left:1.1rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 8 notes</a>
+  <h1>S08-D2: A rule reads the traffic</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> an intrusion detection system (IDS) tests each packet against the parts of a rule, and an alert fires only when every part matches.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl" id="rlbl"></p>
+    <div class="rule" id="rule"></div>
+    <ul class="means" id="means"></ul>
+    <div class="card" id="traffic">
+      <p class="lbl">Traffic passing now</p>
+      <div id="tbody"></div>
+    </div>
+    <div class="card alertbox" id="alerts">
+      <p class="lbl" id="albl"></p>
+      <div id="abody"></div>
+      <div class="says" id="says" hidden>
+        <div class="y"><h3>The alert says</h3><ul id="saysY"></ul></div>
+        <div class="n"><h3>The alert does NOT say</h3><ul id="saysN"></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>A rule is a list of conditions, and an alert needs every condition to match. So reading a rule tells you exactly what an alert means and what it does not mean. The message is a label that the author of the rule wrote, not a fact about the traffic. Before you report an alert, open the packets that fired it.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* The network of this demo. $EXTERNAL_NET is every address outside HOME_NET. */
+  var HOME_NET = "192.0.2.0/24";
+  function inHome(ip){ return ip.indexOf(HOME_NET.split(".").slice(0, 3).join(".") + ".") === 0; }
+  /* The rule, part by part. Joined with single spaces, the texts give the exact rule.
+     kind: "action" is always ready, "test" is checked against the traffic, "label" tests nothing. */
+  var PARTS = [
+    { id: "action", kind: "action", role: "action", text: "alert",
+      mean: "The action: write an alert and let the traffic pass." },
+    { id: "proto", kind: "test", role: "protocol", text: "http",
+      mean: "The protocol: the rule looks only at web traffic.",
+      test: function(t){ return t.proto === "http"; } },
+    { id: "src", kind: "test", role: "source", text: "$HOME_NET any",
+      mean: "Source address and source port: any computer of our own network (" + HOME_NET + "), from any port.",
+      test: function(t){ return inHome(t.src); } },
+    { id: "dir", kind: "test", role: "direction", text: "->",
+      mean: "The direction: from the left side to the right side.",
+      test: function(){ return true; } },
+    { id: "dst", kind: "test", role: "destination", text: "$EXTERNAL_NET any",
+      mean: "Destination address and port: any address outside our network, any port.",
+      test: function(t){ return !inHome(t.dst); } },
+    { id: "msg", kind: "label", role: "message", text: "(msg:\"NB6018 TRAINING Request for update script\";",
+      mean: "The message that the alert will carry. The author of the rule wrote this label. It is not a fact about the traffic." },
+    { id: "flow", kind: "test", role: "flow", text: "flow:established,to_server;",
+      mean: "A connection that is open, in the direction of the server.",
+      test: function(t){ return t.established && t.toServer; } },
+    { id: "method", kind: "test", role: "method", text: "http.method; content:\"GET\";",
+      mean: "The request method is GET.",
+      test: function(t){ return t.method === WANT_METHOD; } },
+    { id: "path", kind: "test", role: "path", text: "http.uri; content:\"/download/update.ps1\";",
+      mean: "The path of the request contains this text.",
+      test: function(t){ return typeof t.path === "string" && t.path.indexOf(WANT_PATH) !== -1; } },
+    { id: "class", kind: "label", role: "class", text: "classtype:trojan-activity;",
+      mean: "The class that the author gave the rule." },
+    { id: "sid", kind: "label", role: "rule ID, revision", text: "sid:9000001; rev:1;)",
+      mean: "The rule ID and the revision of the rule." }
+  ];
+  function part(id){ return PARTS.filter(function(p){ return p.id === id; })[0]; }
+  /* Values read out of the rule text, so the alert can never disagree with the rule. */
+  var WANT_METHOD = /content:"([^"]+)"/.exec(part("method").text)[1];
+  var WANT_PATH = /content:"([^"]+)"/.exec(part("path").text)[1];
+  var MSG = /msg:"([^"]+)"/.exec(part("msg").text)[1];
+  var CLASS = /classtype:([^;]+);/.exec(part("class").text)[1];
+  var SID = /sid:(\d+);/.exec(part("sid").text)[1], REV = /rev:(\d+);/.exec(part("sid").text)[1];
+  var GID = "1";
+  /* How Suricata prints a class: its long name and its priority. */
+  var CLASSES = { "trojan-activity": { name: "A Network Trojan was detected", priority: 1 } };
+  var TESTS = PARTS.filter(function(p){ return p.kind === "test"; });
+  /* The four things that pass the IDS. */
+  var ITEMS = [
+    { name: "A", kind: "DNS query", proto: "dns", protoShow: "DNS", src: "192.0.2.10", sport: null, dst: "192.0.2.53", dport: null,
+      established: false, toServer: true, method: null, path: null, detail: "DNS query for files.example.net", query: "files.example.net" },
+    { name: "B", kind: "web request", proto: "http", protoShow: "HTTP (web)", src: "192.0.2.10", sport: 49731, dst: "203.0.113.80", dport: 80,
+      established: true, toServer: true, method: "GET", path: "/index.html", detail: "request for a web page" },
+    { name: "C", kind: "web answer", proto: "http", protoShow: "HTTP (web)", src: "203.0.113.80", sport: 80, dst: "192.0.2.10", dport: 49731,
+      established: true, toServer: false, method: null, path: null, detail: "a web page that contains the text " + WANT_PATH },
+    { name: "D", kind: "web request", proto: "http", protoShow: "HTTP (web)", src: "192.0.2.10", sport: 49733, dst: "203.0.113.80", dport: 80,
+      established: true, toServer: true, method: "GET", path: WANT_PATH, detail: "request for a script file",
+      time: "01/22/2025-19:45:56.530137", transport: "TCP" }
+  ];
+  function ep(ip, port){ return port === null ? ip : ip + ":" + port; }
+  function epWords(ip, port){ return port === null ? ip : ip + " port " + port; }
+  /* evaluate(): test the parts from left to right and stop at the first part that does not match. */
+  function evaluate(t){
+    var r = { status: {}, matched: [], stop: null, skipped: 0, alert: false };
+    PARTS.forEach(function(p){
+      if (p.kind === "action") { r.status[p.id] = "ready"; return; }
+      if (p.kind === "label") { r.status[p.id] = "label"; return; }
+      if (r.stop) { r.status[p.id] = "nottested"; r.skipped += 1; return; }
+      if (p.test(t)) { r.status[p.id] = "match"; r.matched.push(p.role); }
+      else { r.status[p.id] = "nomatch"; r.stop = p; }
+    });
+    r.alert = r.stop === null;
+    return r;
+  }
+  var R = ITEMS.map(evaluate);
+  function fastLine(t){
+    var c = CLASSES[CLASS];
+    return [t.time + "  [**] ", "[" + GID + ":" + SID + ":" + REV + "]", " " + MSG + " [**] [Classification: " + c.name + "] [Priority: " + c.priority + "] {" + t.transport + "} " + ep(t.src, t.sport) + " -> " + ep(t.dst, t.dport)];
+  }
+  function list(a){ return a.length === 1 ? a[0] : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+  function q(s){ return "\"" + s + "\""; }
+  var A = ITEMS[0], B = ITEMS[1], C = ITEMS[2], D = ITEMS[3];
+  var LINE = fastLine(D), IDS3 = LINE[1];
+  var SAYS = ["A request with the path " + WANT_PATH + " left " + D.src + "."];
+  var NOT = ["that the file arrived", "that the file ran", "who was at the keyboard"];
+  var STEPS = [
+    { caption: "This is one Suricata rule, shown in " + PARTS.length + " parts. It has three areas. The first word is the action. Next come the protocol, the addresses, the ports and the direction. The brackets hold the options.",
+      state: { lit: [], means: false, item: null, alert: false, says: false, note: "One rule, three areas: action - protocol, addresses, ports and direction - options in brackets." } },
+    { caption: "Read the first part: action, protocol, addresses, ports and direction. " + q(part("action").text) + " is the action: write an alert and let the traffic pass. " + q(part("proto").text) + " means that the rule looks only at web traffic. " + q(part("src").text) + " is the source: any computer of our own network, here " + HOME_NET + ", from any port. The arrow " + q(part("dir").text) + " gives the direction, and " + q(part("dst").text) + " is the destination: any address outside our network, on any port.",
+      state: { lit: ["action", "proto", "src", "dir", "dst"], means: true, item: null, alert: false, says: false, note: "The first part: action, protocol, addresses, ports and direction." } },
+    { caption: "Now read the options that test the traffic. " + q(part("flow").text) + " asks for a connection that is open, in the direction of the server. " + q(part("method").text) + " asks for the request method " + WANT_METHOD + ". " + q(part("path").text) + " asks that the path of the request contains this text.",
+      state: { lit: ["flow", "method", "path"], means: true, item: null, alert: false, says: false, note: "The options that test the traffic." } },
+    { caption: "Three options test nothing. " + q("msg") + " is the message that the alert will carry: " + q(MSG) + ". The author of the rule wrote this label, so it is not a fact about the traffic. " + q(part("class").text) + " is the class that the author gave the rule. " + q(part("sid").text.replace(")", "")) + " are the rule ID and the revision of the rule.",
+      state: { lit: ["msg", "class", "sid"], means: true, item: null, alert: false, says: false, note: "The options that only label the alert." } },
+    { caption: "Item " + A.name + " passes the IDS: a " + A.kind + " from " + A.src + " to " + A.dst + " for " + A.query + ". The IDS tests the parts of the rule from left to right. The action is ready, but the " + R[0].stop.role + " part does not match: this is " + A.protoShow + ", not web traffic. The IDS stops there and does not test the other " + R[0].skipped + " parts. No alert.",
+      state: { lit: [], means: false, item: 0, alert: false, says: false } },
+    { caption: "Item " + B.name + " is a " + B.kind + " from " + epWords(B.src, B.sport) + " to " + epWords(B.dst, B.dport) + ": " + B.method + " " + B.path + ". The " + list(R[1].matched) + " parts all match. The " + R[1].stop.role + " part does not match, because " + B.path + " does not contain " + WANT_PATH + ". One part without a match is enough: no alert.",
+      state: { lit: [], means: false, item: 1, alert: false, says: false } },
+    { caption: "Item " + C.name + " is a " + C.kind + " that travels from " + epWords(C.src, C.sport) + " back to " + epWords(C.dst, C.dport) + ". It carries the text " + WANT_PATH + " inside a web page. The " + list(R[2].matched) + " part matches, but the " + R[2].stop.role + " part does not: " + C.src + " is not in $HOME_NET. The IDS stops, so it never tests the " + part("path").role + " part. The same text in the other direction does not fire the rule: no alert.",
+      state: { lit: [], means: false, item: 2, alert: false, says: false } },
+    { caption: "Item " + D.name + " is a " + D.kind + " from " + epWords(D.src, D.sport) + " to " + epWords(D.dst, D.dport) + ": " + D.method + " " + D.path + ". The parts match one after another: " + list(R[3].matched) + ". All " + R[3].matched.length + " tested parts match, so the IDS writes an alert. The traffic still passes, because the action is " + q(part("action").text) + ".",
+      state: { lit: [], means: false, item: 3, alert: R[3].alert, stagger: true, says: false } },
+    { caption: "The alert has the form that the lab will show: one line in the style of Suricata's fast.log file. The line reads: " + LINE.join("").replace("  ", " ") + ". Here " + q(IDS3) + " is the generator, the rule ID and the revision. The message, the class and the priority come from the rule. The time, the addresses and the ports come from the traffic.",
+      state: { lit: [], means: false, item: 3, alert: R[3].alert, mark: true, says: false } },
+    { caption: "Now read what the alert does not say. It says that a request with the path " + WANT_PATH + " left " + D.src + ". It does not say " + NOT[0] + ", " + NOT[1] + ", or " + NOT[2] + ". An alert is a hypothesis, so someone must check the traffic. Read what you just saw below.",
+      state: { lit: [], means: false, item: 3, alert: R[3].alert, says: true } }
+  ];
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) { e.className = cls; } if (text !== undefined) { e.textContent = text; } return e; }
+  var WORD = { ready: "ready", match: "✓ MATCH", nomatch: "✗ NO MATCH", nottested: "not tested", label: "label, no test" };
+  var chips = {};
+  PARTS.forEach(function(p){
+    var c = el("div", "chip");
+    c.appendChild(el("span", "role", p.role));
+    c.appendChild(el("code", "", p.text));
+    c.appendChild(el("span", "st", ""));
+    document.getElementById("rule").appendChild(c);
+    chips[p.id] = c;
+  });
+  document.getElementById("rlbl").textContent = "The rule ($HOME_NET is " + HOME_NET + ")";
+  SAYS.forEach(function(s){ document.getElementById("saysY").appendChild(el("li", "", s)); });
+  NOT.forEach(function(s){ document.getElementById("saysN").appendChild(el("li", "", s)); });
+  /* render(): draw the rule chips, the meanings, the traffic card and the alert box for one state. */
+  function render(state){
+    var t = state.item === null ? null : ITEMS[state.item], r = t ? R[state.item] : null, order = 0;
+    PARTS.forEach(function(p){
+      var c = chips[p.id], st = r ? r.status[p.id] : "", lit = state.lit.indexOf(p.id) !== -1;
+      c.className = "chip" + (lit ? " lit" : "") + (st === "match" || st === "nomatch" || st === "nottested" ? " " + st : "");
+      c.style.transitionDelay = state.stagger && st === "match" ? (order++ * 0.18) + "s" : "0s";
+      c.lastChild.textContent = r ? WORD[st] : (lit ? "look here" : "");
+    });
+    var m = document.getElementById("means"); m.textContent = ""; m.hidden = !state.means;
+    PARTS.forEach(function(p){
+      if (state.lit.indexOf(p.id) === -1) { return; }
+      var li = el("li"); li.appendChild(el("code", "", p.text)); li.appendChild(document.createTextNode(p.mean)); m.appendChild(li);
+    });
+    var tb = document.getElementById("tbody"); tb.textContent = "";
+    document.getElementById("traffic").className = "card" + (t && !state.mark && !state.says ? " now" : "");
+    if (!t) { tb.appendChild(el("p", "empty", state.note)); }
+    else {
+      var dl = el("dl");
+      [["Item", t.name + ", a " + t.kind], ["Protocol", t.protoShow], ["From", ep(t.src, t.sport)], ["To", ep(t.dst, t.dport)],
+       ["Direction", t.toServer ? "towards the server" : "back from the server"], ["Method", t.method || "none"], ["Path", t.path || "none"], ["Detail", t.detail]
+      ].forEach(function(x){ dl.appendChild(el("dt", "", x[0])); dl.appendChild(el("dd", "", x[1])); });
+      tb.appendChild(dl);
+      tb.appendChild(el("p", "verdict" + (r.alert ? " ok" : ""), r.alert ? "ALERT - all " + r.matched.length + " tested parts match" : "NO ALERT - stopped at the " + r.stop.role + " part"));
+    }
+    var n = state.alert ? 1 : 0, ab = document.getElementById("abody"); ab.textContent = "";
+    document.getElementById("albl").textContent = "Alerts written: " + n;
+    document.getElementById("alerts").className = "card alertbox" + (n ? " has" : "");
+    if (!n) { ab.appendChild(el("p", "empty", "(empty)")); }
+    else {
+      var pre = el("p", "log");
+      pre.appendChild(document.createTextNode(LINE[0]));
+      pre.appendChild(el(state.mark ? "b" : "span", "", LINE[1]));
+      pre.appendChild(document.createTextNode(LINE[2]));
+      ab.appendChild(pre);
+      if (state.mark) { ab.appendChild(el("p", "lognote", IDS3 + " = generator : rule ID : revision")); }
+    }
+    document.getElementById("says").hidden = !state.says;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
