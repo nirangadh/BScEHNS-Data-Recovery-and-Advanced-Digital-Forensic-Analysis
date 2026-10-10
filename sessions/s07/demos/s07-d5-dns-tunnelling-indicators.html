@@ -1,0 +1,218 @@
+<!doctype html>
+<!-- NB6018CEM demo S07-D5. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S07-D5 DNS tunnelling beside normal lookups | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.lists{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.8rem}
+.list{min-width:0;border:2px solid var(--hairline);border-radius:10px;padding:.6rem;transition:border-color .25s}
+.list h3{margin:0 0 .1rem;font-size:.86rem;line-height:1.3}
+.list .sub{margin:0 0 .45rem;font-size:.74rem;color:var(--stone)}
+.row{display:grid;grid-template-columns:5.1rem 2.5rem minmax(0,1fr);column-gap:.35rem;padding:.28rem .2rem;border-top:1px solid var(--hairline);font-family:var(--mono);font-size:.74rem;line-height:1.4}
+.row>span{min-width:0}
+.row .tm{color:var(--stone)}
+.row .nm{overflow-wrap:anywhere;word-break:break-all}
+.row .tag{grid-column:1/-1;font-family:var(--font);font-size:.72rem;font-weight:700;color:var(--plum-dark);overflow-wrap:anywhere}
+.row .tag.calm{color:var(--sage-dark)}
+.row .tag:empty{display:none}
+.mark{background:var(--plum-tint);box-shadow:0 0 0 1px var(--plum);border-radius:3px;font-weight:700;transition:background .25s}
+.mark.calm{background:var(--surface);box-shadow:0 0 0 1px var(--sage-dark)}
+.sum{margin:.5rem 0 0;padding:.4rem .5rem;border-radius:8px;font-size:.78rem;font-weight:700;background:var(--surface);color:var(--ink);overflow-wrap:anywhere;white-space:pre-line}
+.sum.hot{background:var(--plum-tint);color:var(--plum-dark)}
+.sum:empty{display:none}
+@media (max-width:40rem){.lists{grid-template-columns:minmax(0,1fr)}.stage{padding:.6rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 7 notes</a>
+  <h1>S07-D5: DNS tunnelling beside normal lookups</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> data hidden in DNS must travel inside the names that are asked for, and that leaves four marks you can see beside normal lookups.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="lists">
+      <div class="list" id="listL"><h3>Normal lookups from 192.0.2.10</h3><p class="sub">time, type, name asked for</p><div id="rowsL"></div><p class="sum" id="sumL"></p></div>
+      <div class="list" id="listR"><h3>Queries to one domain</h3><p class="sub">also from 192.0.2.10, all ending in .t.example.net</p><div id="rowsR"></div><p class="sum hot" id="sumR"></p></div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>You set two lists of DNS queries side by side and saw four indicators: long labels that look random, many names that are each asked only once, an unusual record type, and a steady rhythm. As the notes explain, the hidden data must travel inside the names, so the names give the channel away. This matters because an examiner can find the pattern in DNS logs or flow records, even when no content can be read. Report it as a pattern towards one domain, not as proof of what was sent.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* Data. Every count, length and gap in the captions is computed from these two lists. */
+  /* Times are tenths of a second after 10:14:00. */
+  var LEFT = [
+    [20, "A", "www", "example.com"], [40, "AAAA", "www", "example.com"], [450, "A", "mail", "example.com"],
+    [520, "A", "intranet", "example.org"], [900, "A", "www", "example.com"], [930, "AAAA", "downloads", "example.com"],
+    [1680, "A", "mail", "example.com"], [1810, "A", "intranet", "example.org"]
+  ].map(function(r){ return { t: r[0], type: r[1], label: r[2], dom: r[3] }; });
+  /* Meaningless labels from a seeded generator. They encode nothing. */
+  var ABC = "abcdefghijklmnopqrstuvwxyz234567", seed = 6018;
+  function rnd(n){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >> 16) % n; }
+  var RIGHT = [];
+  (function(){
+    for (var k = 0; k < 8; k++) {
+      var len = 40 + rnd(11), s = "";
+      for (var j = 0; j < len; j++) { s += ABC.charAt(rnd(32)); }
+      RIGHT.push({ t: 600 + k * 5, type: "TXT", label: s, dom: "t.example.net" });
+    }
+  })();
+
+  function clock(t, tenths){
+    var s = Math.floor(t / 10), m = 14 + Math.floor(s / 60), ss = s % 60;
+    return "10:" + m + ":" + (ss < 10 ? "0" : "") + ss + (tenths ? "." + (t % 10) : "");
+  }
+  function gaps(L){ var g = []; for (var k = 1; k < L.length; k++) { g.push((L[k].t - L[k - 1].t) / 10); } return g; }
+  function lens(L){ return L.map(function(q){ return q.label.length; }); }
+  function min(a){ return Math.min.apply(null, a); }
+  function max(a){ return Math.max.apply(null, a); }
+  function full(q){ return q.label + "." + q.dom; }
+  function distinct(L){ var o = {}, n = 0; L.forEach(function(q){ if (!o[full(q)]) { o[full(q)] = 1; n++; } }); return n; }
+  function types(L){
+    var o = {}, keys = [];
+    L.forEach(function(q){ if (!o[q.type]) { o[q.type] = 0; keys.push(q.type); } o[q.type]++; });
+    return keys.map(function(k){ return o[k] + " of type " + k; }).join(", ");
+  }
+  var gL = gaps(LEFT), gR = gaps(RIGHT), lL = lens(LEFT), lR = lens(RIGHT);
+  var dL = distinct(LEFT), dR = distinct(RIGHT), nL = LEFT.length, nR = RIGHT.length;
+  var total = lR.reduce(function(a, b){ return a + b; }, 0);
+  var perQuery = Math.round(total / nR);
+  var steady = min(gR) === max(gR);
+  var need = Math.floor(1000000 / perQuery / 1000) * 1000;
+  var minutes = Math.round((LEFT[nL - 1].t - LEFT[0].t) / 600);
+  var spanR = (RIGHT[nR - 1].t - RIGHT[0].t) / 10;
+  var longName = max(RIGHT.map(function(q){ return full(q).length; }));
+
+  var STEPS = [
+    { caption: "Two lists of DNS queries from one computer, 192.0.2.10. On the left are " + nL + " normal lookups over about " + minutes + " minutes: short names such as www.example.com. On the right are " + nR + " queries in " + spanR + " seconds. Each has a long first label and ends in .t.example.net. Why would anyone hide data in DNS? Almost every network lets DNS out, even when it blocks everything else. And few people read it.", state: { mode: "plain" } },
+    { caption: "Indicator 1, long labels. Count the characters in the first label of each name. On the left the labels have " + min(lL) + " to " + max(lL) + " characters. On the right they have " + min(lR) + " to " + max(lR) + " characters. A label may have at most 63 characters, and a whole name at most 253. The longest name here has " + longName + ". Someone who hides data in names wants long labels, because each one carries more.", state: { mode: "len" } },
+    { caption: "Indicator 1 again, randomness. The left labels are words a person chose: www, mail, intranet, downloads. The right labels contain no words. They are a mix of letters and digits that looks random, which means high entropy. Encoded data looks like this. These labels are meaningless strings made for this demo.", state: { mode: "rand" } },
+    { caption: "Indicator 2, names asked only once. On the left, " + nL + " queries ask for only " + dL + " different names, and " + (nL - dL) + " queries repeat a name. On the right every name is new: " + dR + " of " + nR + ". A real case shows thousands of new names under one domain. A normal name is asked again and again, and the resolver answers it from memory. A made-up name can never be answered from memory. So every query reaches the name server of that domain. That is the trick: the query itself delivers the data.", state: { mode: "uniq" } },
+    { caption: "Indicator 3, record type. The left list has " + types(LEFT) + ". These types ask for an address. The right list has " + types(RIGHT) + ". A TXT answer can carry free text, so it is convenient for sending data back. TXT also has honest uses, for example mail security records. So the type alone proves nothing.", state: { mode: "type" } },
+    { caption: "Indicator 4, rhythm. Look at the gap before each query. On the left the gaps are " + gL.join(" s, ") + " s. They are irregular. On the right the gap is " + (steady ? gR[0] + " s every time" : "between " + min(gR) + " and " + max(gR) + " s") + ". People browse in bursts. A program ticks.", state: { mode: "gap" } },
+    { caption: "Volume. Add up the characters in the right-hand labels: " + lR.join(" + ") + " = " + total + ". That is about " + perQuery + " characters in each query, and encoding makes the hidden data smaller still. So one megabyte needs more than " + need.toLocaleString("en-GB") + " queries. A real transfer makes a very large number of queries to one domain, and that number is easy to see.", state: { mode: "vol" } },
+    { caption: "Be careful. Each indicator has honest causes. Content networks and security products use long generated names. TXT has normal uses. Some programs check a server at a fixed rate. One indicator is a question. Several together, towards one domain, are a finding worth reporting. Report it as a pattern, not as proof of what was sent.", state: { mode: "caution" } },
+    { caption: "Summary. Normal lookups: short readable labels, few names asked many times, address types, irregular gaps. The other list: labels of " + min(lR) + " or more random-looking characters, " + dR + " new names in " + nR + " queries, type TXT, and a gap of " + gR[0] + " s. Four indicators point at one domain. Read what you just saw below.", state: { mode: "all" } }
+  ];
+
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) { e.className = cls; } if (text !== undefined) { e.textContent = text; } return e; }
+  function summary(L, side){
+    var l = lens(L), g = gaps(L), even = min(g) === max(g);
+    return [
+      "1. Labels: " + min(l) + " to " + max(l) + " characters, " + (side ? "random-looking" : "readable words"),
+      "2. Names: " + distinct(L) + " different in " + L.length + " queries",
+      "3. Types: " + types(L),
+      "4. Gaps: " + (even ? g[0] + " s every time" : "irregular, " + min(g) + " to " + max(g) + " s")
+    ].join("\n");
+  }
+  function draw(L, box, sum, mode, side){
+    box.textContent = "";
+    var seen = {}, calm = side ? "" : " calm";
+    L.forEach(function(q, k){
+      var row = el("div", "row"), tag = "";
+      row.appendChild(el("span", "tm", clock(q.t, side)));
+      row.appendChild(el("span", "ty" + (mode === "type" ? " mark" + calm : ""), q.type));
+      var nm = el("span", "nm");
+      nm.appendChild(el("span", (mode === "len" || mode === "rand" || mode === "vol" && side) ? "mark" + calm : "", q.label));
+      nm.appendChild(document.createTextNode("." + q.dom));
+      row.appendChild(nm);
+      if (mode === "len") { tag = "label: " + q.label.length + " characters"; }
+      if (mode === "rand") { tag = side ? "no words, looks random (high entropy)" : "a readable word"; }
+      if (mode === "uniq") { tag = seen[full(q)] ? "asked before" : "new name"; }
+      if (mode === "type") { tag = side ? "type TXT: free text" : "type " + q.type + ": an address"; }
+      if (mode === "gap") { tag = k === 0 ? "first query" : "gap: " + (q.t - L[k - 1].t) / 10 + " s"; }
+      if (mode === "vol" && side) { tag = "carries at most " + q.label.length + " characters"; }
+      seen[full(q)] = 1;
+      row.appendChild(el("span", "tag" + calm, tag));
+      box.appendChild(row);
+    });
+    var l = lens(L), g = gaps(L), s = "";
+    if (mode === "len") { s = "Label length: " + min(l) + " to " + max(l) + " characters"; }
+    if (mode === "rand") { s = side ? "Random-looking labels: " + L.length + " of " + L.length : "Readable labels: " + L.length + " of " + L.length; }
+    if (mode === "uniq") { s = distinct(L) + " different names in " + L.length + " queries"; }
+    if (mode === "type") { s = "Record types: " + types(L); }
+    if (mode === "gap") { s = min(g) === max(g) ? "Steady: " + g[0] + " s every time" : "Irregular: " + min(g) + " s to " + max(g) + " s"; }
+    if (mode === "vol") { s = side ? "Total: " + total + " characters in " + L.length + " queries" : ""; }
+    if (mode === "caution" || mode === "all") { s = summary(L, side); }
+    sum.textContent = s;
+  }
+  /* render(): draw both lists for one state. */
+  function render(state){
+    draw(LEFT, document.getElementById("rowsL"), document.getElementById("sumL"), state.mode, 0);
+    draw(RIGHT, document.getElementById("rowsR"), document.getElementById("sumR"), state.mode, 1);
+    document.getElementById("listR").style.borderColor = state.mode === "all" ? "var(--plum)" : "";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

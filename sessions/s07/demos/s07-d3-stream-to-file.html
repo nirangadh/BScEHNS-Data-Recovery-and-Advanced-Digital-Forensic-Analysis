@@ -1,0 +1,207 @@
+<!doctype html>
+<!-- NB6018CEM demo S07-D3. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S07-D3 From a stream to a file | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.conv{font-family:var(--mono);font-size:.78rem;color:var(--stone);margin:0 0 .6rem;overflow-wrap:anywhere}
+.lab{font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--stone);margin:0 0 .35rem}
+.pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.2rem,1fr));gap:.45rem}
+.p{border:2px solid var(--sage-dark);border-radius:9px;overflow:hidden;font-size:.74rem;min-width:0;transition:opacity .25s,border-color .25s,background .25s}
+.p .ph{background:var(--ink);color:#fff;padding:.3rem .4rem;font-family:var(--mono);font-size:.72rem;overflow-wrap:anywhere}
+.p .ph small{display:block;font-family:var(--font);font-size:.66rem;opacity:.85}
+.p .dt{background:var(--surface);padding:.35rem .4rem;font-family:var(--mono);font-size:.72rem;overflow-wrap:anywhere}
+.p .dt small{display:block;font-family:var(--font);font-size:.66rem;color:var(--stone)}
+.p .tag{padding:.2rem .4rem;font-size:.7rem;font-weight:800;color:var(--plum-dark);background:var(--plum-tint);border-top:1px dashed var(--plum)}
+.p.flag{border-color:var(--plum);border-style:dashed}
+.p.drop{border-style:dotted;border-color:var(--hairline);opacity:.55}
+.p.drop .ph,.p.drop .dt{text-decoration:line-through}
+.p.bare{border-color:var(--sage)}
+.p.bare .ph{background:#fff;color:#8a958e;text-decoration:line-through;border-bottom:1px dotted var(--hairline)}
+.st{display:flex;flex-wrap:wrap;border:2px solid var(--sage-dark);border-radius:9px;overflow:hidden}
+.sg{flex:1 1 4.6rem;min-width:0;padding:.4rem .35rem;font-family:var(--mono);font-size:.72rem;background:var(--surface);border-right:1px dashed var(--sage);border-bottom:1px dashed var(--sage);overflow-wrap:anywhere;text-align:center}
+.sg small{display:block;font-family:var(--font);font-size:.66rem;color:var(--stone)}
+.sg.un{background:#f3f3ee;flex-basis:9rem}
+.sg.sig{background:var(--plum-tint);font-weight:800;color:var(--plum-dark);box-shadow:inset 0 -4px 0 var(--plum);flex-basis:5.5rem}
+.sg.pic{flex-basis:7rem}
+.sg.cut{background:#fafafa;color:#8a958e;text-decoration:line-through}
+.tot{font-size:.8rem;margin:.4rem 0 0;font-weight:700}
+.file{margin-top:.8rem;border:2px solid var(--plum);border-radius:9px;background:var(--plum-tint);padding:.5rem .6rem;font-size:.82rem;overflow-wrap:anywhere}
+.file b{font-family:var(--mono);font-size:.8rem}
+.file div{margin-top:.2rem}
+.end{margin-top:.8rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.45rem}
+.end div{border:1px solid var(--hairline);border-radius:9px;padding:.45rem .55rem;font-size:.8rem}
+.end b{display:block;font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;color:var(--stone)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 7 notes</a>
+  <h1>S07-D3: From a stream to a file</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> reassembly turns the pieces of a file inside packets into one stream, and file carving then cuts the file out of that stream by its file signature.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="conv">One TCP conversation: 192.0.2.10 sending to 203.0.113.80</p>
+    <p class="lab" id="lab"></p>
+    <div class="pk" id="pk"></div>
+    <div id="sbox" hidden>
+      <div class="st" id="st"></div>
+      <p class="tot" id="tot"></p>
+    </div>
+    <div class="file" id="file" hidden></div>
+    <div class="end" id="end" hidden>
+      <div><b>The tool knows the protocol</b>For example HTTP. The tool does steps 3 to 8 for you. Wireshark: Export Objects.</div>
+      <div><b>The tool does not know it</b>You do steps 3 to 8 by hand, as you did here.</div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Six pieces in arrival order became one stream in the order the sender wrote it, and a file was carved from that stream by its file signature. This is reassembly, followed by the file carving you did on a disk, now applied to a new source. It matters because a file recovered from traffic is evidence of what crossed the wire. A missing packet leaves a hole in the file, so check that the stream is complete before you rely on it.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var ARR = ["a","b","c","d","e","f"], SORTED = ["a","b","d","e","c","f"];
+  var STEPS = [
+    { caption: "The capture holds six packets of one TCP conversation, from 192.0.2.10 to 203.0.113.80. They are shown in arrival order. Each packet has a packet header with a sequence number and a length of 100, and below it the data it carries, shown as a few hex bytes. The sequence numbers in arrival order are 1, 101, 301, 201, 201 and 401.",
+      state: { view: "pk", lab: "Six packets, in arrival order", order: ARR, tags: {} } },
+    { caption: "Notice two problems, now marked on the packets. The packet with sequence number 301 arrived early, before 201. And 201 arrived twice: the sender sent it again because the first copy seemed lost. Both copies carry the same 100 bytes.",
+      state: { view: "pk", lab: "Two problems", order: ARR, tags: { c: "Arrived early", e: "Arrived twice: a repeat" } } },
+    { caption: "Reassembly starts. Sort the packets by sequence number. The order is now 1, 101, 201, 201, 301, 401. This is the order in which the sender wrote the data.",
+      state: { view: "pk", lab: "Sorted by sequence number", order: SORTED, tags: { e: "A repeat" } } },
+    { caption: "Drop the repeated piece. Two packets have the same sequence number and the same length, so they carry the same data. Keep one. The second copy of 201 is now crossed out. Five packets remain: 1, 101, 201, 301, 401.",
+      state: { view: "pk", lab: "Repeated piece dropped", order: SORTED, tags: { e: "Dropped" }, drop: true } },
+    { caption: "Remove every packet header. The five packet headers are now crossed out. Only the data that each packet carried remains: five pieces of 100 bytes each.",
+      state: { view: "pk", lab: "Packet headers removed", order: ["a","b","d","c","f"], tags: {}, bare: true } },
+    { caption: "Join the five pieces. They now form one block with no gaps: bytes 1 to 100, 101 to 200, 201 to 300, 301 to 400 and 401 to 500. This is the stream: 500 bytes, in the order the sender wrote them.",
+      state: { view: "joined", lab: "The stream" } },
+    { caption: "Look inside the stream. Bytes 1 to 48 are text of a transfer protocol that the tool does not recognise. Then, at bytes 49 to 52, FF D8 FF E0 appears. Much later, at bytes 471 and 472, FF D9 appears. Both are highlighted. FF D8 FF is the header of a JPEG picture and FF D9 is its footer. Together they are the file signature. After the footer come 28 more bytes of the unknown protocol.",
+      state: { view: "inside", lab: "Inside the stream" } },
+    { caption: "Carve the file, exactly as you carved from a disk. Cut from the first byte of the header to the last byte of the footer: bytes 49 to 472 of the stream. The 48 bytes before and the 28 bytes after are crossed out. The result is one JPEG file of 424 bytes.",
+      state: { view: "inside", lab: "File carving", cut: true, file: 1 } },
+    { caption: "The carved file is now evidence. Calculate its SHA-256 value at once. Record the stream it came from: the two addresses, the two ports, and bytes 49 to 472. Then another analyst can repeat your work and get the same file.",
+      state: { view: "inside", lab: "Hash and record", cut: true, file: 2 } },
+    { caption: "When the tool knows the protocol, for example HTTP, it does steps 3 to 8 for you. Wireshark calls that Export Objects. When the tool does not know the protocol, you do those steps by hand, as you did here. Read what you just saw below.",
+      state: { view: "inside", lab: "Tool or by hand", cut: true, file: 2, end: true } }
+  ];
+  var P = {
+    a: [1, "50 55 54 20 72 65 ...", "1st"], b: [101, "A7 3C 19 E2 5B 80 ...", "2nd"],
+    c: [301, "6E B2 48 05 D3 7F ...", "3rd"], d: [201, "0D 64 F1 2A 9C 37 ...", "4th"],
+    e: [201, "0D 64 F1 2A 9C 37 ...", "5th"], f: [401, "39 E0 72 AB 16 4D ...", "6th"]
+  };
+  function el(tag, cls, txt){ var n = document.createElement(tag); if (cls) { n.className = cls; } if (txt) { n.textContent = txt; } return n; }
+  function seg(box, cls, main, sub){ var s = el("div", "sg" + (cls ? " " + cls : ""), main); s.appendChild(el("small", "", sub)); box.appendChild(s); }
+  /* render(): draw the stage for one state. */
+  function render(state){
+    var pk = document.getElementById("pk"), sbox = document.getElementById("sbox"), st = document.getElementById("st"),
+        file = document.getElementById("file");
+    document.getElementById("lab").textContent = state.lab;
+    pk.textContent = ""; st.textContent = ""; file.textContent = "";
+    pk.hidden = state.view !== "pk"; sbox.hidden = state.view === "pk";
+    file.hidden = !state.file; document.getElementById("end").hidden = !state.end;
+    if (state.view === "pk") {
+      state.order.forEach(function(id){
+        var p = P[id], tag = state.tags[id];
+        var d = el("div", "p" + (tag ? " flag" : "") + (state.drop && id === "e" ? " drop" : "") + (state.bare ? " bare" : ""));
+        var h = el("div", "ph", "seq " + p[0] + ", len 100");
+        h.appendChild(el("small", "", state.bare ? "packet header removed" : "packet header, arrived " + p[2]));
+        d.appendChild(h);
+        var t = el("div", "dt", p[1]); t.appendChild(el("small", "", "the data it carries, 100 bytes")); d.appendChild(t);
+        if (tag) { d.appendChild(el("div", "tag", tag)); }
+        pk.appendChild(d);
+      });
+      return;
+    }
+    if (state.view === "joined") {
+      ["a","b","d","c","f"].forEach(function(id){ seg(st, "", P[id][1], "bytes " + P[id][0] + " to " + (P[id][0] + 99)); });
+      document.getElementById("tot").textContent = "5 pieces x 100 bytes = 500 bytes, no packet headers, no repeats";
+      return;
+    }
+    var c = state.cut ? "un cut" : "un";
+    seg(st, c, "PUT report-0417 ...", "bytes 1 to 48: unknown protocol, 48 bytes");
+    seg(st, "sig", "FF D8 FF E0", "bytes 49 to 52: JPEG header");
+    seg(st, "pic", "... picture data ...", "bytes 53 to 470, 418 bytes");
+    seg(st, "sig", "FF D9", "bytes 471 to 472: JPEG footer");
+    seg(st, c, "... END ...", "bytes 473 to 500: unknown protocol, 28 bytes");
+    document.getElementById("tot").textContent = state.cut ? "48 cut + 424 kept + 28 cut = 500 bytes" : "48 + 4 + 418 + 2 + 28 = 500 bytes";
+    if (state.file) {
+      file.appendChild(el("b", "", "carved-0001.jpg"));
+      file.appendChild(el("div", "", "Stream bytes 49 to 472 = 424 bytes. Starts FF D8 FF E0, ends FF D9."));
+      if (state.file > 1) {
+        file.appendChild(el("div", "", "SHA-256: calculate now and write it in your notes."));
+        file.appendChild(el("div", "", "Source: stream 192.0.2.10 to 203.0.113.80, bytes 49 to 472."));
+      }
+    }
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

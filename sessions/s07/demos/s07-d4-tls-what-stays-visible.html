@@ -1,0 +1,219 @@
+<!doctype html>
+<!-- NB6018CEM demo S07-D4. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S07-D4 What TLS leaves visible | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+.outer{border:2px solid var(--hairline);border-radius:10px;padding:.5rem .6rem;font-size:.82rem;transition:background .25s,border-color .25s}
+.outer.hot{border-color:var(--plum);background:var(--plum-tint)}
+.outer h3,.col h3{margin:0 0 .3rem;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--stone)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.3rem .8rem}
+.facts div{min-width:0;overflow-wrap:anywhere}
+.facts b{display:block;font-size:.72rem;color:var(--stone)}
+.facts span{font-family:var(--mono);font-size:.78rem}
+.tag{display:inline-block;border-radius:999px;padding:0 .5rem;font-size:.7rem;font-weight:700;white-space:nowrap;border:1px solid}
+.tag.readable{border-color:var(--plum-dark);color:var(--plum-dark);background:#fff}
+.tag.encrypted{border-color:var(--sage-dark);color:#fff;background:var(--sage-dark)}
+.tag.hidden{border-color:var(--ink);color:#fff;background:var(--ink)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.6rem;margin-top:.7rem}
+.col{border:1px solid var(--hairline);border-radius:10px;padding:.5rem;min-width:0}
+.col h3{color:var(--ink);font-size:.82rem}
+.msg{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.15rem .4rem;border:2px solid var(--hairline);border-radius:8px;padding:.25rem .4rem;margin-top:.3rem;font-size:.78rem;transition:background .25s,border-color .25s,opacity .25s}
+.msg.readable{background:var(--plum-tint)}
+.msg.encrypted{background:var(--surface);border-style:dashed}
+.msg.hot{border-color:var(--plum);box-shadow:0 0 0 2px var(--plum)}
+.msg.dim{opacity:.5}
+.msg .nm{font-family:var(--mono);font-weight:700;min-width:0;overflow-wrap:anywhere}
+.msg .det{flex:1 1 100%;font-size:.74rem;overflow-wrap:anywhere}
+.msg .det code{font-family:var(--mono);font-size:.72rem}
+.msg .det .tag{margin-left:.25rem}
+table.sum{border-collapse:collapse;width:100%;table-layout:fixed;font-size:.78rem;margin-top:.7rem}
+table.sum th,table.sum td{border:1px solid var(--hairline);padding:.3rem .3rem;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+table.sum thead th{background:var(--ink);color:#fff}
+table.sum .tag{white-space:normal;padding:0 .35rem}
+[hidden]{display:none!important}
+@media (max-width:480px){.stage{padding:.6rem}table.sum{font-size:.7rem}table.sum .tag{font-size:.64rem;padding:0 .25rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 7 notes</a>
+  <h1>S07-D4: What TLS leaves visible</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> encryption hides the content of a connection, but not the handshake fields sent before the keys exist, and those fields depend on the TLS version.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="outer" id="outer">
+      <h3>Always on the wire, in every case <span class="tag readable">readable</span></h3>
+      <div class="facts">
+        <div><b>From (client)</b><span>192.0.2.10 port 51514</span></div>
+        <div><b>To (server)</b><span>203.0.113.80 port 443</span></div>
+        <div><b>Time of every packet</b><span>first 09:14:02.118, last 09:14:31.640</span></div>
+        <div><b>Size of every packet</b><span>3 kB sent, 4.6 MB received</span></div>
+      </div>
+    </div>
+    <div class="cols" id="cols"></div>
+    <table class="sum" id="sum" hidden>
+      <thead><tr><th>What the observer wants</th><th>TLS 1.2</th><th>TLS 1.3</th><th>TLS 1.3 with ECH</th></tr></thead>
+      <tbody id="sumb"></tbody>
+    </table>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>You saw the same visit to <span class="mono">files.example.com</span> three ways, as an observer on the wire sees it. What is readable depends on the TLS version and on Encrypted Client Hello: the server name and the certificate in TLS 1.2, only the server name in TLS 1.3, and only the provider's shared name with ECH. The destination address, the sizes and the timing are always there. So an examiner can often say which site a device contacted and how much it sent, without ever reading a byte of the content, and must say which of these facts the capture really held.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* STEPS: each step is a caption (the full meaning, in words) and a state for render(). */
+  var STEPS = [
+    { caption: "An observer on the wire watches one visit to files.example.com. Before we look at TLS, four facts are readable in every packet header and capture record: the client address 192.0.2.10, the server address 203.0.113.80 with port 443, the time of every packet, and the size of every packet. Here the client sent about 3 kB and received about 4.6 MB.",
+      state: { cols: 0, outer: true, hot: [], sum: false } },
+    { caption: "Case one: the visit uses TLS 1.2. The handshake has eight messages before any content moves. Seven are marked readable: ClientHello, ServerHello, Certificate, ServerKeyExchange, ServerHelloDone, ClientKeyExchange and ChangeCipherSpec. They cross the wire unencrypted, because the two sides are still agreeing the keys for this connection.",
+      state: { cols: 1, hot: ["a0","a1","a2","a3","a4","a5","a6"], sum: false } },
+    { caption: "Look at the ClientHello in TLS 1.2. It carries the server name, known as SNI (Server Name Indication). The client must name the site before any key exists, so the name files.example.com is marked readable. The observer now knows which site, not only which address.",
+      state: { cols: 1, hot: ["a0"], sum: false } },
+    { caption: "Now the Certificate message in TLS 1.2. The server proves its identity with a certificate, and it is also marked readable. The observer reads who it was issued to (files.example.com), who issued it (Example Test CA) and its validity (one year).",
+      state: { cols: 1, hot: ["a2"], sum: false } },
+    { caption: "After ChangeCipherSpec the keys are in use. The Finished message and all application data are marked encrypted. The observer cannot read the pages or the files. The observer still sees every packet's time and size.",
+      state: { cols: 1, hot: ["a7","a8"], sum: false } },
+    { caption: "Case two appears beside the first: the same visit with TLS 1.3. Only two messages are marked readable now, ClientHello and ServerHello. The server name in the ClientHello is still readable: files.example.com. Both sides have keys straight after the ServerHello.",
+      state: { cols: 2, hot: ["b0","b1"], sum: false } },
+    { caption: "In TLS 1.3 everything after the ServerHello is marked encrypted: EncryptedExtensions, Certificate, CertificateVerify, Finished and application data. So the observer can no longer read the certificate. The server name is the only field left that names the site.",
+      state: { cols: 2, hot: ["b3"], sum: false } },
+    { caption: "Case three: TLS 1.3 with Encrypted Client Hello (ECH) switched on. The ClientHello now has two parts. The outer part is marked readable and shows the server name public.example.net, a name that belongs to the provider and is shared by many sites. The real name, files.example.com, travels in an inner part marked encrypted. The rest is the same as TLS 1.3.",
+      state: { cols: 3, hot: ["c0"], sum: false } },
+    { caption: "A summary table compares the three cases. Server name: readable in TLS 1.2, readable in TLS 1.3, hidden with ECH. Certificate: readable in TLS 1.2, encrypted in the other two. Content: encrypted in all three. Destination address, sizes and timing: readable in all three.",
+      state: { cols: 3, hot: [], sum: true, outer: true } },
+    { caption: "One visit, three views. Encryption hid the content every time, but never the address, the sizes or the timing. Read what you just saw below.",
+      state: { cols: 3, hot: [], sum: true } }
+  ];
+  /* Each message: [id, name, word, detail parts]. A detail part is text, or [code text], or {tag}. */
+  var SITE = "files.example.com", ENC = [
+    ["Finished", "encrypted"], ["Application data", "encrypted", ["pages and files"]] ];
+  var T13 = [["EncryptedExtensions", "encrypted"], ["Certificate", "encrypted", ["cannot be read"]], ["CertificateVerify", "encrypted"]].concat(ENC);
+  var CASES = [
+    { k: "a", title: "TLS 1.2", m: [
+      ["ClientHello", "readable", ["server name: ", [SITE]]],
+      ["ServerHello", "readable"],
+      ["Certificate", "readable", ["issued to: ", [SITE], ". Issued by: Example Test CA. Valid: one year."]],
+      ["ServerKeyExchange", "readable"], ["ServerHelloDone", "readable"],
+      ["ClientKeyExchange", "readable"], ["ChangeCipherSpec", "readable"]].concat(ENC) },
+    { k: "b", title: "TLS 1.3", m: [
+      ["ClientHello", "readable", ["server name: ", [SITE]]],
+      ["ServerHello", "readable"]].concat(T13) },
+    { k: "c", title: "TLS 1.3 with ECH", m: [
+      ["ClientHello", "readable", ["outer server name: ", ["public.example.net"], ". Inner part, real name ", [SITE], {tag: "encrypted"}]],
+      ["ServerHello", "readable"]].concat(T13) }
+  ];
+  var SUM = [
+    ["Server name", "readable", "readable", "hidden"],
+    ["Certificate", "readable", "encrypted", "encrypted"],
+    ["Content", "encrypted", "encrypted", "encrypted"],
+    ["Destination address, sizes and timing", "readable", "readable", "readable"]
+  ];
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) { e.className = cls; } if (text) { e.textContent = text; } return e; }
+  /* render(): draw the stage for one state. */
+  function render(state){
+    document.getElementById("outer").classList.toggle("hot", !!state.outer);
+    var cols = document.getElementById("cols"); cols.textContent = "";
+    cols.hidden = state.cols === 0;
+    CASES.slice(0, state.cols).forEach(function(c){
+      var box = el("div", "col"); box.appendChild(el("h3", "", c.title));
+      c.m.forEach(function(m, n){
+        var id = c.k + n, hot = state.hot.indexOf(id) !== -1;
+        var d = el("div", "msg " + m[1] + (hot ? " hot" : (state.hot.length ? " dim" : "")));
+        d.appendChild(el("span", "nm", m[0]));
+        d.appendChild(el("span", "tag " + m[1], m[1]));
+        if (m[2]) {
+          var det = el("span", "det");
+          m[2].forEach(function(p){
+            if (typeof p === "string") { det.appendChild(document.createTextNode(p)); }
+            else if (p.tag) { det.appendChild(el("span", "tag " + p.tag, p.tag)); }
+            else { det.appendChild(el("code", "", p[0])); }
+          });
+          d.appendChild(det);
+        }
+        box.appendChild(d);
+      });
+      cols.appendChild(box);
+    });
+    var sum = document.getElementById("sum"), body = document.getElementById("sumb");
+    sum.hidden = !state.sum; body.textContent = "";
+    SUM.forEach(function(r){
+      var tr = el("tr"); tr.appendChild(el("th", "", r[0]));
+      r.slice(1).forEach(function(w){ var td = el("td"); td.appendChild(el("span", "tag " + w, w)); tr.appendChild(td); });
+      body.appendChild(tr);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
