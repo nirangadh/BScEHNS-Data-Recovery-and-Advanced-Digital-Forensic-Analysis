@@ -23,6 +23,7 @@ highlighter: rouge
 plugins: []
 exclude:
   - README.md
+  - CLAUDE.md
   - LICENSE-CONTENT.md
   - LICENSE-CODE.md
   - _templates
