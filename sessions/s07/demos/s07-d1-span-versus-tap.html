@@ -1,0 +1,219 @@
+<!doctype html>
+<!-- NB6018CEM demo S07-D1. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S07-D1 SPAN versus TAP under load | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+.blk{border:1px solid var(--hairline);border-radius:10px;padding:.6rem .7rem;min-width:0}
+.blk h3{margin:0 0 .1rem;font-size:.95rem}
+.blk .sub{margin:0 0 .5rem;font-size:.78rem;color:var(--stone)}
+.pair{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.6rem}
+.pair .blk{flex:1 1 17rem}
+.row{display:flex;align-items:center;gap:.4rem;margin:.3rem 0;font-size:.78rem}
+.row .lab{flex:0 0 4.6rem;line-height:1.2}
+.row .val{flex:0 0 2.6rem;text-align:right;font-family:var(--mono);font-weight:700}
+.track{position:relative;flex:1 1 auto;min-width:0;height:1.5rem;background:#f3f5f0;border:1px solid var(--hairline);border-radius:5px;overflow:hidden;display:flex}
+.track.tall{height:2.1rem}
+.seg{height:100%;width:0;flex:0 0 auto;transition:width .45s}
+.seg.o{background:var(--sage)}
+.seg.i{background:var(--sage-dark)}
+.seg.d{background:repeating-linear-gradient(45deg,var(--plum) 0 5px,var(--plum-tint) 5px 10px)}
+.seg.n{background:repeating-linear-gradient(90deg,#fff 0 4px,var(--hairline) 4px 6px);box-shadow:inset 0 0 0 2px var(--stone)}
+.limit{position:absolute;top:0;bottom:0;left:83.333%;border-left:2px dashed var(--ink)}
+.scale{font-size:.7rem;color:var(--stone);text-align:right;margin:0 0 .2rem}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;margin-top:.5rem}
+.num{border:1px solid var(--hairline);border-radius:8px;padding:.3rem .2rem;text-align:center;font-size:.7rem;color:var(--stone);min-width:0;overflow-wrap:anywhere}
+.num b{display:block;font-family:var(--mono);font-size:.92rem;color:var(--ink)}
+.num.bad{border:2px solid var(--plum);background:var(--plum-tint);color:var(--plum-dark)}
+.num.bad b{color:var(--plum-dark)}
+.verdict{margin:.5rem 0 0;font-size:.8rem;font-weight:700;color:var(--sage-dark)}
+.verdict.bad{color:var(--plum-dark)}
+.key{display:flex;flex-wrap:wrap;gap:.3rem .9rem;font-size:.72rem;color:var(--stone);margin-top:.6rem}
+.key span{display:inline-flex;align-items:center;gap:.3rem}
+.key i{display:inline-block;width:1.1rem;height:.7rem;border-radius:2px}
+.tell{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.6rem}
+.tell div{flex:1 1 14rem;border:2px solid var(--plum);background:var(--plum-tint);border-radius:10px;padding:.45rem .6rem;font-size:.8rem}
+.tell b{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--plum-dark)}
+.cap{margin-top:.6rem;border:1px solid var(--hairline);border-radius:10px;padding:.5rem .6rem}
+.cap h3{margin:0 0 .3rem;font-size:.74rem;letter-spacing:.06em;color:var(--stone);text-transform:uppercase}
+.cap div{font-family:var(--mono);font-size:.74rem;padding:.25rem .4rem;border-top:1px solid var(--hairline);overflow-wrap:anywhere}
+.cap div.gap{border:2px dashed var(--plum);background:var(--plum-tint);color:var(--plum-dark);border-radius:6px;margin:.2rem 0}
+.cap div em{font-style:normal;font-weight:700;color:var(--plum-dark)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 7 notes</a>
+  <h1>S07-D1: SPAN versus TAP under load</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a mirror (SPAN) port squeezes both directions of a link into one port and silently drops copies under load, while a TAP gives each direction its own output and keeps every frame.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="blk">
+      <h3>The real link: office switch to firewall</h3>
+      <p class="sub">1000 Mbit/s in each direction. Bars show Mbit/s. The dashed line marks 1000.</p>
+      <div class="row"><span class="lab">Outbound</span><div class="track"><span class="seg o" id="l-o"></span><span class="limit"></span></div><span class="val" id="l-ov"></span></div>
+      <div class="row"><span class="lab">Inbound</span><div class="track"><span class="seg i" id="l-i"></span><span class="limit"></span></div><span class="val" id="l-iv"></span></div>
+      <p class="verdict" id="l-v"></p>
+    </div>
+    <div class="pair">
+      <div class="blk">
+        <h3>Capture point 1: mirror port (SPAN)</h3>
+        <p class="sub">One port, 1000 Mbit/s, for both directions together.</p>
+        <div class="row"><span class="lab">Copies of both</span><div class="track tall"><span class="seg n" id="m-n"></span><span class="seg o" id="m-o"></span><span class="seg i" id="m-i"></span><span class="seg d" id="m-d"></span><span class="limit"></span></div></div>
+        <div class="nums">
+          <div class="num">offered<b id="m-off"></b></div>
+          <div class="num">sent<b id="m-sent"></b></div>
+          <div class="num" id="m-dbox">dropped<b id="m-drop"></b></div>
+        </div>
+        <p class="verdict" id="m-v"></p>
+      </div>
+      <div class="blk">
+        <h3>Capture point 2: TAP in the cable</h3>
+        <p class="sub">Two outputs, 1000 Mbit/s each, one per direction.</p>
+        <div class="row"><span class="lab">Output A, outbound</span><div class="track"><span class="seg o" id="t-o"></span><span class="limit"></span></div><span class="val" id="t-ov"></span></div>
+        <div class="row"><span class="lab">Output B, inbound</span><div class="track"><span class="seg i" id="t-i"></span><span class="limit"></span></div><span class="val" id="t-iv"></span></div>
+        <div class="nums">
+          <div class="num">offered<b id="t-off"></b></div>
+          <div class="num">sent<b id="t-sent"></b></div>
+          <div class="num">dropped<b>0</b></div>
+        </div>
+        <p class="verdict" id="t-v"></p>
+      </div>
+    </div>
+    <div class="key">
+      <span><i class="seg o"></i>outbound frames</span>
+      <span><i class="seg i"></i>inbound frames</span>
+      <span><i class="seg d"></i>striped: copies dropped</span>
+      <span><i class="seg n"></i>boxed: never copied</span>
+    </div>
+    <div class="tell" id="tell" hidden>
+      <div><b>The user notices</b>Nothing. All the real traffic passed.</div>
+      <div><b>The capture file reports</b>Nothing. It opens with no error.</div>
+    </div>
+    <div class="cap" id="cap" hidden>
+      <h3>The mirror capture, opened later: one TCP stream</h3>
+      <div>1&nbsp; 192.0.2.10 &gt; 203.0.113.5&nbsp; Seq=1 Len=1000</div>
+      <div class="gap">MISSING: Seq=1001 Len=1000, dropped at the capture point</div>
+      <div>2&nbsp; 192.0.2.10 &gt; 203.0.113.5&nbsp; Seq=2001 Len=1000 <em>[TCP Previous segment not captured]</em></div>
+      <div class="gap">MISSING: Seq=3001 Len=1000, dropped at the capture point</div>
+      <div>3&nbsp; 203.0.113.5 &gt; 192.0.2.10&nbsp; Ack=4001 <em>[TCP ACKed unseen segment]</em></div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The mirror port (SPAN) had to fit 1200 Mbit/s of copies into one 1000 Mbit/s port, so the switch dropped 200 Mbit/s with no warning, while the real traffic passed untouched. The TAP gave each direction its own output and kept every frame. This is the idea in the notes: a capture is only as complete as its capture point, so record where and how it was taken. In a case, a missing packet is not proof that nothing was sent.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* STEPS: each step is a caption (the full meaning, in words) and a state for render().
+     State: o/i = real load in Mbit/s; m = mirror bar [never copied, outbound sent, inbound sent, dropped];
+     ms = mirror counters [offered, sent, dropped]; mv/tv = verdict text; bad = mirror capture incomplete. */
+  var STEPS = [
+    { caption: "An office switch connects to the firewall over a 1 Gbit/s link. Each direction, outbound and inbound, can carry 1000 Mbit/s. The examiner can copy the traffic at two capture points. The first is the switch's mirror port, known as SPAN: one port of 1000 Mbit/s. The second is a TAP, a hardware device in the cable. It has two outputs of 1000 Mbit/s, one per direction. No traffic flows yet.",
+      state: { o: 0, i: 0, m: [0, 0, 0, 0], ms: ["0", "0", "0"], mv: "Waiting for traffic.", tv: "Waiting for traffic.", bad: false } },
+    { caption: "Light load. The link carries 200 Mbit/s outbound and 300 Mbit/s inbound. The switch copies both directions into the one mirror port: 200 plus 300 is 500 Mbit/s offered. The port can send 1000, so it sends all 500 and drops 0. The TAP sends 200 on output A and 300 on output B, and drops 0. Both captures are complete.",
+      state: { o: 200, i: 300, m: [0, 200, 300, 0], ms: ["500", "500", "0"], mv: "Complete: 500 fits into 1000.", tv: "Complete.", bad: false } },
+    { caption: "The load rises to 600 Mbit/s outbound and 600 Mbit/s inbound. The link carries both, because each direction has its own 1000 Mbit/s. The mirror port is offered 600 plus 600, which is 1200 Mbit/s. It can send only 1000. The switch drops 200 Mbit/s of copies, about 17 per cent. The TAP sends 600 on each output and drops 0.",
+      state: { o: 600, i: 600, m: [0, 500, 500, 200], ms: ["1200", "1000", "200"], mv: "Incomplete: about 17 per cent of copies dropped.", tv: "Complete: 600 fits into each 1000.", bad: true } },
+    { caption: "The same load. What does the user notice? Nothing. The switch dropped only copies, so all 1200 Mbit/s of real traffic passed untouched. What is the examiner told? Nothing. The capture file opens normally and shows no error. The mirror capture holds about 83 per cent of the frames. The TAP capture holds all of them.",
+      state: { o: 600, i: 600, m: [0, 500, 500, 200], ms: ["1200", "1000", "200"], mv: "Incomplete, and nothing says so.", tv: "Complete: 600 fits into each 1000.", bad: true, tell: true } },
+    { caption: "A different problem. The load is lower: 300 Mbit/s outbound and 400 Mbit/s inbound. The mirror port is offered 700 of its 1000, so it has room. But the switch's processor is busy. Copying frames is a second job for the switch, with the lowest priority. A busy switch may drop copies even below the port's limit, and nothing in the capture shows it. The TAP only copies, so it sends 300 and 400 and drops 0.",
+      state: { o: 300, i: 400, m: [0, 300, 400, 0], ms: ["700", "700 or fewer", "may be some"], mv: "Busy switch: copies may be dropped below the limit.", tv: "Complete.", bad: true } },
+    { caption: "Another problem: a wrong setting. The load is 200 Mbit/s outbound and 300 Mbit/s inbound. The mirror was set to copy only the frames that the port receives. On this port those are the inbound frames. The mirror port is offered 300, sends 300 and drops 0. The 200 Mbit/s outbound was never copied. The capture holds one half of every conversation, for example answers with no requests. It still looks like a normal file. The TAP sends both directions and drops 0.",
+      state: { o: 200, i: 300, m: [200, 0, 300, 0], ms: ["300", "300", "0"], mv: "One direction only: 200 outbound never copied.", tv: "Complete: both directions.", bad: true } },
+    { caption: "Later the examiner opens the mirror capture from the load of 600 and 600. One TCP stream runs from 192.0.2.10 to 203.0.113.5. Frame 1 carries bytes 1 to 1000. The frame with bytes 1001 to 2000 is missing. Frame 2 carries bytes 2001 to 3000, and Wireshark marks it \"TCP Previous segment not captured\". The frame with bytes 3001 to 4000 is missing too. Frame 3 is the answer from 203.0.113.5. It acknowledges all 4000 bytes, and Wireshark marks it \"TCP ACKed unseen segment\". The receiver got the data, so the data was sent. These gaps may be drops at the capture point, not something the suspect did.",
+      state: { o: 600, i: 600, m: [0, 500, 500, 200], ms: ["1200", "1000", "200"], mv: "Incomplete: the gaps show up later.", tv: "Complete: 600 fits into each 1000.", bad: true, cap: true } },
+    { caption: "A mirror port copies frames as a second job and squeezes two directions into one port. Under load it drops copies and tells nobody. A TAP gives each direction its own output and keeps every frame. The capture is only as complete as its capture point. Read what you just saw below.",
+      state: { o: 600, i: 600, m: [0, 500, 500, 200], ms: ["1200", "1000", "200"], mv: "Incomplete: 200 of 1200 dropped.", tv: "Complete: 600 fits into each 1000.", bad: true, cap: true } }
+  ];
+  /* render(): draw the stage for one state. Every bar uses one scale, 0 to 1200 Mbit/s. */
+  function render(state){
+    function el(id){ return document.getElementById(id); }
+    function w(id, v){ el(id).style.width = (v / 12) + "%"; }
+    function txt(id, s){ el(id).textContent = s; }
+    w("l-o", state.o); w("l-i", state.i); txt("l-ov", state.o); txt("l-iv", state.i);
+    txt("l-v", state.o + state.i === 0 ? "No traffic yet." : "All " + (state.o + state.i) + " Mbit/s of real traffic passes.");
+    w("m-n", state.m[0]); w("m-o", state.m[1]); w("m-i", state.m[2]); w("m-d", state.m[3]);
+    txt("m-off", state.ms[0]); txt("m-sent", state.ms[1]); txt("m-drop", state.ms[2]);
+    el("m-dbox").classList.toggle("bad", state.ms[2] !== "0");
+    txt("m-v", state.mv); el("m-v").classList.toggle("bad", state.bad);
+    w("t-o", state.o); w("t-i", state.i); txt("t-ov", state.o); txt("t-iv", state.i);
+    txt("t-off", state.o + " + " + state.i); txt("t-sent", state.o + " + " + state.i);
+    txt("t-v", state.tv);
+    el("tell").hidden = !state.tell;
+    el("cap").hidden = !state.cap;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
