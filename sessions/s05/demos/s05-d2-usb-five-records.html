@@ -1,0 +1,250 @@
+<!doctype html>
+<!-- NB6018CEM demo S05-D2. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S05-D2 One USB stick, five records | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+table.t{border-collapse:collapse;width:100%;font-size:.92rem}
+table.t th,table.t td{border:1px solid var(--hairline);padding:.4rem .5rem;text-align:left;vertical-align:top}
+table.t th{background:var(--ink);color:#fff;font-weight:700}
+tr.hot td{background:var(--plum-tint);box-shadow:inset 4px 0 0 var(--plum)}
+tr.ok td{background:var(--surface)}
+tr.gone td{color:#8a958e;text-decoration:line-through}
+.note{font-size:.85rem;color:var(--stone);margin:.6rem 0 0}
+.pill{display:inline-block;border-radius:999px;padding:.1rem .6rem;font-size:.8rem;font-weight:700;border:1px solid var(--sage-dark);color:var(--sage-dark);background:#fff}
+.pill.local{border-color:var(--plum-dark);color:var(--plum-dark);background:var(--plum-tint)}
+.flag{font-weight:800;color:var(--plum-dark)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.6rem}
+.card{border:2px solid var(--hairline);border-radius:10px;padding:.6rem .7rem;transition:background .25s,border-color .25s;opacity:.55}
+.card h3{margin:0 0 .2rem;font-size:.95rem;font-family:var(--mono);word-break:break-all}
+.card .where{font-size:.8rem;color:var(--stone)}
+.card .fact{margin-top:.4rem;font-weight:700;min-height:2.6em;word-break:break-word}
+.card.active{border-color:var(--plum);background:var(--plum-tint);opacity:1}
+.card.done{border-color:var(--sage-dark);background:var(--surface);opacity:1}
+.story{margin-top:.9rem;padding:.7rem .8rem;border-left:5px solid var(--plum);background:#fff;border-radius:0 10px 10px 0;font-size:.98rem}
+.story .gap{color:#8a958e}
+.pair{margin-top:.8rem;font-family:var(--mono);font-size:.95rem;word-break:break-all}
+.pair mark{background:var(--plum-tint);color:var(--plum-dark);font-weight:800;padding:0 .1rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 5 notes</a>
+  <h1>S05-D2: One USB stick, five records</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> each artefact holds one fact about a USB stick, and only the device serial number joins the facts into one story.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+<div class="cards" id="cards"></div>
+    <div class="story" id="story"></div>
+    <div class="pair" id="pair"></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>No single artefact holds the history of a USB device. Each record was made for one job, so each answers one question: which device, first connected when, which drive letter, under which account. The device serial number is what joins them, and it must be read to the last character, because the company's stick and the suspect's stick differ only from the ninth. One of the five records uses local time, so it cannot be compared with the others until it is normalised to UTC.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var STEPS = [
+    {
+      "caption": "The suspect's USB stick has been connected to the computer and taken away again. Five records on the computer's own disk each hold one fact about it. At the start, the sentence below has five gaps.",
+      "state": {
+        "active": -1,
+        "done": [],
+        "pair": false
+      }
+    },
+    {
+      "caption": "Record 1, the registry key USBSTOR. It answers: which device? It holds the make, the model and the device serial number. It does not say who used the stick, or which drive letter it had.",
+      "state": {
+        "active": 0,
+        "done": [],
+        "pair": false
+      }
+    },
+    {
+      "caption": "Record 2, the text file setupapi.dev.log. It answers: when was this device first connected? Windows wrote the line when it installed the driver. Notice the clock: this file records local time, not UTC.",
+      "state": {
+        "active": 1,
+        "done": [
+          0
+        ],
+        "pair": false
+      }
+    },
+    {
+      "caption": "Record 3, the registry key MountedDevices. It answers: which drive letter? It links the volume on the stick to the letter E. Every path that begins with E: in other artefacts now has a meaning.",
+      "state": {
+        "active": 2,
+        "done": [
+          0,
+          1
+        ],
+        "pair": false
+      }
+    },
+    {
+      "caption": "Record 4, the key MountPoints2 in the user's own hive. It answers: under which account? The first three records belong to the computer and name nobody. This one is in the hive of the account informant.",
+      "state": {
+        "active": 3,
+        "done": [
+          0,
+          1,
+          2
+        ],
+        "pair": false
+      }
+    },
+    {
+      "caption": "Record 5, event 20001 in the System event log. It answers: when was the driver installed, in UTC? It is a second record of the first connection, made by another part of Windows, so it can confirm record 2 once both are in the same clock.",
+      "state": {
+        "active": 4,
+        "done": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pair": false
+      }
+    },
+    {
+      "caption": "All five gaps are filled. What joins the facts is the device serial number. Now compare it with the serial number of the company's own stick, which is the same make and model. The first eight characters are the same. They differ at the ninth.",
+      "state": {
+        "active": -1,
+        "done": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pair": true
+      }
+    },
+    {
+      "caption": "Five records, five questions, one device. Read what you just saw below.",
+      "state": {
+        "active": -1,
+        "done": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pair": true
+      }
+    }
+  ];
+  var RECS = [
+    { name: "USBSTOR", where: "SYSTEM hive", q: "Which device?", fact: "SanDisk Cruzer Fit, serial 4C530012550531106501" },
+    { name: "setupapi.dev.log", where: "C:\\Windows\\inf", q: "First connected when?", fact: "2015-03-24 09:58:32, local time" },
+    { name: "MountedDevices", where: "SYSTEM hive", q: "Which drive letter?", fact: "E:" },
+    { name: "MountPoints2", where: "NTUSER.DAT of informant", q: "Under which account?", fact: "informant" },
+    { name: "Event 20001", where: "System event log", q: "Driver installed when?", fact: "A second time for the first connection, in UTC" }
+  ];
+  var built = false;
+  function render(state){
+    var box = document.getElementById("cards");
+    if (!built) {
+      RECS.forEach(function(r, k){
+        var d = document.createElement("div"); d.className = "card"; d.setAttribute("data-i", k);
+        var h = document.createElement("h3"); h.textContent = r.name; d.appendChild(h);
+        var w = document.createElement("div"); w.className = "where"; w.textContent = r.where + " - " + r.q; d.appendChild(w);
+        var f = document.createElement("div"); f.className = "fact"; d.appendChild(f);
+        box.appendChild(d);
+      });
+      built = true;
+    }
+    var known = state.done.slice(); if (state.active >= 0) { known.push(state.active); }
+    Array.prototype.forEach.call(box.children, function(c, k){
+      c.classList.toggle("active", k === state.active);
+      c.classList.toggle("done", state.done.indexOf(k) !== -1);
+      c.querySelector(".fact").textContent = known.indexOf(k) !== -1 ? RECS[k].fact : "";
+    });
+    function g(k, text){ return known.indexOf(k) !== -1 ? text : "[ ? ]"; }
+    document.getElementById("story").textContent = "A " + g(0, "SanDisk Cruzer Fit with the serial number 4C530012550531106501") +
+      " was first connected at " + g(1, "09:58:32 local time on 24 March 2015") + ", received the drive letter " + g(2, "E:") +
+      ", was in use under the account " + g(3, "informant") + ", and its driver installation is confirmed by " + g(4, "event 20001") + ".";
+    var p = document.getElementById("pair"); p.textContent = "";
+    if (state.pair) {
+      [["The company's stick: ", "4C530012", "4", "50531101593"], ["The suspect's stick: ", "4C530012", "5", "50531106501"]].forEach(function(x){
+        var line = document.createElement("div"); line.appendChild(document.createTextNode(x[0] + x[1]));
+        var m = document.createElement("mark"); m.textContent = x[2]; line.appendChild(m); line.appendChild(document.createTextNode(x[3])); p.appendChild(line);
+      });
+    }
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

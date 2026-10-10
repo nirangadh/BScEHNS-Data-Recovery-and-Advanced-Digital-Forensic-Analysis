@@ -1,0 +1,451 @@
+<!doctype html>
+<!-- NB6018CEM demo S05-D3. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S05-D3 Two clocks in one timeline | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+table.t{border-collapse:collapse;width:100%;font-size:.92rem}
+table.t th,table.t td{border:1px solid var(--hairline);padding:.4rem .5rem;text-align:left;vertical-align:top}
+table.t th{background:var(--ink);color:#fff;font-weight:700}
+tr.hot td{background:var(--plum-tint);box-shadow:inset 4px 0 0 var(--plum)}
+tr.ok td{background:var(--surface)}
+tr.gone td{color:#8a958e;text-decoration:line-through}
+.note{font-size:.85rem;color:var(--stone);margin:.6rem 0 0}
+.pill{display:inline-block;border-radius:999px;padding:.1rem .6rem;font-size:.8rem;font-weight:700;border:1px solid var(--sage-dark);color:var(--sage-dark);background:#fff}
+.pill.local{border-color:var(--plum-dark);color:var(--plum-dark);background:var(--plum-tint)}
+.flag{font-weight:800;color:var(--plum-dark)}
+
+.bias{margin:.7rem 0 0;padding:.5rem .7rem;border:1px solid var(--hairline);border-radius:10px;background:var(--surface);font-family:var(--mono);font-size:.9rem}
+.bias[hidden]{display:none}
+td.time{font-family:var(--mono);white-space:nowrap}
+td.time small{display:block;color:var(--stone);font-family:var(--font);white-space:normal}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 5 notes</a>
+  <h1>S05-D3: Two clocks in one timeline</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a source that records local time puts its event hours out of place, until every source is normalised to UTC.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+<table class="t"><thead><tr><th>Time</th><th>Clock</th><th>Source</th><th>Event</th></tr></thead><tbody id="rows"></tbody></table>
+    <div class="bias" id="bias" hidden>SYSTEM\ControlSet001\Control\TimeZoneInformation: ActiveTimeBias = 240 minutes. UTC = local time + 4 hours.</div>
+    <p class="note">Four real records from the morning of 24 March 2015 in the case.</p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Four honest records gave an impossible order, because three stored UTC and one stored local time. Reading the offset from the image and converting the one local source put the stick's connection where it belongs, two minutes after the last rename. Converting every source, including those already in UTC, broke the order again. This is why every source is normalised to UTC before events are merged, and why a timeline keeps the original time and the clock of each source beside the converted time.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var STEPS = [
+    {
+      "caption": "Four records from four sources, each with the time exactly as its source wrote it. No clock is shown yet, because a time in a file does not announce its zone.",
+      "state": {
+        "rows": [
+          {
+            "id": "start",
+            "time": "13:21:29",
+            "clock": "",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "13:56:20",
+            "clock": "",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "usb",
+            "time": "09:58:32",
+            "clock": "",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "bag",
+            "time": "14:00:19",
+            "clock": "",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          }
+        ],
+        "bias": false
+      }
+    },
+    {
+      "caption": "Sort them as they stand. The USB stick is now connected at 09:58:32, more than three hours before Windows starts at 13:21:29. A computer that is switched off cannot install a driver. Something is wrong with this list.",
+      "state": {
+        "rows": [
+          {
+            "id": "usb",
+            "time": "09:58:32",
+            "clock": "",
+            "hot": true,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "start",
+            "time": "13:21:29",
+            "clock": "",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "13:56:20",
+            "clock": "",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "bag",
+            "time": "14:00:19",
+            "clock": "",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          }
+        ],
+        "bias": false
+      }
+    },
+    {
+      "caption": "Ask of each source: which clock wrote this time? Three of them store UTC. The text log setupapi.dev.log stores the local time that the clock on the desk showed. The list mixes two clocks.",
+      "state": {
+        "rows": [
+          {
+            "id": "usb",
+            "time": "09:58:32",
+            "clock": "local",
+            "hot": true,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "start",
+            "time": "13:21:29",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "13:56:20",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "bag",
+            "time": "14:00:19",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          }
+        ],
+        "bias": false
+      }
+    },
+    {
+      "caption": "Read the offset from the image itself. The registry of the suspect's computer gives an active bias of 240 minutes: its local time was four hours behind UTC. The rule is UTC = local time + bias.",
+      "state": {
+        "rows": [
+          {
+            "id": "usb",
+            "time": "09:58:32",
+            "clock": "local",
+            "hot": true,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "start",
+            "time": "13:21:29",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "13:56:20",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "bag",
+            "time": "14:00:19",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          }
+        ],
+        "bias": true
+      }
+    },
+    {
+      "caption": "Convert the one local source, and only that one: 09:58:32 local time plus four hours is 13:58:32 UTC. The original time stays beside it, so that anyone can check the arithmetic.",
+      "state": {
+        "rows": [
+          {
+            "id": "usb",
+            "time": "13:58:32",
+            "clock": "UTC, converted",
+            "hot": true,
+            "ok": false,
+            "was": "was 09:58:32 local"
+          },
+          {
+            "id": "start",
+            "time": "13:21:29",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "13:56:20",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "bag",
+            "time": "14:00:19",
+            "clock": "UTC",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          }
+        ],
+        "bias": true
+      }
+    },
+    {
+      "caption": "Sort again. Windows starts, the last file is renamed at 13:56:20, the stick is connected two minutes later at 13:58:32, and the folder on it is opened at 14:00:19. Now the list tells a story that a person could have lived.",
+      "state": {
+        "rows": [
+          {
+            "id": "start",
+            "time": "13:21:29",
+            "clock": "UTC",
+            "hot": false,
+            "ok": true,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "13:56:20",
+            "clock": "UTC",
+            "hot": false,
+            "ok": true,
+            "was": ""
+          },
+          {
+            "id": "usb",
+            "time": "13:58:32",
+            "clock": "UTC, converted",
+            "hot": false,
+            "ok": true,
+            "was": "was 09:58:32 local"
+          },
+          {
+            "id": "bag",
+            "time": "14:00:19",
+            "clock": "UTC",
+            "hot": false,
+            "ok": true,
+            "was": ""
+          }
+        ],
+        "bias": true
+      }
+    },
+    {
+      "caption": "The opposite mistake is just as common: adding four hours to every source. The three that were already in UTC move four hours late, and the stick is again connected before Windows starts, at 13:58:32 against 17:21:29. Convert only what needs converting.",
+      "state": {
+        "rows": [
+          {
+            "id": "usb",
+            "time": "13:58:32",
+            "clock": "UTC, converted",
+            "hot": false,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "start",
+            "time": "17:21:29",
+            "clock": "UTC, converted again",
+            "hot": true,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "17:56:20",
+            "clock": "UTC, converted again",
+            "hot": true,
+            "ok": false,
+            "was": ""
+          },
+          {
+            "id": "bag",
+            "time": "18:00:19",
+            "clock": "UTC, converted again",
+            "hot": true,
+            "ok": false,
+            "was": ""
+          }
+        ],
+        "bias": true
+      }
+    },
+    {
+      "caption": "Back to the correct list: every source normalised to UTC, one conversion made, the original time kept. Read what you just saw below.",
+      "state": {
+        "rows": [
+          {
+            "id": "start",
+            "time": "13:21:29",
+            "clock": "UTC",
+            "hot": false,
+            "ok": true,
+            "was": ""
+          },
+          {
+            "id": "ren",
+            "time": "13:56:20",
+            "clock": "UTC",
+            "hot": false,
+            "ok": true,
+            "was": ""
+          },
+          {
+            "id": "usb",
+            "time": "13:58:32",
+            "clock": "UTC, converted",
+            "hot": false,
+            "ok": true,
+            "was": "was 09:58:32 local"
+          },
+          {
+            "id": "bag",
+            "time": "14:00:19",
+            "clock": "UTC",
+            "hot": false,
+            "ok": true,
+            "was": ""
+          }
+        ],
+        "bias": true
+      }
+    }
+  ];
+  var REC = {"start": ["Security event log", "Windows starts"], "ren": ["Change journal", "The last of twenty files is renamed"], "usb": ["setupapi.dev.log", "The suspect's USB stick is first connected"], "bag": ["Shellbag", "The folder E:\\Secret Project Data is opened"]};
+  function render(state){
+    var body = document.getElementById("rows"); body.textContent = "";
+    state.rows.forEach(function(r){
+      var tr = document.createElement("tr"); if (r.hot) { tr.className = "hot"; } else if (r.ok) { tr.className = "ok"; }
+      var t = document.createElement("td"); t.className = "time"; t.textContent = r.time;
+      if (r.was) { var s = document.createElement("small"); s.textContent = r.was; t.appendChild(s); }
+      tr.appendChild(t);
+      var c = document.createElement("td");
+      if (r.clock) { var p = document.createElement("span"); p.className = "pill" + (r.clock === "local" ? " local" : ""); p.textContent = r.clock === "local" ? "local time" : r.clock; c.appendChild(p); } else { c.textContent = "?"; }
+      tr.appendChild(c);
+      REC[r.id].forEach(function(x){ var d = document.createElement("td"); d.textContent = x; tr.appendChild(d); });
+      body.appendChild(tr);
+    });
+    document.getElementById("bias").hidden = !state.bias;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

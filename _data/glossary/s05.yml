@@ -1,0 +1,70 @@
+# _data/glossary/s05.yml - the words first taught in Session 5 (Windows artefacts and timelining).
+# What Windows records
+artefact:
+  term: "artefact"
+  def: "A record that a system or a program makes while it works, and that later shows what happened on the computer."
+registry:
+  term: "registry"
+  def: "The store in which Windows and its programs keep their settings, and many records of what users and devices did."
+hive:
+  term: "hive"
+  def: "One of the files on disk that together hold the registry, such as SYSTEM, SOFTWARE or a user's NTUSER.DAT."
+registry-key:
+  term: "registry key"
+  def: "A named place in the registry that holds values and other keys, as a folder holds files and folders."
+registry-value:
+  term: "registry value"
+  def: "One named piece of data inside a registry key, such as a number, a text or a block of bytes."
+last-write-time:
+  term: "last-write time"
+  def: "The single time that a registry key keeps, which shows when the key or any of its values last changed."
+event-log:
+  term: "event log"
+  def: "A file in which Windows writes one dated record for each thing that it reports, such as a logon or a shutdown."
+event-id:
+  term: "event ID"
+  def: "The number that names the kind of an event in an event log, for example 4624 for a logon."
+prefetch-file:
+  term: "prefetch file"
+  def: "A small file that Windows writes when a program starts, holding the program's name, how often it ran and when it last ran."
+lnk-file:
+  term: "LNK file"
+  def: "A shortcut file that Windows makes by itself when a user opens a file, holding the path and the dates of that file."
+jump-list:
+  term: "jump list"
+  def: "A list that Windows keeps for each program of the files that the user opened with it most recently."
+shellbag:
+  term: "shellbag"
+  def: "A registry record of how a folder window looked, which stays after the folder or its device has gone."
+device-serial-number:
+  term: "device serial number"
+  def: "A number that the maker gives to one single device, so that it can be told apart from others of the same model."
+change-journal:
+  term: "change journal"
+  def: "A list that NTFS keeps of every change to a file on a volume, such as a creation, a rename or a deletion."
+# One clock
+utc:
+  term: "UTC"
+  def: "Coordinated Universal Time, the one world time that has no time zone and no summer time, used to compare clocks."
+local-time:
+  term: "local time"
+  def: "The time that a clock shows in the place where the computer is set to be, which differs from UTC by the offset."
+time-zone-offset:
+  term: "time zone offset"
+  def: "The number of hours and minutes by which a local time is ahead of or behind UTC, written for example as UTC-4."
+daylight-saving-time:
+  term: "daylight saving time"
+  def: "A rule in some countries that moves local clocks forward by one hour for the summer months."
+normalisation:
+  term: "normalisation"
+  def: "Changing the times from every source to one common clock, in forensics UTC, before the events are compared or merged."
+# The timeline
+timeline:
+  term: "timeline"
+  def: "A list of events in the order of their times, each with the source that recorded it."
+super-timeline:
+  term: "super-timeline"
+  def: "One timeline that a tool builds from every kind of record it can read on a system, often with millions of rows."
+triage-collection:
+  term: "triage collection"
+  def: "A small, chosen set of files copied from a system or an image because they answer the first questions fastest."
