@@ -1,0 +1,70 @@
+# _data/glossary/s06.yml - the words first taught in Session 6.
+memory:
+  term: "memory"
+  def: "The fast working store of a running computer, also called RAM. It holds what the computer is doing now, and it is emptied when the power goes."
+volatile-evidence:
+  term: "volatile evidence"
+  def: "Evidence that exists only while a computer is running, and is lost when the power goes or as the computer keeps working."
+order-of-volatility:
+  term: "order of volatility"
+  def: "The rule that an examiner collects evidence in the order in which it would be lost, starting with what disappears soonest."
+memory-image:
+  term: "memory image"
+  def: "A file that holds a copy of the contents of a computer's memory, taken while the computer was running."
+live-acquisition:
+  term: "live acquisition"
+  def: "Collecting evidence from a computer while it is running, with a tool that runs on that same computer."
+footprint:
+  term: "footprint"
+  def: "The changes that an examiner's own tool makes to the computer on which it runs."
+smear:
+  term: "smear"
+  def: "The small disagreements inside a memory image that arise because memory kept changing while it was being copied."
+memory-page:
+  term: "page"
+  def: "A block of memory of fixed size, usually 4,096 bytes. Windows manages memory one page at a time."
+page-file:
+  term: "page file"
+  def: "A file on the disk to which Windows moves pages of memory that it does not need at the moment."
+hibernation-file:
+  term: "hibernation file"
+  def: "A file on the disk into which Windows writes the contents of memory when the computer goes into its deep sleep."
+kernel:
+  term: "kernel"
+  def: "The central part of an operating system. It controls the hardware, the memory and every running program."
+process:
+  term: "process"
+  def: "One running copy of a program, with its own area of memory."
+process-id:
+  term: "process ID"
+  def: "The number that the operating system gives to a process while it runs. It is written as PID."
+parent-process:
+  term: "parent process"
+  def: "The process that started another process. The process that it started is called its child."
+command-line:
+  term: "command line"
+  def: "The full text with which a process was started: the path of the program and every option and file name given to it."
+loaded-module:
+  term: "loaded module"
+  def: "A file of program code that a process has brought into its memory in order to use it. On Windows most are DLL files."
+network-connection:
+  term: "network connection"
+  def: "An open link between a process on one computer and an address and port on another computer."
+symbol-table:
+  term: "symbol table"
+  def: "A description of how one exact version of an operating system lays out its internal records. A memory tool needs it to read a memory image."
+process-list:
+  term: "process list"
+  def: "The chain of records in which the kernel keeps every process that it is running."
+memory-scan:
+  term: "memory scan"
+  def: "A search through every byte of a memory image for the pattern of a record, without using the operating system's own lists."
+memory-protection:
+  term: "memory protection"
+  def: "The rights that the operating system gives to a region of memory: whether a process may read it, write to it, or run it as code."
+injected-code:
+  term: "injected code"
+  def: "Program code that was placed into the memory of a process and did not come from the program's own file on the disk."
+plugin:
+  term: "plugin"
+  def: "One command of the tool Volatility. Each one reads one kind of record from a memory image."

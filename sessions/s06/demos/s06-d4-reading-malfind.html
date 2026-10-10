@@ -1,0 +1,269 @@
+<!doctype html>
+<!-- NB6018CEM demo S06-D4. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S06-D4 Reading a malfind finding | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+table.t{border-collapse:collapse;width:100%;font-size:.92rem}
+table.t th,table.t td{border:1px solid var(--hairline);padding:.4rem .5rem;text-align:left;vertical-align:top}
+table.t th{background:var(--ink);color:#fff;font-weight:700}
+tr.hot td{background:var(--plum-tint);box-shadow:inset 4px 0 0 var(--plum)}
+tr.ok td{background:var(--surface)}
+tr.gone td{color:#8a958e;text-decoration:line-through}
+.note{font-size:.85rem;color:var(--stone);margin:.6rem 0 0}
+.pill{display:inline-block;border-radius:999px;padding:.1rem .6rem;font-size:.8rem;font-weight:700;border:1px solid var(--sage-dark);color:var(--sage-dark);background:#fff}
+.pill.local{border-color:var(--plum-dark);color:var(--plum-dark);background:var(--plum-tint)}
+.flag{font-weight:800;color:var(--plum-dark)}
+
+
+.regs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}
+@media (max-width:640px){.regs{grid-template-columns:1fr}}
+.reg{border:2px solid var(--hairline);border-radius:10px;padding:.5rem .6rem;font-size:.82rem;transition:background .25s,border-color .25s;overflow-wrap:anywhere}
+.reg h3{margin:0 0 .3rem;font-family:var(--mono);font-size:.86rem}
+.reg dl{margin:0}.reg dt{font-size:.7rem;font-weight:700;letter-spacing:.05em;color:var(--stone);text-transform:uppercase;margin-top:.3rem}
+.reg dd{margin:0}.reg dd.m{font-family:var(--mono);font-size:.76rem}
+.reg.hit{border-color:var(--plum);background:var(--plum-tint)}
+.reg.lead{border-color:var(--plum-dark);background:var(--plum-tint);box-shadow:inset 0 5px 0 var(--plum)}
+.reg.ok{border-color:var(--sage-dark);background:var(--surface)}
+.reg.out{background:#f3f3ee;color:#7c8780;border-style:dashed}
+.reg .v{margin-top:.45rem;font-weight:700;min-height:2.6em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 6 notes</a>
+  <h1>S06-D4: Reading a malfind finding</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a region is reported because of two properties, its protection and the missing file behind it, and neither property says who put the content there or why.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="regs" id="regs"></div>
+    <p class="note">A made-up machine. The names of the programs are not from the case.</p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The plugin applied two tests: writable and executable at once, and private with no file behind it. Two regions passed. One belonged to a program that creates such memory in normal work. The other began with the header of a Windows program, and the plugin could not say how it got there. In a case, a line from malfind is a lead: the finding comes from the parent, the command line, the modules, the connections and the content of the region, and a report states what was seen before it states what it means.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var STEPS = [
+ {
+  "caption": "Three regions of memory, in three processes of a made-up machine. For each one Windows records its rights and whether a file on the disk lies behind it. Which of them will the plugin malfind report?",
+  "state": {
+   "show": 2,
+   "marks": [
+    "",
+    "",
+    ""
+   ],
+   "verdict": [
+    "",
+    "",
+    ""
+   ]
+  }
+ },
+ {
+  "caption": "Test 1: is the region writable and executable at once? The first two are. The third is readable and executable only, which is the normal protection of program code. The third region drops out.",
+  "state": {
+   "show": 2,
+   "marks": [
+    "hit",
+    "hit",
+    "out"
+   ],
+   "verdict": [
+    "",
+    "",
+    "Not reported"
+   ]
+  }
+ },
+ {
+  "caption": "Test 2: is the region private, with no file behind it? The first two are. The third was loaded from a program file, which is how code normally arrives. The plugin reports the first two regions. That is all it tests.",
+  "state": {
+   "show": 2,
+   "marks": [
+    "hit",
+    "hit",
+    "out"
+   ],
+   "verdict": [
+    "Reported",
+    "Reported",
+    "Not reported"
+   ]
+  }
+ },
+ {
+  "caption": "Now read the first bytes. The first region holds machine instructions and no header. The second begins with 4d 5a, the letters MZ: the header of a Windows program. The third also begins with MZ, and nobody is surprised, because it is a program file loaded in the normal way.",
+  "state": {
+   "show": 3,
+   "marks": [
+    "hit",
+    "hit",
+    "out"
+   ],
+   "verdict": [
+    "Reported",
+    "Reported",
+    "Not reported"
+   ]
+  }
+ },
+ {
+  "caption": "What the plugin cannot know: who put the content there, and why. The first region belongs to a web browser, which turns script code into machine instructions while it runs and needs such memory for it. Judgement: normal for this program.",
+  "state": {
+   "show": 3,
+   "marks": [
+    "ok",
+    "hit",
+    "out"
+   ],
+   "verdict": [
+    "Reported: normal for a browser",
+    "Reported",
+    "Not reported"
+   ]
+  }
+ },
+ {
+  "caption": "The second region needs more work. Who is the parent of practice.exe? What is its command line? Which modules did it load? Is it connected to anything? The line from malfind is where this work starts.",
+  "state": {
+   "show": 3,
+   "marks": [
+    "ok",
+    "lead",
+    "out"
+   ],
+   "verdict": [
+    "Reported: normal for a browser",
+    "Reported: a lead, examine further",
+    "Not reported"
+   ]
+  }
+ },
+ {
+  "caption": "On the unit's test machine, the answer is known: a control sample wrote the two letters and a label into its own memory, and did nothing else. In another case the same line could be a whole program placed into a process by an attacker. The line is identical in both cases.",
+  "state": {
+   "show": 3,
+   "marks": [
+    "ok",
+    "lead",
+    "out"
+   ],
+   "verdict": [
+    "Reported: normal for a browser",
+    "Reported: cause known here, unknown elsewhere",
+    "Not reported"
+   ]
+  }
+ },
+ {
+  "caption": "Two properties made the plugin speak: the protection and the missing file. Neither is a verdict. Read what you just saw below.",
+  "state": {
+   "show": 3,
+   "marks": [
+    "ok",
+    "lead",
+    "out"
+   ],
+   "verdict": [
+    "Reported: normal for a browser",
+    "Reported: cause known here, unknown elsewhere",
+    "Not reported"
+   ]
+  }
+ }
+];
+  var REG = [{"proc": "browser.exe", "pid": "2816", "prot": "Read, write, execute", "backing": "Private: no file behind it", "bytes": "48 89 5c 24 08 57 48 83", "text": "H.\\$.WH."}, {"proc": "practice.exe", "pid": "4120", "prot": "Read, write, execute", "backing": "Private: no file behind it", "bytes": "4d 5a 90 00 03 00 00 00", "text": "MZ......"}, {"proc": "editor.exe", "pid": "3320", "prot": "Read, execute", "backing": "Loaded from editor.exe on the disk", "bytes": "4d 5a 90 00 03 00 00 00", "text": "MZ......"}];
+  function row(dl, k, v, mono){
+    var dt = document.createElement("dt"); dt.textContent = k; dl.appendChild(dt);
+    var dd = document.createElement("dd"); dd.textContent = v; if (mono) { dd.className = "m"; } dl.appendChild(dd);
+  }
+  function render(state){
+    var box = document.getElementById("regs"); box.textContent = "";
+    REG.forEach(function(r, k){
+      var d = document.createElement("div"); d.className = "reg " + state.marks[k];
+      var h = document.createElement("h3"); h.textContent = r.proc + " (PID " + r.pid + ")"; d.appendChild(h);
+      var dl = document.createElement("dl");
+      row(dl, "Rights", r.prot, false);
+      row(dl, "Behind it", r.backing, false);
+      if (state.show >= 3) { row(dl, "First bytes", r.bytes + "  " + r.text, true); }
+      d.appendChild(dl);
+      var v = document.createElement("div"); v.className = "v"; v.textContent = state.verdict[k]; d.appendChild(v);
+      box.appendChild(d);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
