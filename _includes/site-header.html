@@ -10,9 +10,18 @@
     <h1>{% if s.n == 0 %}{{ s.title }}{% else %}Session {{ s.n }}: {{ s.title }}{% endif %}</h1>
     <p class="sub">{% if s.day > 0 %}Day {{ s.day }}, {{ s.slot }} session{% else %}A self-study task to finish before the module starts{% endif %}</p>
     {%- elsif page.url == "/" %}
-    <h1>{{ site.title }}</h1>
-    <p class="sub">{{ site.module_code }} | {{ site.programme }} | NIBM</p>
-    <p class="sub">Level 6, 20 credits. Coursework 25%, phase test 75%.</p>
+    <div class="home-head">
+      <div class="home-head-text">
+        <h1 class="one-line">{{ site.title }}</h1>
+        <p class="sub">{{ site.module_code }} | {{ site.programme }}</p>
+        <p class="sub focus">{{ site.focus }}</p>
+        <p class="sub">Level 6, 20 credits. Assessed by coursework and a phase test.</p>
+      </div>
+      <figure class="qr">
+        <img src="{{ '/assets/img/portal-qr.svg' | relative_url }}" width="128" height="128" alt="QR code that opens this courseware portal">
+        <figcaption>Scan to open</figcaption>
+      </figure>
+    </div>
     {%- else %}
     <h1>{{ page.title }}</h1>
     {%- if page.subtitle %}<p class="sub">{{ page.subtitle }}</p>{% endif %}

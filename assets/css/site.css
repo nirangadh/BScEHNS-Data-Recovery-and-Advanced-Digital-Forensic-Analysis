@@ -30,7 +30,7 @@ a:hover{color:var(--plum-dark)}
 .skip{position:absolute;left:-999px;top:0;background:var(--ink);color:#fff;padding:.5rem 1rem;z-index:10}
 .skip:focus{left:1rem}
 .wrap{max-width:var(--measure);margin:0 auto;padding:0 1.1rem}
-.wrap-wide{max-width:60rem;margin:0 auto;padding:0 1.1rem}
+.wrap-wide{max-width:72rem;margin:0 auto;padding:0 1.1rem}
 
 /* Header band with the module's signature bars (sage long, plum short) */
 .site-header{background:var(--ink);color:#fff;padding:1.6rem 0 1.4rem}
@@ -39,6 +39,17 @@ a:hover{color:var(--plum-dark)}
 .site-header .eyebrow a:hover{text-decoration:underline;color:#fff}
 .site-header h1{margin:.35rem 0 0;font-size:clamp(1.45rem,4vw,2rem);line-height:1.2;font-weight:800}
 .site-header p.sub{margin:.4rem 0 0;color:var(--surface);font-size:.95rem}
+.site-header p.sub.focus{color:#fff;max-width:40rem}
+/* Home header: text column and QR code. The module title stays on one line on wider screens:
+   it scales with the text column (container units) instead of wrapping. On phones it may wrap,
+   and the QR is hidden, because a phone showing this page has no use for a code to open it. */
+.home-head{display:flex;align-items:center;gap:1.5rem}
+.home-head-text{flex:1 1 auto;min-width:0;container-type:inline-size}
+.qr{flex:none;margin:0;text-align:center}
+.qr img{display:block;width:128px;height:128px;background:#fff;border-radius:10px;padding:6px}
+.qr figcaption{margin-top:.35rem;font-size:.78rem;font-weight:600;color:var(--surface);letter-spacing:.03em}
+@media (min-width:48rem){.site-header h1.one-line{white-space:nowrap;font-size:min(2rem,3.3cqi)}}
+@media (max-width:47.99rem){.qr{display:none}}
 .bars{display:flex;gap:6px;margin-top:.9rem}
 .bars i{display:block;height:6px;border-radius:2px}
 .bars i:first-child{width:56px;background:var(--sage)}
@@ -190,6 +201,7 @@ details.answer>summary{cursor:pointer;font-weight:700;color:var(--sage-dark);pad
   body{background:#fff;font-size:11pt;color:#000}
   .site-header{background:#fff;color:#000;border-bottom:2px solid #000;padding:.5rem 0}
   .site-header .eyebrow,.site-header .eyebrow a,.site-header p.sub{color:#333}
+  .site-header p.sub.focus,.qr figcaption{color:#333}
   .bars,.skip,.progress-box,.pager,.qc-opts,.qc-retry,.quicklinks{display:none!important}
   .qc-why,.js .qc-why{display:block!important}.no-js-answer,.js .no-js-answer{display:inline!important}
   .term .term-def{display:none}
