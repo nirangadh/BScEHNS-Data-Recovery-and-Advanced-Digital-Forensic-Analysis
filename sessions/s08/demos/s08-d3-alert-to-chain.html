@@ -1,0 +1,329 @@
+<!doctype html>
+<!-- NB6018CEM demo S08-D3. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S08-D3 From one alert to the chain | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono)}
+.lbl{margin:0 0 .35rem;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--stone)}
+.top{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+@media (min-width:760px){.top{grid-template-columns:15rem minmax(0,1fr)}}
+.top>div{min-width:0}
+.alert{border:2px solid var(--plum);background:var(--plum-tint);border-radius:10px;padding:.55rem .65rem;font-size:.76rem}
+.alert h3{margin:0 0 .3rem;font-size:.74rem;letter-spacing:.06em;color:var(--plum-dark)}
+.alert dl{margin:0;display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:.12rem .4rem}
+.alert dt{color:var(--stone)}
+.alert dd{margin:0;font-family:var(--mono);overflow-wrap:anywhere;min-width:0}
+.alert dd.hi{font-weight:700;background:#fff;outline:2px solid var(--plum);border-radius:4px;padding:0 .25rem}
+.five{margin-top:.7rem}
+.five[hidden],.zone[hidden]{display:none}
+.boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(6.4rem,1fr));gap:.35rem}
+.box{border:1px solid var(--sage-dark);background:var(--surface);border-radius:8px;padding:.25rem .4rem;font-size:.7rem;min-width:0}
+.box b{display:block;font-size:.68rem;color:var(--stone);font-weight:700}
+.box span{font-family:var(--mono);overflow-wrap:anywhere}
+.calc{margin:.45rem 0 0;font-size:.74rem;color:var(--ink)}
+.calc .mono{display:block;font-weight:700;overflow-wrap:anywhere;color:var(--plum-dark)}
+.flows{font-family:var(--mono);font-size:.7rem}
+.fr{display:grid;grid-template-columns:4.4rem 3.8rem minmax(0,1fr) 5.6rem 6.2rem;gap:.1rem .45rem;padding:.3rem .4rem;border:1px solid var(--hairline);border-top:0;transition:background .25s,opacity .25s}
+.fr>div{min-width:0;overflow-wrap:anywhere}
+.fr.head{background:var(--ink);color:#fff;font-family:var(--font);font-weight:700;font-size:.68rem;border-color:var(--ink);border-top:1px solid var(--ink);border-radius:6px 6px 0 0}
+.fr .tag{font-family:var(--font);font-weight:800;font-size:.68rem}
+.fr.now{background:var(--plum-tint);box-shadow:inset 4px 0 0 var(--plum)}
+.fr.now .tag,.fr.now .st{color:var(--plum-dark)}
+.fr.done{background:var(--surface);box-shadow:inset 4px 0 0 var(--sage-dark)}
+.fr.done .tag{color:var(--sage-dark)}
+.fr.dim{opacity:.6}
+.fr .st{display:block;font-family:var(--font);font-weight:800;font-size:.68rem}
+.fr .sub{color:var(--stone)}
+@media (max-width:759px){
+ .fr.head{display:none}
+ .fr{grid-template-columns:4.7rem minmax(0,1fr) 5.6rem;grid-template-areas:"tag conn byt" "time conn id"}
+ .fr:first-of-type,.fr.head+.fr{border-top:1px solid var(--hairline)}
+ .fr .c-tag{grid-area:tag}.fr .c-time{grid-area:time}.fr .c-conn{grid-area:conn}.fr .c-byt{grid-area:byt}.fr .c-id{grid-area:id}
+}
+.empty{border:2px dashed var(--hairline);border-radius:10px;padding:.8rem;color:var(--stone);font-size:.8rem}
+.zone{margin-top:.9rem;border-top:1px solid var(--hairline);padding-top:.7rem}
+.zone .line{font-family:var(--mono);font-size:.72rem;background:var(--surface);border:1px solid var(--hairline);border-radius:8px;padding:.4rem .5rem;overflow-wrap:anywhere;margin:0 0 .4rem}
+.zone ul{margin:.2rem 0 0;padding-left:1.1rem;font-size:.8rem}
+.chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.6rem}
+.card{border:2px solid var(--sage-dark);background:var(--surface);border-radius:10px;padding:.5rem .6rem;font-size:.76rem;min-width:0}
+.card.mid{border-color:var(--plum);background:var(--plum-tint)}
+.card h3{margin:0 0 .2rem;font-size:.76rem;letter-spacing:.06em}
+.card p{margin:0;font-family:var(--mono);font-size:.7rem;overflow-wrap:anywhere}
+.card .why{font-family:var(--font);color:var(--stone);margin-top:.2rem}
+.note{font-size:.82rem;color:var(--stone);margin:.7rem 0 0;min-height:1.3em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 8 notes</a>
+  <h1>S08-D3: From one alert to the chain</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> an alert and a flow record of the same connection carry the same Community ID, and that ID joins one alert to the flows before and after it, which show the chain of the attack.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="top">
+      <div>
+        <p class="lbl">The alert</p>
+        <div class="alert" id="alert"></div>
+        <div class="five" id="five" hidden></div>
+      </div>
+      <div>
+        <p class="lbl" id="flbl"></p>
+        <div class="flows" id="flows"></div>
+      </div>
+    </div>
+    <div class="zone" id="zone" hidden></div>
+    <p class="note" id="note"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>One alert became a chain of three steps, because you joined two records of the same capture. The Community ID is the join key: both tools calculate it from the same five values, so the same connection gets the same ID. The join also found flows that raised no alert at all. Correlation turns a single alert into a story that you can check step by step.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* The alert (Suricata) and the flow records (Zeek conn.log). t is seconds after midnight, UTC. */
+  function T(h, m, s){ return h * 3600 + m * 60 + s; }
+  var ALERT = { t: T(19,45,56), sid: 9000001, msg: "NB6018 TRAINING Request for update script",
+                src: "192.0.2.10", sport: 49731, dst: "203.0.113.80", dport: 80, proto: "tcp",
+                cid: "1:lEICeLw60WvS6WALAkcCuZPvFeU=" };
+  var F = [
+    { t: T(19,44,10), src: "192.0.2.14", sport: 50112, dst: "203.0.113.9",   dport: 443,  proto: "tcp", svc: "",     dur: 31,   sent: 2100, recv: 48300,  cid: "1:srgPVWFPCYmTGxw0xuyGAVplTME=" },
+    { t: T(19,45,54), src: "192.0.2.10", sport: 53124, dst: "192.0.2.53",    dport: 53,   proto: "udp", svc: "dns",  dur: null, sent: null, recv: null,   cid: "1:mEAbA4NR+BConeUP+jcS9dC582w=" },
+    { t: T(19,45,56), src: "192.0.2.10", sport: 49731, dst: "203.0.113.80",  dport: 80,   proto: "tcp", svc: "http", dur: 2,    sent: 412,  recv: 186240, cid: "1:lEICeLw60WvS6WALAkcCuZPvFeU=" },
+    { t: T(19,46,20), src: "192.0.2.10", sport: 49760, dst: "198.51.100.25", dport: 8080, proto: "tcp", svc: "",     dur: 1,    sent: 310,  recv: 96,     cid: "1:VAthMbss3vki07ExDXDC59xd4Aw=" },
+    { t: T(19,47,20), src: "192.0.2.10", sport: 49761, dst: "198.51.100.25", dport: 8080, proto: "tcp", svc: "",     dur: 1,    sent: 310,  recv: 96,     cid: null },
+    { t: T(19,48,20), src: "192.0.2.10", sport: 49763, dst: "198.51.100.25", dport: 8080, proto: "tcp", svc: "",     dur: 1,    sent: 310,  recv: 96,     cid: null }
+  ];
+  /* The dns.log line that belongs to the DNS flow record. */
+  var DNS = { cid: "1:mEAbA4NR+BConeUP+jcS9dC582w=", query: "files.example.net", answer: "203.0.113.80" };
+  var WINDOW = 5; /* seconds allowed between alert time and flow time in the join by hand */
+
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function clock(t){ return pad(Math.floor(t / 3600)) + ":" + pad(Math.floor(t / 60) % 60) + ":" + pad(t % 60); }
+  function num(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  function short(c){ return c.slice(0, 6) + "..." + c.slice(-4); }
+  function list(a){ return a.length === 1 ? String(a[0]) : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+  function idx(fn){ var r = []; F.forEach(function(f, k){ if (fn(f)) { r.push(k); } }); return r; }
+  function nos(a){ return a.map(function(k){ return k + 1; }); }
+  function secs(n){ return n + (n === 1 ? " second" : " seconds"); }
+
+  /* Everything stated in a caption is worked out here from the data above. */
+  var COMPUTERS = []; F.forEach(function(f){ if (COMPUTERS.indexOf(f.src) === -1) { COMPUTERS.push(f.src); } });
+  var OTHER = COMPUTERS.filter(function(c){ return c !== ALERT.src; });
+  var MATCH = idx(function(f){ return f.cid === ALERT.cid; });
+  var M = F[MATCH[0]];
+  var RATIO = Math.round(M.recv / M.sent / 10) * 10;
+  var HAND = idx(function(f){ return f.src === ALERT.src && f.dst === ALERT.dst && f.sport === ALERT.sport && f.dport === ALERT.dport && f.proto === ALERT.proto && Math.abs(f.t - ALERT.t) <= WINDOW; });
+  var BEFORE = idx(function(f){ return f.src === ALERT.src && f.t < M.t; });
+  var L = F[BEFORE[BEFORE.length - 1]];
+  var DNS_JOIN = DNS.cid === L.cid, SAME_ADDR = DNS.answer === ALERT.dst;
+  var AFTER = idx(function(f){ return f.src === ALERT.src && f.t > M.t; });
+  var C = AFTER.map(function(k){ return F[k]; });
+  var GAPS = []; C.forEach(function(f, k){ if (k > 0) { GAPS.push(f.t - C[k - 1].t); } });
+  var REGULAR = GAPS.every(function(g){ return g === GAPS[0]; });
+  var SAME_SIZE = C.every(function(f){ return f.sent === C[0].sent && f.recv === C[0].recv; });
+  var NEW_PORTS = C.map(function(f){ return f.sport; }).filter(function(p, k, a){ return a.indexOf(p) === k; }).length;
+  var OTHER_ROWS = idx(function(f){ return f.src !== ALERT.src; });
+  var NUMWORD = ["zero", "one", "two", "three", "four", "five", "six"];
+  var CHAIN = [
+    { name: "LOOKUP", when: clock(L.t), what: DNS.query + " -> " + DNS.answer, why: "DNS query, row " + (BEFORE[BEFORE.length - 1] + 1) },
+    { name: "DOWNLOAD", when: clock(M.t), what: num(M.recv) + " bytes received from " + M.dst, why: "the alert, row " + (MATCH[0] + 1) },
+    { name: "CONTACT", when: "from " + clock(C[0].t), what: C[0].dst + ":" + C[0].dport + ", every " + secs(GAPS[0]), why: "no alert, rows " + list(nos(AFTER)) }
+  ];
+  var OPEN = ["What the downloaded data was", "Whether it ran", "Who was at the keyboard"];
+
+  var STEPS = [
+    { caption: "Suricata, an intrusion detection system (IDS), read a packet capture and raised one alert. At " + clock(ALERT.t) + " UTC, rule " + ALERT.sid + " matched a connection from " + ALERT.src + " port " + ALERT.sport + " to " + ALERT.dst + " port " + ALERT.dport + ": \"" + ALERT.msg + "\". The alert also carries a code called a Community ID. The alert says that something matched. It does not say how much data came back, how long the connection lasted, or what happened before and after.",
+      state: { flows: false, five: false, mark: "none", zone: "", note: "One alert. No size, no duration, no before and after." } },
+    { caption: "Zeek, another tool, read the same capture and wrote " + F.length + " flow records, one line for each connection. They come from " + COMPUTERS.length + " computers: " + list(COMPUTERS) + ". Each flow record has a time, two addresses, two ports, a protocol, byte counts and a Community ID. Which row is the connection of the alert?",
+      state: { flows: true, five: false, mark: "none", zone: "", note: F.length + " flow records from " + COMPUTERS.length + " computers. Which one is the alert's connection?" } },
+    { caption: "Take five values out of the alert: source address " + ALERT.src + ", destination address " + ALERT.dst + ", source port " + ALERT.sport + ", destination port " + ALERT.dport + " and protocol " + ALERT.proto.toUpperCase() + ". Suricata puts them in a fixed order and calculates a hash value from them. The result is the Community ID, and the \"1:\" at its start is the version. Zeek does the same calculation on the same five values of the same connection. So both tools get the same ID, and both directions of one conversation give it too.",
+      state: { flows: true, five: true, mark: "none", zone: "", note: "Same five values, same calculation, same Community ID in any tool." } },
+    { caption: "Search the flow records for the alert's Community ID, " + ALERT.cid + ". It equals the ID of row " + list(nos(MATCH)) + " and of no other row: " + MATCH.length + " match in " + F.length + " rows. Now the alert has a flow record: " + secs(M.dur) + ", " + num(M.sent) + " bytes sent and " + num(M.recv) + " bytes received. The computer received about " + RATIO + " times more than it sent. That is the shape of a download.",
+      state: { flows: true, five: true, mark: "match", zone: "", note: "MATCH on row " + list(nos(MATCH)) + ": " + secs(M.dur) + ", sent " + num(M.sent) + ", received " + num(M.recv) + " bytes." } },
+    { caption: "Some logs have no Community ID. Then you join by hand: the two addresses, the two ports, the protocol, and a time within " + secs(WINDOW) + " of the alert. Here that join also gives row " + list(nos(HAND)) + " and no other row. It is slower, and it can pick the wrong row, or no row, when the clocks of the two tools differ.",
+      state: { flows: true, five: false, mark: "hand", zone: "hand", note: "The join by hand gives the same row, with more work and more risk." } },
+    { caption: "Now look just before the alert, at the same computer, " + ALERT.src + ". Row " + (BEFORE[BEFORE.length - 1] + 1) + " is a DNS query at " + clock(L.t) + ", " + secs(M.t - L.t) + " earlier, sent to " + L.dst + " port " + L.dport + ". Zeek's DNS log has a line with " + (DNS_JOIN ? "the same" : "another") + " Community ID, " + DNS.cid + ": the query was " + DNS.query + " and the answer was " + DNS.answer + ". That answer is " + (SAME_ADDR ? "the very address" : "not the address") + " of the download server. This is the lookup: the computer asked for an address and then connected to it.",
+      state: { flows: true, five: false, mark: "before", zone: "dns", note: "LOOKUP: " + DNS.query + " -> " + DNS.answer + ", " + secs(M.t - L.t) + " before the download." } },
+    { caption: "Now look just after the alert, at the same computer: rows " + list(nos(AFTER)) + " go to a new address, " + C[0].dst + " port " + C[0].dport + ". They start at " + list(C.map(function(f){ return clock(f.t); })) + ", " + (REGULAR ? "exactly " : "about ") + secs(GAPS[0]) + " apart, and each sends " + num(C[0].sent) + " bytes and receives " + num(C[0].recv) + (SAME_SIZE ? "" : " or so") + ": small and regular, like a clock. This is repeated contact with the attacker's server. Each contact uses a new source port, and a new source port gives a new Community ID, so the " + NUMWORD[C.length] + " rows have " + NUMWORD[NEW_PORTS] + " different IDs. No rule fired on these rows: the IDS had no rule for them, and you found them through the join.",
+      state: { flows: true, five: false, mark: "after", zone: "gaps", note: "CONTACT: " + C.length + " small flows, " + secs(GAPS[0]) + " apart, and no alert on any of them." } },
+    { caption: "The three steps now form a chain for one computer, " + ALERT.src + ". LOOKUP at " + clock(L.t) + ": it asked for " + DNS.query + " and got " + DNS.answer + ". DOWNLOAD at " + clock(M.t) + ": the alert, with " + num(M.recv) + " bytes received from that address. CONTACT from " + clock(C[0].t) + ": " + C[0].dst + " port " + C[0].dport + ", every " + secs(GAPS[0]) + ", " + C.length + " times in this capture. Row " + list(nos(OTHER_ROWS)) + " belongs to another computer, " + list(OTHER) + ", and is not part of the chain.",
+      state: { flows: true, five: false, mark: "chain", zone: "chain", note: "LOOKUP, then DOWNLOAD, then CONTACT. Row " + list(nos(OTHER_ROWS)) + " is not part of it." } },
+    { caption: "The chain still leaves " + NUMWORD[OPEN.length] + " questions open. It does not show what the downloaded data was, whether it ran, or who was at the keyboard. Those answers need the packets and the computer itself. Until then, the chain is a hypothesis that you can check step by step. Read what you just saw below.",
+      state: { flows: true, five: false, mark: "chain", zone: "open", note: "Flow records show who, when and how much. They do not show what or who." } }
+  ];
+
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) { e.className = cls; } if (text !== undefined) { e.textContent = text; } return e; }
+  function drawAlert(state){
+    var box = document.getElementById("alert"); box.textContent = "";
+    box.appendChild(el("h3", "", "ALERT (Suricata)"));
+    var dl = el("dl"), five = state.five;
+    [["Time", clock(ALERT.t) + " UTC", 0], ["Rule ID", String(ALERT.sid), 0], ["Message", ALERT.msg, 0],
+     ["From", ALERT.src + ":" + ALERT.sport, 1], ["To", ALERT.dst + ":" + ALERT.dport, 1], ["Protocol", ALERT.proto.toUpperCase(), 1],
+     ["Comm. ID", ALERT.cid, 2]].forEach(function(x){
+      dl.appendChild(el("dt", "", x[0]));
+      var hi = (five && x[2] === 1) || ((state.mark === "match" || five) && x[2] === 2) || (state.mark === "hand" && x[2] === 1) || (state.mark === "hand" && x[0] === "Time");
+      dl.appendChild(el("dd", hi ? "hi" : "", x[1]));
+    });
+    box.appendChild(dl);
+    var fv = document.getElementById("five"); fv.hidden = !five; fv.textContent = "";
+    if (!five) { return; }
+    fv.appendChild(el("p", "lbl", "The five values"));
+    var bx = el("div", "boxes");
+    [["Source address", ALERT.src], ["Destination address", ALERT.dst], ["Source port", String(ALERT.sport)], ["Destination port", String(ALERT.dport)], ["Protocol", ALERT.proto.toUpperCase()]].forEach(function(x){
+      var b = el("div", "box"); b.appendChild(el("b", "", x[0])); b.appendChild(el("span", "", x[1])); bx.appendChild(b);
+    });
+    fv.appendChild(bx);
+    var c = el("p", "calc", "Fixed order, then one calculation, in Suricata and in Zeek. Result (a hash value):");
+    c.appendChild(el("span", "mono", ALERT.cid));
+    fv.appendChild(c);
+  }
+  function rowLook(k, mark){
+    var f = F[k], r = { cls: "", tag: "", st: "" };
+    var isM = MATCH.indexOf(k) !== -1, isL = k === BEFORE[BEFORE.length - 1], isC = AFTER.indexOf(k) !== -1;
+    if (mark === "match") { r.cls = isM ? "now" : ""; r.st = isM ? "MATCH" : (f.cid ? "no match" : ""); if (isM) { r.tag = "ALERT"; } }
+    else if (mark === "hand") { var h = HAND.indexOf(k) !== -1; r.cls = h ? "now" : ""; r.tag = h ? "SAME ROW" : ""; }
+    else if (mark === "before") { if (isM) { r.cls = "done"; r.tag = "ALERT"; } if (isL) { r.cls = "now"; r.tag = "LOOKUP"; } }
+    else if (mark === "after") { if (isM) { r.cls = "done"; r.tag = "ALERT"; } if (isL) { r.cls = "done"; r.tag = "LOOKUP"; } if (isC) { r.cls = "now"; r.tag = "CONTACT"; r.st = "no alert"; } }
+    else if (mark === "chain") { if (isM) { r.cls = "done"; r.tag = "DOWNLOAD"; } else if (isL) { r.cls = "done"; r.tag = "LOOKUP"; } else if (isC) { r.cls = "done"; r.tag = "CONTACT"; } else { r.cls = "dim"; r.tag = "not in chain"; } }
+    return r;
+  }
+  function drawFlows(state){
+    var box = document.getElementById("flows"); box.textContent = "";
+    document.getElementById("flbl").textContent = state.flows ? "Flow records (Zeek conn.log), times in UTC" : "Flow records";
+    if (!state.flows) { box.appendChild(el("div", "empty", "(The flow records of the same capture come in the next step.)")); return; }
+    var h = el("div", "fr head");
+    ["Row", "Time", "From > to", "Bytes", "Community ID"].forEach(function(x){ h.appendChild(el("div", "", x)); });
+    box.appendChild(h);
+    F.forEach(function(f, k){
+      var look = rowLook(k, state.mark), tr = el("div", "fr " + look.cls);
+      var c1 = el("div", "c-tag", "Row " + (k + 1)); if (look.tag) { c1.appendChild(el("span", "st", look.tag)); }
+      tr.appendChild(c1);
+      tr.appendChild(el("div", "c-time", clock(f.t)));
+      var cn = el("div", "c-conn", f.src + ":" + f.sport + " >");
+      cn.appendChild(el("div", "", f.dst + ":" + f.dport));
+      cn.appendChild(el("div", "sub", f.proto + (f.svc ? " " + f.svc : "") + (f.dur !== null ? ", " + f.dur + " s" : "")));
+      tr.appendChild(cn);
+      var by = el("div", "c-byt");
+      if (f.sent === null) { by.textContent = "DNS query"; by.className = "c-byt sub"; }
+      else { by.textContent = "sent " + num(f.sent); by.appendChild(el("div", "", "recv " + num(f.recv))); }
+      tr.appendChild(by);
+      var id = el("div", "c-id" + (f.cid ? "" : " sub"), f.cid ? short(f.cid) : "(another ID: new source port)");
+      if (look.st) { id.appendChild(el("span", "st", look.st)); }
+      tr.appendChild(id);
+      box.appendChild(tr);
+    });
+  }
+  function drawZone(state){
+    var z = document.getElementById("zone"); z.textContent = ""; z.hidden = !state.zone;
+    if (!state.zone) { return; }
+    var ul;
+    if (state.zone === "hand") {
+      z.appendChild(el("p", "lbl", "Join by hand, without a Community ID"));
+      ul = el("ul");
+      ["Source address " + ALERT.src + " and source port " + ALERT.sport + ": equal", "Destination address " + ALERT.dst + " and destination port " + ALERT.dport + ": equal",
+       "Protocol " + ALERT.proto.toUpperCase() + ": equal", "Time within " + secs(WINDOW) + " of " + clock(ALERT.t) + ": yes (difference " + secs(Math.abs(F[HAND[0]].t - ALERT.t)) + ")",
+       "Result: row " + list(nos(HAND)) + ". Risk: clocks that differ move the time outside the window."].forEach(function(x){ ul.appendChild(el("li", "", x)); });
+      z.appendChild(ul);
+    } else if (state.zone === "dns") {
+      z.appendChild(el("p", "lbl", "The matching line in Zeek's DNS log (dns.log)"));
+      z.appendChild(el("p", "line", "Community ID " + DNS.cid + " | query " + DNS.query + " | answer " + DNS.answer));
+      z.appendChild(el("p", "line", "Alert destination: " + ALERT.dst + (SAME_ADDR ? "  = the answer (SAME ADDRESS)" : "  (different address)")));
+    } else if (state.zone === "gaps") {
+      z.appendChild(el("p", "lbl", "Repeated contact with " + C[0].dst + ":" + C[0].dport));
+      var s = C.map(function(f, k){ return (k ? "  +" + GAPS[k - 1] + " s  " : "") + clock(f.t); }).join("");
+      z.appendChild(el("p", "line", s));
+      z.appendChild(el("p", "line", "Each: sent " + num(C[0].sent) + " bytes, received " + num(C[0].recv) + " bytes. Alerts on these rows: 0."));
+    } else {
+      z.appendChild(el("p", "lbl", "The chain for " + ALERT.src));
+      var ch = el("div", "chain");
+      CHAIN.forEach(function(c, k){
+        var d = el("div", "card" + (k === 1 ? " mid" : ""));
+        d.appendChild(el("h3", "", (k + 1) + ". " + c.name + (k < CHAIN.length - 1 ? "  >" : "")));
+        d.appendChild(el("p", "", c.when)); d.appendChild(el("p", "", c.what)); d.appendChild(el("p", "why", c.why));
+        ch.appendChild(d);
+      });
+      z.appendChild(ch);
+      if (state.zone === "open") {
+        z.appendChild(el("p", "lbl", "Still not shown (needs the packets and the computer)")).style.marginTop = ".8rem";
+        ul = el("ul"); OPEN.forEach(function(x){ ul.appendChild(el("li", "", x + ": NOT SHOWN")); }); z.appendChild(ul);
+      }
+    }
+  }
+  /* render(): draw the alert card, the flow records, the lower area and the note for one state. */
+  function render(state){
+    drawAlert(state); drawFlows(state); drawZone(state);
+    document.getElementById("note").textContent = state.note;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
