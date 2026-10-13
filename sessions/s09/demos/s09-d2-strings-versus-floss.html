@@ -1,0 +1,205 @@
+<!doctype html>
+<!-- NB6018CEM demo S09-D2. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html.
+     The bytes are made up and harmless: they only show how text can be hidden in a file. They are not real program code. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S09-D2 What strings sees, what FLOSS sees | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.lbl{margin:0 0 .35rem;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--stone)}
+.regions{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.6rem}
+.reg{border:2px solid var(--hairline);border-radius:10px;padding:.5rem .6rem;min-width:0;transition:border-color .25s,background .25s}
+.reg.lit{border-color:var(--plum);background:var(--plum-tint)}
+.reg h3{margin:0 0 .3rem;font-size:.82rem}
+.bytes{font-family:var(--mono);font-size:.74rem;line-height:1.5;overflow-wrap:anywhere;margin:0}
+.bytes span{padding:0 1px;border-radius:2px}
+.bytes span.run{background:#fff;outline:2px solid var(--sage-dark)}
+.bytes span.emu{background:var(--plum-tint);outline:2px solid var(--plum)}
+.asm{font-family:var(--mono);font-size:.72rem;margin:.3rem 0 0;padding:0;list-style:none}
+.asm li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.asm li.on{color:var(--plum-dark);font-weight:700}
+.build{margin-top:.35rem;font-family:var(--mono);font-size:.9rem;font-weight:700;color:var(--plum-dark);min-height:1.4em}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.6rem;margin-top:.8rem}
+.col{border:1px solid var(--hairline);border-radius:10px;padding:.5rem .6rem;min-width:0}
+.col ul{margin:0;padding-left:1.1rem;font-family:var(--mono);font-size:.76rem}
+.col li.new{color:var(--plum-dark);font-weight:700}
+.col .sum{margin:.4rem 0 0;font-size:.8rem;font-weight:800}
+.empty{color:var(--stone);font-size:.8rem;margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 9 notes</a>
+  <h1>S09-D2: What strings sees, what FLOSS sees</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> text that a program builds one character at a time, or keeps in a changed form, never appears whole in its file. strings misses it; FLOSS imitates the code that produces it, without running the program, and finds it.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="regions" id="regions"></div>
+    <div class="out">
+      <div class="col"><p class="lbl">strings found</p><div id="sOut"></div></div>
+      <div class="col"><p class="lbl">FLOSS found</p><div id="fOut"></div></div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>strings reads the bytes and prints runs of readable characters, so it found the texts that sit whole in the file and nothing else. The file name was spread across separate instructions and the web address was stored changed, so neither existed as a readable run. FLOSS imitated the two small pieces of code that build and decode them, without running the program, and printed what they produce. Section 4 of the notes: record each hidden text, and record that it was hidden.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var MIN = 4;                                      /* strings prints runs of at least four readable characters */
+  var PLAIN = ["Welcome to the unit training tool", "KERNEL32.dll", "CreateFileA", "WriteFile"];
+  var STACK = "unit-cache.exe";                     /* built one character at a time */
+  var DOMAIN = "files.example.net";                 /* kept XOR-encoded */
+  var KEY = 0xA5;
+  var OFF0 = 0xF0;                                  /* first stack offset used by the made-up instructions */
+  function hex(n){ var s = n.toString(16).toUpperCase(); return s.length < 2 ? "0" + s : s; }
+  function codes(s){ return s.split("").map(function(c){ return c.charCodeAt(0); }); }
+  /* Region 1: plain texts, separated by zero bytes, as compilers store them. */
+  var R1 = []; PLAIN.forEach(function(t){ R1 = R1.concat(codes(t)); R1.push(0, 0); });
+  /* Region 2: one made-up instruction per character: C6 45 <offset> <char>, which means "put this byte at this place". */
+  var R2 = [], INSN = [];
+  codes(STACK).forEach(function(c, k){ R2.push(0xC6, 0x45, (OFF0 + k) & 0xFF, c); INSN.push("mov byte [ebp-" + hex(0x100 - ((OFF0 + k) & 0xFF)) + "], 0x" + hex(c) + "   ; '" + String.fromCharCode(c) + "'"); });
+  /* Region 3: the domain, each byte combined with the key by XOR. */
+  var R3 = codes(DOMAIN).map(function(c){ return c ^ KEY; });
+  var REGIONS = [
+    { id: "r1", title: "Region 1: readable texts", bytes: R1 },
+    { id: "r2", title: "Region 2: code that builds a name", bytes: R2 },
+    { id: "r3", title: "Region 3: data kept encoded (key 0x" + hex(KEY) + ")", bytes: R3 }
+  ];
+  function printable(b){ return b >= 0x20 && b <= 0x7E; }
+  /* A real strings algorithm over the made-up bytes: every run of MIN or more printable bytes. */
+  function runs(bytes){
+    var out = [], start = -1;
+    for (var k = 0; k <= bytes.length; k++) {
+      var p = k < bytes.length && printable(bytes[k]);
+      if (p && start < 0) { start = k; }
+      if (!p && start >= 0) { if (k - start >= MIN) { out.push({ s: start, e: k }); } start = -1; }
+    }
+    return out;
+  }
+  var ALL = R1.concat(R2).concat(R3);
+  var FOUND = runs(ALL).map(function(r){ return String.fromCharCode.apply(null, ALL.slice(r.s, r.e)); });
+  var RUNS = REGIONS.map(function(rg){ return runs(rg.bytes); });
+  var DECODED = String.fromCharCode.apply(null, R3.map(function(b){ return b ^ KEY; }));
+  var BUILT = String.fromCharCode.apply(null, codes(STACK));
+  var inFound = function(t){ return FOUND.some(function(f){ return f.indexOf(t) !== -1; }); };
+  var STEPS = [
+    { caption: "A made-up program file holds three regions. Region 1 keeps texts whole, as most programs do. Region 2 is code that builds a file name one character at a time. Region 3 is a web address, with every byte changed by XOR with the key 0x" + hex(KEY) + ".",
+      state: { lit: [], marks: "none", emu: -1, s: false, f: 0 } },
+    { caption: "strings reads the bytes from start to end and prints every run of at least " + MIN + " readable characters. In region 1 it finds " + RUNS[0].length + " runs, marked green. In region 2 the letters of the name sit between other bytes, so no run reaches " + MIN + " and nothing is printed. In region 3 the changed bytes are not readable characters at all, and " + RUNS[2].length + " runs are found.",
+      state: { lit: ["r1", "r2", "r3"], marks: "runs", emu: -1, s: true, f: 0 } },
+    { caption: "So strings prints " + FOUND.length + " texts: " + FOUND.join(", ") + ". The name " + STACK + " is " + (inFound(STACK) ? "among them" : "not among them") + ", and the address " + DOMAIN + " is " + (inFound(DOMAIN) ? "among them" : "not among them") + ". Looking only at this list, you would say the program names no file and no address.",
+      state: { lit: [], marks: "runs", emu: -1, s: true, f: 0 } },
+    { caption: "FLOSS first prints the same static strings. Then it finds the code of region 2 and imitates it, instruction by instruction, in a closed copy. Each instruction puts one character at its place on the stack. The program is never started.",
+      state: { lit: ["r2"], marks: "runs", emu: 2, s: true, f: 1 } },
+    { caption: "After the last of the " + STACK.length + " instructions, the characters on the stack read " + BUILT + ". FLOSS prints it as a stack string. In the file it never existed as one run.",
+      state: { lit: ["r2"], marks: "runs", emu: STACK.length, s: true, f: 2 } },
+    { caption: "FLOSS also finds a small loop that combines each byte of region 3 with 0x" + hex(KEY) + ". It imitates the loop over the " + R3.length + " bytes, and the result is readable: " + DECODED + ". FLOSS prints it as a decoded string.",
+      state: { lit: ["r3"], marks: "dec", emu: STACK.length, s: true, f: 3 } },
+    { caption: "Side by side: strings found " + FOUND.length + " texts. FLOSS found the same " + FOUND.length + ", plus 1 stack string and 1 decoded string. The two hidden texts are the most telling in the file. Read what you just saw below.",
+      state: { lit: [], marks: "dec", emu: STACK.length, s: true, f: 3 } }
+  ];
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) { e.className = cls; } if (text !== undefined) { e.textContent = text; } return e; }
+  var boxes = {}, spans = {}, asm = null, build = null;
+  REGIONS.forEach(function(rg, ri){
+    var d = el("div", "reg"); d.appendChild(el("h3", "", rg.title));
+    var p = el("p", "bytes"); spans[rg.id] = [];
+    rg.bytes.forEach(function(b){ var sp = el("span", "", hex(b)); p.appendChild(sp); p.appendChild(document.createTextNode(" ")); spans[rg.id].push(sp); });
+    d.appendChild(p);
+    if (ri === 1) { asm = el("ul", "asm"); INSN.forEach(function(t){ asm.appendChild(el("li", "", t)); }); d.appendChild(asm); build = el("div", "build"); d.appendChild(build); }
+    document.getElementById("regions").appendChild(d); boxes[rg.id] = d;
+  });
+  /* render(): mark the bytes that each tool reads, and fill the two result columns. */
+  function render(state){
+    REGIONS.forEach(function(rg, ri){
+      boxes[rg.id].className = "reg" + (state.lit.indexOf(rg.id) !== -1 ? " lit" : "");
+      spans[rg.id].forEach(function(sp, k){
+        var inRun = state.marks !== "none" && RUNS[ri].some(function(r){ return k >= r.s && k < r.e; });
+        var emu = (ri === 1 && state.emu > 0 && k % 4 === 3 && Math.floor(k / 4) < state.emu) || (ri === 2 && state.marks === "dec");
+        sp.className = emu ? "emu" : inRun ? "run" : "";
+      });
+    });
+    Array.prototype.forEach.call(asm.children, function(li, k){ li.className = state.emu > 0 && k < state.emu ? "on" : ""; });
+    build.textContent = state.emu > 0 ? "stack: " + BUILT.slice(0, state.emu) : "";
+    var so = document.getElementById("sOut"), fo = document.getElementById("fOut"); so.textContent = ""; fo.textContent = "";
+    if (!state.s) { so.appendChild(el("p", "empty", "(not run yet)")); }
+    else { var ul = el("ul"); FOUND.forEach(function(t){ ul.appendChild(el("li", "", t)); }); so.appendChild(ul); so.appendChild(el("p", "sum", FOUND.length + " texts")); }
+    if (!state.f) { fo.appendChild(el("p", "empty", "(not run yet)")); }
+    else {
+      var ul2 = el("ul"); FOUND.forEach(function(t){ ul2.appendChild(el("li", "", t)); });
+      if (state.f >= 2) { ul2.appendChild(el("li", "new", "stack: " + BUILT)); }
+      if (state.f >= 3) { ul2.appendChild(el("li", "new", "decoded: " + DECODED)); }
+      fo.appendChild(ul2); fo.appendChild(el("p", "sum", FOUND.length + " static" + (state.f >= 2 ? " + 1 stack" : "") + (state.f >= 3 ? " + 1 decoded" : "")));
+    }
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

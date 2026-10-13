@@ -1,0 +1,67 @@
+# _data/glossary/s09.yml - the words first taught in Session 9 (malware triage: static analysis).
+# Handling
+malware:
+  term: "malware"
+  def: "A program written to harm a computer, its data or its user, or to act against the wishes of the computer's owner."
+sample:
+  term: "sample"
+  def: "One copy of a suspicious file, kept unchanged so that it can be examined."
+static-analysis:
+  term: "static analysis"
+  def: "Examining a program by reading its file, without ever running it."
+# The PE file
+pe-file:
+  term: "PE file"
+  def: "A Windows program file, such as an .exe or a .dll file, in the format that Windows uses to load programs. PE stands for Portable Executable."
+pe-header:
+  term: "PE header"
+  def: "The part near the start of a PE file that tells Windows the type of processor, the date written when the program was built, and where each part of the file lies."
+pe-section:
+  term: "PE section"
+  def: "One named block of a PE file, such as .text for the program code, with its own size and its own rights to be read, written or run."
+dll:
+  term: "DLL"
+  def: "A Windows file of program code, ending in .dll, that other programs load in order to use its functions. DLL stands for dynamic-link library."
+import:
+  term: "import"
+  def: "A function from a DLL that a program lists in its own file because it needs it, such as a function that opens a network connection."
+export:
+  term: "export"
+  def: "A function that a DLL offers to other programs and lists by name in its own file."
+resource:
+  term: "resource"
+  def: "Data stored inside a program file for the program's own use, such as an icon, a piece of text or a whole other file."
+compile-timestamp:
+  term: "compile timestamp"
+  def: "The date and time written into the PE header when the program was built. Anyone who controls the file can change it."
+# Strings
+encoded-string:
+  term: "encoded string"
+  def: "A piece of text stored in a changed form inside a program, so that it cannot be read until the program changes it back."
+stack-string:
+  term: "stack string"
+  def: "A piece of text that a program puts together one character at a time while it runs, so that it never appears whole in the file."
+# Packing
+packer:
+  term: "packer"
+  def: "A program that compresses or encrypts another program and adds a small piece of code that restores the original in memory when it runs."
+unpacking:
+  term: "unpacking"
+  def: "Getting the original program back from a packed one, either with a tool that knows the packer or by letting the program restore itself."
+# Capabilities
+capability:
+  term: "capability"
+  def: "Something that the code of a program is able to do, such as creating a service or sending data over a network, whether or not it ever does it."
+capa-rule:
+  term: "capa rule"
+  def: "A written description of the functions and patterns that together show one capability, which the tool capa searches for in a program."
+mitre-attack:
+  term: "ATT&CK"
+  def: "A public catalogue, kept by the organisation MITRE, of the methods that attackers use, each with a name and a number such as T1543."
+mbc:
+  term: "MBC"
+  def: "The Malware Behavior Catalog: a public list of what malware does, with names and numbers in the same style as ATT&CK."
+# Detection
+yara-rule:
+  term: "YARA rule"
+  def: "A short text that describes the strings and other features of a group of files, so that the tool YARA can find every file that matches."

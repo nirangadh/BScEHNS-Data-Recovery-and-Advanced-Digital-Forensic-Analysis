@@ -1,0 +1,185 @@
+<!doctype html>
+<!-- NB6018CEM demo S09-D3. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built from _templates/demo-template.html.
+     The program and all its values are made up and illustrative. No real program, packer output or malicious code is shown. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S09-D3 Packing, and unpacking | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.lbl{margin:0 0 .35rem;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--stone)}
+.top{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:.7rem}
+.tag{font-family:var(--mono);font-size:.82rem;font-weight:700;border-radius:8px;padding:.2rem .55rem;border:2px solid var(--sage-dark);background:var(--surface)}
+.tag.packed{border-color:var(--plum);background:var(--plum-tint);color:var(--plum-dark)}
+.whole{font-size:.82rem;color:var(--stone)}
+.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:.8rem}
+@media (max-width:600px){.cols{grid-template-columns:minmax(0,1fr)}}
+.sec{display:grid;grid-template-columns:4.6rem minmax(0,1fr) 3rem;gap:.4rem;align-items:center;margin:.3rem 0;font-size:.78rem}
+.sec .n{font-family:var(--mono);font-weight:700;overflow-wrap:anywhere}
+.track{height:1rem;background:var(--surface);border-radius:4px;position:relative;overflow:hidden}
+.fill{position:absolute;left:0;top:0;bottom:0;background:var(--sage);border-radius:4px;transition:width .4s,background .4s}
+.fill.hi{background:var(--plum)}
+.sec .v{font-family:var(--mono);text-align:right}
+.sz{font-size:.7rem;color:var(--stone);grid-column:2 / 4;margin-top:-.2rem}
+.sz.odd{color:var(--plum-dark);font-weight:700}
+.imps{margin:0;padding:0;list-style:none;font-family:var(--mono);font-size:.76rem}
+.imps li{overflow-wrap:anywhere}
+.facts{margin:.6rem 0 0;display:grid;grid-template-columns:minmax(0,8rem) minmax(0,1fr);gap:.12rem .5rem;font-size:.78rem}
+.facts dt{color:var(--stone)}.facts dd{margin:0;font-family:var(--mono);overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 9 notes</a>
+  <h1>S09-D3: Packing, and unpacking</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> packing raises the entropy of one PE section, empties another in the file, and hides the imports behind a few functions; unpacking brings them back.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="top"><span class="tag" id="tag"></span><span class="whole" id="whole"></span></div>
+    <div class="cols">
+      <div><p class="lbl">PE sections: entropy (0 to 8), size in the file and in memory</p><div id="secs"></div></div>
+      <div><p class="lbl" id="ilbl"></p><ul class="imps" id="imps"></ul>
+        <dl class="facts" id="facts"></dl></div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Packing moved the whole program into one dense PE section, left an empty PE section to unpack into, and replaced a telling import list with the few functions the unpacking code needs. Each change hides something that sections 3 and 4 of the notes read. Unpacking with a tool that knows the packer brought the PE sections, the imports and the strings back, as a new file with its own hash value. When no such tool exists, the honest note is that the contents are not visible statically.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* Illustrative values for a made-up program. */
+  var ORIGINAL = {
+    tag: "unpacked", label: "original program",
+    whole: 4.9,
+    secs: [
+      { n: ".text",  e: 6.2, raw: 8192, mem: 7900 },
+      { n: ".rdata", e: 4.1, raw: 4096, mem: 3300 },
+      { n: ".data",  e: 1.0, raw: 512,  mem: 1024 }
+    ],
+    imps: ["KERNEL32.dll: CreateFileA, ReadFile, WriteFile, CopyFileA, GetTempPathA, CreateThread, Sleep, ExitProcess", "ADVAPI32.dll: OpenSCManagerA, CreateServiceA, StartServiceA, RegSetValueExA", "WININET.dll: InternetOpenA, InternetOpenUrlA, InternetReadFile"],
+    strings: 52, ep: ".text", hash: "A1 ... (hash of the original)"
+  };
+  var PACKED = {
+    tag: "packed", label: "after packing",
+    whole: 5.3,
+    secs: [
+      { n: "UPX0", e: 0.0, raw: 0,    mem: 16384 },
+      { n: "UPX1", e: 7.6, raw: 4608, mem: 8192 },
+      { n: "UPX2", e: 2.7, raw: 512,  mem: 4096 }
+    ],
+    imps: ["KERNEL32.dll: LoadLibraryA, GetProcAddress, VirtualAlloc, VirtualProtect, ExitProcess", "ADVAPI32.dll: CreateServiceA", "WININET.dll: InternetOpenA"],
+    strings: 9, ep: "UPX1", hash: "B7 ... (a different hash)"
+  };
+  var UNPACKED = {
+    tag: "unpacked copy", label: "after upx -d on a copy",
+    whole: 4.9, secs: ORIGINAL.secs, imps: ORIGINAL.imps, strings: ORIGINAL.strings, ep: ".text", hash: "C3 ... (new item, record it)"
+  };
+  function count(st){ return st.imps.reduce(function(a, l){ return a + l.split(":")[1].split(",").length; }, 0); }
+  var NO = count(ORIGINAL), NP = count(PACKED);
+  var HI = 7.0;
+  var maxP = Math.max.apply(null, PACKED.secs.map(function(s){ return s.e; }));
+  var hiSec = PACKED.secs.filter(function(s){ return s.e === maxP; })[0];
+  var empty = PACKED.secs.filter(function(s){ return s.raw === 0; })[0];
+  var STEPS = [
+    { caption: "A made-up program before packing. Three PE sections with ordinary names, each about as large in the file as in memory, and none with entropy above " + Math.max.apply(null, ORIGINAL.secs.map(function(s){ return s.e; })) + ". " + NO + " imports show what it is built to do: services, threads, files and web addresses. strings finds " + ORIGINAL.strings + " texts.",
+      state: { st: ORIGINAL, focus: "" } },
+    { caption: "A packer compresses all of that into one block, " + hiSec.n + ", whose entropy rises to " + hiSec.e + ": compressed data uses every byte value almost equally. It also adds a small piece of code that will restore the program in memory, and moves the entry point there.",
+      state: { st: PACKED, focus: "sec" } },
+    { caption: "Look at the sizes. " + empty.n + " has " + empty.raw + " bytes in the file but " + empty.mem + " in memory: space reserved for the program that will be restored while it runs. That is a sign to note, together with the unusual PE section names.",
+      state: { st: PACKED, focus: "size" } },
+    { caption: "The import list shrinks from " + NO + " functions to " + NP + ". What remains is what the unpacking code needs: LoadLibraryA and GetProcAddress to find every other function later, VirtualAlloc and VirtualProtect for memory, and one function from each DLL so that Windows loads it. strings now finds only " + PACKED.strings + " texts.",
+      state: { st: PACKED, focus: "imp" } },
+    { caption: "One figure for the whole file is " + PACKED.whole + ", which looks ordinary. The figure for " + hiSec.n + " alone is " + hiSec.e + ". As Session 4 warned, one number for a whole file hides its parts: read each PE section.",
+      state: { st: PACKED, focus: "whole" } },
+    { caption: "This packer is UPX, whose format is published. upx -d, run on a copy, reverses it without running the program: the three ordinary PE sections, all " + NO + " imports and the " + ORIGINAL.strings + " texts come back. The unpacked copy is a new file with its own hash value, recorded as a new item. Read what you just saw below.",
+      state: { st: UNPACKED, focus: "back" } }
+  ];
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) { e.className = cls; } if (text !== undefined) { e.textContent = text; } return e; }
+  /* render(): draw the PE sections, the imports and the facts for one state. */
+  function render(state){
+    var st = state.st, secs = document.getElementById("secs"); secs.textContent = "";
+    st.secs.forEach(function(s){
+      var row = el("div", "sec"); row.appendChild(el("span", "n", s.n));
+      var tr = el("div", "track"), f = el("div", "fill" + (s.e >= HI ? " hi" : "")); f.style.width = (s.e / 8 * 100) + "%"; tr.appendChild(f); row.appendChild(tr);
+      row.appendChild(el("span", "v", s.e.toFixed(1)));
+      row.appendChild(el("span", "sz" + (s.raw === 0 && state.focus === "size" ? " odd" : ""), "in file " + s.raw + " B, in memory " + s.mem + " B"));
+      secs.appendChild(row);
+    });
+    var t = document.getElementById("tag"); t.textContent = st.label; t.className = "tag" + (st === PACKED ? " packed" : "");
+    document.getElementById("whole").textContent = "Whole-file entropy: " + st.whole.toFixed(1) + (state.focus === "whole" ? "  (looks ordinary)" : "");
+    document.getElementById("ilbl").textContent = "Imports: " + count(st) + " functions";
+    var ul = document.getElementById("imps"); ul.textContent = ""; st.imps.forEach(function(l){ ul.appendChild(el("li", "", l)); });
+    var dl = document.getElementById("facts"); dl.textContent = "";
+    [["strings finds", st.strings + " texts"], ["Entry point in", st.ep], ["SHA-256", st.hash]].forEach(function(x){ dl.appendChild(el("dt", "", x[0])); dl.appendChild(el("dd", "", x[1])); });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
