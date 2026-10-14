@@ -1,0 +1,156 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S11-D3 Versions pile up under a delete | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+/* Stage styles for this demo */
+
+.mode{font-weight:700;font-size:.85rem;margin:0 0 .7rem}
+.mode span{padding:.2rem .6rem;border-radius:999px;background:var(--sage-dark);color:#fff}
+.mode span.off{background:#3B3B3B}
+.views{display:flex;flex-wrap:wrap;gap:1rem}
+.view{flex:1 1 15rem;border:1px solid var(--hairline);border-radius:10px;padding:.7rem}
+.view h3{margin:0 0 .5rem;font-size:.8rem;letter-spacing:.08em;color:var(--sage-dark)}
+.view h3.p{color:var(--plum-dark)}
+.row{font-family:var(--mono);font-size:.8rem;padding:.4rem .5rem;border-radius:6px;margin-bottom:4px;background:var(--surface);overflow-wrap:anywhere}
+.row.cur{border-left:5px solid var(--sage-dark)}
+.row.old{background:#F4F6F2;color:var(--stone)}
+.row.dm{background:#3B3B3B;color:#fff}
+.row.gone{background:none;border:1px dashed var(--hairline);color:var(--stone);font-family:var(--font)}
+.row small{display:block;font-family:var(--font);font-size:.72rem;opacity:.85}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 11 notes</a>
+  <h1>S11-D3: Versions pile up under a delete</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> in a versioned bucket every overwrite adds a version and a delete only adds a delete marker, so the current view looks empty while every earlier version is still there.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="mode">Bucket versioning: <span id="mode">Enabled</span></p>
+    <div class="views">
+      <div class="view"><h3>THE CURRENT VIEW: WHAT A NORMAL LIST SHOWS</h3><div id="cur"></div></div>
+      <div class="view"><h3 class="p">EVERY VERSION THE BUCKET HOLDS</h3><div id="all"></div></div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Every overwrite added a version and the delete only added a delete marker, so the current view looked empty while all three versions stayed in the bucket, each with its version ID. Without versioning, the same actions left nothing. This is section 7's cloud form of Session 2's idea that deletion removes the pointer, with one difference: here the history survives by design, until someone with permission deletes a version itself. Your lab switches versioning on before the incident so that this history exists for Session 12.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var V = [
+    { id: "kq7Tz0pFh3Ld9sV2mNbR8cYxE5uJa1Gw", size: "312 bytes", t: "18:04:10" },
+    { id: "R2vXc8LmQa4tP0sKe9dHw1yBn6jUf3Zo", size: "608 bytes", t: "18:10:12" },
+    { id: "f5NbW3qYs7xDk1Lr0aTc9vMh2gPe8JuE", size: "905 bytes", t: "18:16:14" }
+  ];
+  var DM = { id: "Hc4pZ9tR1wKy7bNs3eLq0mVa8dXu5FjG", t: "18:24:31" };
+  var STEPS = [
+    { caption: "A versioned bucket, and one key: staging/pricing-plan.txt. Nothing has been written yet, so both views are empty. The version IDs and times in this demo are invented.", state: { n: 0 } },
+    { caption: "The file is uploaded. S3 stores it as version 1, with its own version ID. The current view and the full list agree: one object, one version.", state: { n: 1 } },
+    { caption: "The file is overwritten with new content. Without versioning, the old content would be gone. Here S3 keeps it: version 2 becomes current, and version 1 stays below it.", state: { n: 2 } },
+    { caption: "A third write. The current view still shows one object, the newest. The full list now holds three versions, each with its own size, time and version ID.", state: { n: 3 } },
+    { caption: "The file is deleted. S3 removes nothing. It puts a delete marker on top. The current view now shows no pricing-plan.txt at all: the object looks gone.", state: { n: 4 } },
+    { caption: "But the full list still holds all three versions under the delete marker. Each can be read by its version ID. Getting one back is Session 12's work: today you only made sure the history exists.", state: { n: 4, hl: true } },
+    { caption: "The same four actions in a bucket without versioning. Each overwrite replaces the content, and the delete removes it. Both views are empty, and nothing remains to recover.", state: { n: 4, off: true } },
+    { caption: "Versioning turns a delete into a marker and an overwrite into a new version. Read what you just saw below.", state: { n: 4, hl: true } }
+  ];
+  function vrow(k, cur, hl){
+    var v = V[k];
+    return '<div class="row ' + (cur ? "cur" : "old") + '">version ' + (k + 1) + (cur ? " (current)" : "") + "<small>ID " + v.id + " | " + v.size + " | " + v.t + " UTC</small></div>";
+  }
+  function render(state){
+    var cur = document.getElementById("cur"), all = document.getElementById("all"), mode = document.getElementById("mode");
+    mode.textContent = state.off ? "Never enabled" : "Enabled"; mode.classList.toggle("off", !!state.off);
+    if (state.off) {
+      cur.innerHTML = '<div class="row gone">staging/pricing-plan.txt is not listed</div>';
+      all.innerHTML = '<div class="row gone">Nothing. Each overwrite replaced the content, and the delete removed it.</div>';
+      return;
+    }
+    if (state.n === 0) { cur.innerHTML = all.innerHTML = '<div class="row gone">empty</div>'; return; }
+    if (state.n < 4) {
+      cur.innerHTML = '<div class="row cur">staging/pricing-plan.txt<small>' + V[state.n - 1].size + " | " + V[state.n - 1].t + " UTC</small></div>";
+      var h = ""; for (var k = state.n - 1; k >= 0; k--) { h += vrow(k, k === state.n - 1); } all.innerHTML = h; return;
+    }
+    cur.innerHTML = '<div class="row gone">staging/pricing-plan.txt is not listed</div>';
+    var g = '<div class="row dm">delete marker (current)<small>ID ' + DM.id + " | " + DM.t + " UTC</small></div>";
+    for (var j = 2; j >= 0; j--) { g += vrow(j, false); }
+    all.innerHTML = g;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
