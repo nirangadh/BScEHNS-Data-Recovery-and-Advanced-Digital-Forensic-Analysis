@@ -1,0 +1,88 @@
+# _data/glossary/s11.yml - the words first taught in Session 11 (cloud forensics: readiness and architecture).
+# Terms from earlier sessions (acquisition, forensically sound, hash value, verification, chain of custody,
+# custody record, evidence register, timeline, UTC, incident response, forensic readiness, metadata,
+# volatile evidence, order of volatility, IP address) are used, never redefined.
+cloud-provider:
+  term: "cloud provider"
+  def: "A company that runs computers, storage and services in its own data centres and rents them to customers over the internet."
+region:
+  term: "Region"
+  def: "A named area of the world where a cloud provider keeps a group of data centres; you choose the Region, and your data stays there."
+shared-responsibility-model:
+  term: "shared-responsibility model"
+  def: "The agreement that says which parts of security the cloud provider looks after and which parts the customer looks after."
+iaas:
+  term: "IaaS"
+  def: "Infrastructure as a service: the provider rents you virtual servers, storage and networks, and you manage the operating system and everything above it."
+paas:
+  term: "PaaS"
+  def: "Platform as a service: the provider runs the servers and the operating system, and you bring only your code, data and settings."
+saas:
+  term: "SaaS"
+  def: "Software as a service: a complete program that the provider runs for you, such as web mail, where you control only your data and your users."
+multi-tenancy:
+  term: "multi-tenancy"
+  def: "Many customers sharing the same physical computers and disks, kept apart only by the provider's software."
+jurisdiction:
+  term: "jurisdiction"
+  def: "The power of a country's courts and laws over a person, a company or data; in the cloud, it depends on where the data and the provider are."
+root-user:
+  term: "root user"
+  def: "The first sign-in of an AWS account, made with the e-mail address used to open it; it can do everything, so it is used only for a few account tasks."
+iam-user:
+  term: "IAM user"
+  def: "A named identity inside one AWS account, with its own password or keys and only the permissions that it is given."
+multi-factor-authentication:
+  term: "multi-factor authentication (MFA)"
+  def: "A sign-in that needs a second proof besides the password, such as a code from an app on your phone."
+access-key:
+  term: "access key"
+  def: "A pair of values, an ID and a secret, that lets a program such as the AWS CLI act as an IAM user; the secret part must never be shown or shared."
+aws-cli:
+  term: "AWS CLI"
+  def: "The AWS command-line program: every action in the AWS console can also be typed as a command, and its output saved to a file."
+cloudshell:
+  term: "AWS CloudShell"
+  def: "A command line that runs on AWS's own computers inside your browser, already signed in as you, with the AWS CLI installed."
+budget-alarm:
+  term: "budget alarm"
+  def: "An AWS Budgets setting that sends you an e-mail when your account's costs reach, or are expected to reach, an amount you chose."
+bucket:
+  term: "bucket"
+  def: "A named container for files in Amazon S3, the AWS storage service; its name is unique across all AWS accounts."
+object:
+  term: "object"
+  def: "One file stored in an S3 bucket, together with its key (the name and path) and its metadata."
+object-versioning:
+  term: "object versioning"
+  def: "A bucket setting that keeps every earlier version of an object when the object is overwritten or deleted, instead of throwing it away."
+version-id:
+  term: "version ID"
+  def: "The unique label that S3 gives each version of an object; with it, one exact version can be read."
+delete-marker:
+  term: "delete marker"
+  def: "A small placeholder that a versioned bucket puts on top of an object when it is deleted, so the object looks gone while its versions remain."
+cloudtrail:
+  term: "AWS CloudTrail"
+  def: "The AWS service that records actions taken in an account: who did what, when, from where and with which program."
+trail:
+  term: "trail"
+  def: "A CloudTrail setting that keeps recording events and delivers them as files to an S3 bucket that you choose, for as long as you keep the files."
+management-event:
+  term: "management event"
+  def: "A CloudTrail record of an action that creates, changes or reads the settings of a resource, such as creating a bucket or signing in."
+data-event:
+  term: "data event"
+  def: "A CloudTrail record of an action on the content of a resource, such as reading, writing or deleting an object; it is off unless you switch it on."
+event-history:
+  term: "Event history"
+  def: "The CloudTrail page that shows the last 90 days of management events in a Region, kept even when no trail exists; it never holds data events."
+server-access-log:
+  term: "server access log"
+  def: "A record that S3 itself writes for each request made to a bucket, delivered as files to another bucket, usually hours later and without a guarantee."
+log-file-integrity-validation:
+  term: "log-file integrity validation"
+  def: "A CloudTrail setting that hashes every log file and signs an hourly list of those hash values, so any later change or removal can be detected."
+digest-file:
+  term: "digest file"
+  def: "The hourly file that log-file integrity validation writes: it lists the hash value of each log file of that hour, and AWS signs it so that nobody else could have written it."
