@@ -1,0 +1,35 @@
+# _data/glossary/s13.yml - the words first taught in Session 13.
+# One file per session; never edit another session's file.
+request-id:
+  term: "request ID"
+  def: "A code that a service gives to one request, so that every record of that request can name it."
+user-agent:
+  term: "user agent"
+  def: "The name and version that a program sends with each request to say what it is; the program chooses it, so it is a claim."
+jq-filter:
+  term: "jq filter"
+  def: "A short program, read by the tool jq, that chooses records from JSON data and turns the chosen fields into new output."
+operation-name:
+  term: "operation name"
+  def: "The label in an S3 server access log line that names the kind of request, such as REST.PUT.OBJECT for an upload."
+join-key:
+  term: "join key"
+  def: "A value that two records share, so that a row in one can be matched with its row in the other."
+record-coverage:
+  term: "record coverage"
+  def: "Which requests a record can contain and which it cannot, given its settings and its delivery."
+ip-range:
+  term: "IP range"
+  def: "A block of IP addresses that belongs to one network, written as a first address and a number of fixed bits, such as 198.51.100.0/24."
+finding:
+  term: "finding"
+  def: "A statement about what happened that the evidence supports, with the evidence named."
+limitation:
+  term: "limitation"
+  def: "A known weakness in the evidence or the method that could change a conclusion, stated with its effect."
+recommendation:
+  term: "recommendation"
+  def: "A proposed change, tied to a finding and to the risk it showed, with the evidence that supports it."
+report-template:
+  term: "report template"
+  def: "A file with the headings of a report already in order and a short note under each, ready to be written into."
