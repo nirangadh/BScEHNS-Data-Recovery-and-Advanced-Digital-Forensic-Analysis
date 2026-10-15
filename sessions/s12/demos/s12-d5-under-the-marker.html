@@ -1,0 +1,172 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S12-D5 Read under the marker, or remove it | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+/* Stage styles for this demo */
+
+.lanes{display:flex;flex-direction:column;gap:.7rem}
+.lane{border:1px solid var(--hairline);border-radius:10px;padding:.6rem .7rem}
+.lane h3{margin:0 0 .45rem;font-size:.8rem;letter-spacing:.08em;color:var(--sage-dark)}
+.lane h3.p{color:var(--plum-dark)}
+.cells{display:flex;flex-wrap:wrap;gap:5px}
+.cell{min-width:2.6rem;padding:.25rem .35rem;border-radius:6px;font-family:var(--mono);font-size:.72rem;text-align:center;background:#F4F6F2;color:var(--stone);border:1px dashed var(--hairline)}
+.cell.in{background:var(--sage-dark);color:#fff;border:1px solid var(--sage-dark)}
+.cell.me{background:var(--plum-dark);color:#fff;border:1px solid var(--plum-dark)}
+.cell.wait{background:#fff;color:var(--plum-dark);border:1px dashed var(--plum)}
+.cell.lost{background:#3B3B3B;color:#fff;border:1px solid #3B3B3B}
+.cell.ok{background:#E3EEE6;color:var(--sage-dark);border:1px solid var(--sage)}
+.note{white-space:pre-wrap;font-family:var(--mono);font-size:.78rem;background:var(--surface);border-radius:8px;padding:.5rem .6rem;margin-top:.7rem;overflow-wrap:anywhere}
+.clock{font-weight:800;font-size:.95rem;margin:0 0 .6rem}
+.clock span{padding:.15rem .55rem;border-radius:999px;background:var(--ink);color:#fff}
+.verdict{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.6rem}
+.verdict div{flex:1 1 13rem;border-radius:8px;padding:.45rem .6rem;font-size:.85rem;background:#F4F6F2}
+.verdict b{display:block;font-size:.75rem;letter-spacing:.06em;color:var(--sage-dark)}
+.legend{font-size:.78rem;color:var(--stone);margin-top:.5rem}
+
+.views{display:flex;flex-wrap:wrap;gap:1rem}
+.view{flex:1 1 15rem;border:1px solid var(--hairline);border-radius:10px;padding:.7rem}
+.view h3{margin:0 0 .5rem;font-size:.8rem;letter-spacing:.08em;color:var(--sage-dark)}
+.view h3.p{color:var(--plum-dark)}
+.row{font-family:var(--mono);font-size:.78rem;padding:.4rem .5rem;border-radius:6px;margin-bottom:4px;background:var(--surface);overflow-wrap:anywhere}
+.row.old{background:#F4F6F2;color:var(--stone)}
+.row.cur{border-left:5px solid var(--sage-dark)}
+.row.dm{background:#3B3B3B;color:#fff}
+.row.gone{background:none;border:1px dashed var(--plum);color:var(--plum-dark);font-family:var(--font)}
+.row.copy{background:var(--plum-tint);border-left:5px solid var(--plum)}
+.row small{display:block;font-family:var(--font);font-size:.72rem;opacity:.85}
+.status{font-weight:800;margin-top:.6rem}
+.status.y{color:var(--sage-dark)}.status.n{color:var(--plum-dark)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 12 notes</a>
+  <h1>S12-D5: Read under the marker, or remove it</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> getting a version by its version ID leaves the history exactly as it was, while removing the delete marker brings the object back and erases the marker from the history.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="clock">Action: <span id="act"></span></p>
+    <div class="views">
+      <div class="view"><h3>THE BUCKET: STAGING/PRICING-PLAN.TXT</h3><div id="stack"></div></div>
+      <div class="view"><h3 class="p">YOUR KALI VM AND YOUR RECORDS</h3><div id="kali"></div></div>
+    </div>
+    <p class="status" id="status"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Reading version 3 by its version ID gave you its content and left the history identical, line for line, which you could prove by listing it again. Removing the delete marker also gave the file back, but erased the marker, with its version ID and the time of the deletion, from the history. This is section 7: list first, collect by version ID, and leave the marker to the owner, who may remove it as a response action once the evidence is collected.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var V = [
+    { id: "kq7Tz0pFh3Ld9sV2mNbR8cYxE5uJa1Gw", t: "09:03:10" },
+    { id: "R2vXc8LmQa4tP0sKe9dHw1yBn6jUf3Zo", t: "09:06:12" },
+    { id: "f5NbW3qYs7xDk1Lr0aTc9vMh2gPe8JuE", t: "09:09:14" }
+  ];
+  var DM = { id: "Hc4pZ9tR1wKy7bNs3eLq0mVa8dXu5FjG", t: "09:17:31" };
+  var STEPS = [
+    { caption: "The bucket after the incident: three versions of pricing-plan.txt with a delete marker on top. The marker is the latest entry, so the object looks deleted. Its time, 09:17:31, is when the delete happened. The IDs and times are invented.", state: { m: "start" } },
+    { caption: "First, list the history. You save the listing: three versions and the marker, with their version IDs and times. This is your before-state.", state: { m: "listed" } },
+    { caption: "Path A, collection: get-object with the version ID of version 3. A copy of version 3 arrives on your Kali VM. In the bucket, nothing moves: the marker is still on top.", state: { m: "got" } },
+    { caption: "List again and compare with the before-state: identical, line for line. You have the content, and you can prove that you changed nothing. This is what the lab does.", state: { m: "same" } },
+    { caption: "Path B, which the lab never does: the owner removes the delete marker. The object is back in service: version 3 is the latest version again, and a normal download works.", state: { m: "removed" } },
+    { caption: "Compare the history now with the before-state: one entry is gone. The marker's version ID and its time, the only record in the bucket of when the deletion happened, no longer exist. That is a response action, for the owner, after collection.", state: { m: "diff" } },
+    { caption: "Both paths give you the file. Only one keeps the evidence. Read what you just saw below.", state: { m: "diff" } }
+  ];
+  function vrow(k, cur){ return '<div class="row ' + (cur ? "cur" : "old") + '">version ' + (k + 1) + (cur ? " (latest)" : "") + "<small>ID " + V[k].id + " | " + V[k].t + " UTC</small></div>"; }
+  function dmrow(){ return '<div class="row dm">delete marker (latest)<small>ID ' + DM.id + " | " + DM.t + " UTC</small></div>"; }
+  function render(s){
+    var acts = { start: "none yet", listed: "list-object-versions", got: "get-object --version-id (version 3)", same: "list-object-versions, again", removed: "delete the marker (owner only, not in the lab)", diff: "compare with the before-state" };
+    document.getElementById("act").textContent = acts[s.m];
+    var removed = s.m === "removed" || s.m === "diff";
+    var h = removed ? '<div class="row gone">delete marker: removed. Its ID and time are no longer in the history.</div>' + vrow(2, true) : dmrow() + vrow(2, false);
+    h += vrow(1, false) + vrow(0, false);
+    document.getElementById("stack").innerHTML = h;
+    var k = "";
+    if (s.m !== "start") { k += '<div class="row">versions-before.json<small>4 entries: 3 versions and 1 delete marker</small></div>'; }
+    if (s.m === "got" || s.m === "same") { k += '<div class="row copy">pricing-plan-v3.txt<small>downloaded by version ID ' + V[2].id + "</small></div>"; }
+    if (s.m === "same") { k += '<div class="row">versions-after.json<small>4 entries, identical to before</small></div>'; }
+    if (s.m === "diff") { k += '<div class="row copy">history now<small>3 entries: the delete marker is missing</small></div>'; }
+    document.getElementById("kali").innerHTML = k || '<div class="row old">nothing collected yet</div>';
+    var st = document.getElementById("status");
+    st.className = "status " + (removed ? "n" : "y");
+    st.textContent = removed ? "The bucket has changed: evidence lost." : "The bucket is unchanged.";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

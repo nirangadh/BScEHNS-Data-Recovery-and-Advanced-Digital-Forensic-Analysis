@@ -1,0 +1,32 @@
+# _data/glossary/s12.yml - the words first taught in Session 12 (cloud forensics: collection and preservation).
+# Terms from earlier sessions (acquisition, working copy, hash value, verification, chain of custody, custody record,
+# evidence register, collection, metadata, UTC, footprint, IP address, and Session 11's bucket, object, object versioning,
+# version ID, delete marker, CloudTrail, trail, management event, data event, Event history, server access log,
+# log-file integrity validation, digest file) are used, never redefined.
+log-delivery-latency:
+  term: "log delivery latency"
+  def: "The time between an action and the moment the file that records it arrives where you can collect it."
+best-effort-delivery:
+  term: "best-effort delivery"
+  def: "Delivery that a provider attempts but does not promise, so a record may arrive late or never arrive."
+evidence-set:
+  term: "evidence set"
+  def: "All the items collected for one task, kept together with their hash values, their custody record entries and their evidence register entries."
+prefix:
+  term: "prefix"
+  def: "The first part of an object key, such as staging/, which groups objects in a bucket the way a folder name groups files."
+latest-version:
+  term: "latest version"
+  def: "The entry that S3 returns for a key when no version ID is given; when it is a delete marker, the object looks deleted."
+server-side-encryption:
+  term: "server-side encryption"
+  def: "Encryption that S3 applies when it stores an object and removes when an allowed user reads it; with SSE-S3, S3 manages the keys itself."
+etag:
+  term: "ETag (entity tag)"
+  def: "A value that S3 stores with each object version to identify its content; for some uploads it equals the MD5 hash value of the content, for others it does not."
+multipart-upload:
+  term: "multipart upload"
+  def: "A way of uploading one object in several parts that S3 joins together; the ETag of such an object is not the MD5 hash value of its content."
+lifecycle-rule:
+  term: "lifecycle rule"
+  def: "A bucket setting that deletes or moves objects, or their older versions, automatically after a set time."
