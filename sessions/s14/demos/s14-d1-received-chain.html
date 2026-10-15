@@ -1,0 +1,172 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S14-D1 Reading the Received chain | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.8rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.75rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.dim{opacity:.35}
+.hl{outline:2px solid var(--plum);background:var(--plum-tint)}
+.lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;color:var(--stone);margin:.2rem 0 .35rem}
+.hdr{font-family:var(--mono);font-size:.76rem;line-height:1.45;margin:0 0 .8rem}
+.hdr div{padding:.15rem .35rem;border-radius:5px;white-space:pre-wrap;overflow-wrap:anywhere;transition:background .25s}
+.route{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin:.3rem 0 .8rem}
+.hop{border:2px solid var(--hairline);border-radius:9px;padding:.3rem .55rem;font-size:.78rem;text-align:center;min-width:6.5rem}
+.hop.on{border-color:var(--sage-dark);background:var(--surface)}
+.hop.now{border-color:var(--plum);background:var(--plum-tint)}
+.arrow{color:var(--stone);font-weight:700}
+table.utc{border-collapse:collapse;width:100%;font-size:.8rem}
+table.utc td,table.utc th{border:1px solid var(--hairline);padding:.25rem .4rem;text-align:left}
+table.utc th{background:var(--surface)}
+table.utc tr.hide td{color:transparent}
+table.utc tr.warn td{background:var(--plum-tint)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 14 notes</a>
+  <h1>S14-D1: Reading the Received chain</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> each mail server adds its Received line on top of the ones before it, so the chain is read from the bottom up, hop by hop, with every server's time normalised to UTC.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl">THE HEADER, AS THE RECEIVER'S SERVER STORED IT (NEWEST LINE AT THE TOP)</p>
+    <div class="hdr" id="hdr"></div>
+    <p class="lbl">THE ROUTE, BUILT FROM THE BOTTOM UP</p>
+    <div class="route" id="route"></div>
+    <table class="utc"><thead><tr><th>Hop</th><th>Time as written</th><th>UTC</th></tr></thead><tbody id="tb"></tbody></table>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Each mail server added its line at the top, so you walked the route from the bottom line up: the sender's machine, then three servers. Every server wrote its own clock with its own offset, and only after normalising each one to UTC could you see that the hops followed each other within seconds. The sender's Date line, written by the sender's own clock, could then be tested against the first server's time.</p>
+<p>This is section 3 of the notes. In the investigation, server lines give times from clocks the suspect could not touch, and they show the route; you still trust each line only as far as you trust the server that wrote it.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var LINES = [
+    "Received: from mail.example.org (mail.example.org [198.51.100.25])\n    by mx.example.com; Tue, 3 Mar 2026 09:14:07 +0000",
+    "Received: from relay.example.org (relay.example.org [192.0.2.40])\n    by mail.example.org; Tue, 3 Mar 2026 10:14:05 +0100",
+    "Received: from laptop (unknown [203.0.113.57])\n    by relay.example.org; Tue, 3 Mar 2026 14:44:02 +0530",
+    "From: Ravi Perera <ravi@example.org>",
+    "Date: Tue, 3 Mar 2026 14:43:58 +0530"
+  ];
+  var HOPS = ["sender's laptop\n203.0.113.57", "relay.example.org", "mail.example.org", "mx.example.com"];
+  var ROWS = [
+    ["Sender's program (Date)", "14:43:58 +0530", "09:13:58"],
+    ["relay.example.org", "14:44:02 +0530", "09:14:02"],
+    ["mail.example.org", "10:14:05 +0100", "09:14:05"],
+    ["mx.example.com", "09:14:07 +0000", "09:14:07"]
+  ];
+  var STEPS = [
+    { caption: "This is the header of one invented message, as the receiving server stored it. Each mail server added its Received line at the top, so the newest line is first. Nothing is read yet.", state: { hl: [], hops: 0, rows: [], now: -1, skew: false } },
+    { caption: "Start at the bottom Received line. It was written by relay.example.org, the first server. Its from part names the machine that handed the message over: it called itself laptop, and the server saw the address 203.0.113.57.", state: { hl: [2], hops: 2, rows: [], now: 1, skew: false } },
+    { caption: "The time in that line is 14:44:02 with the offset +0530. Subtract five and a half hours: 09:14:02 UTC. This is relay.example.org's clock, not the sender's.", state: { hl: [2], hops: 2, rows: [1], now: 1, skew: false } },
+    { caption: "The Date line was written by the sender's own program: 14:43:58 +0530, which is 09:13:58 UTC. It is four seconds before the first server's time, which is what an honest clock looks like.", state: { hl: [4], hops: 2, rows: [0, 1], now: 0, skew: false } },
+    { caption: "Move up one line. mail.example.org received the message from relay.example.org, the server named in the line below. Its clock says 10:14:05 +0100: subtract one hour, 09:14:05 UTC.", state: { hl: [1], hops: 3, rows: [0, 1, 2], now: 2, skew: false } },
+    { caption: "The top line is the receiver's own server, mx.example.com, at 09:14:07 +0000, already UTC. Each by matches the from of the line above it, and in UTC the hops follow each other within seconds.", state: { hl: [0], hops: 4, rows: [0, 1, 2, 3], now: 3, skew: false } },
+    { caption: "Now suppose the Date line had said 14:26:58 +0530, which is 08:56:58 UTC: seventeen minutes before the first server received the message. Servers' clocks the sender cannot touch would then show that the sender's computer clock was about seventeen minutes slow.", state: { hl: [4, 2], hops: 4, rows: [0, 1, 2, 3], now: -1, skew: true } },
+    { caption: "Read the chain from the bottom up to follow the route, and normalise every hop's time to UTC before you compare two hops. Read it from the top down to decide how far you trust it.", state: { hl: [0, 1, 2], hops: 4, rows: [0, 1, 2, 3], now: -1, skew: false } }
+  ];
+  function render(s){
+    var h = document.getElementById("hdr"); h.innerHTML = "";
+    LINES.forEach(function(l, k){
+      var d = document.createElement("div");
+      d.textContent = (k === 4 && s.skew) ? "Date: Tue, 3 Mar 2026 14:26:58 +0530" : l;
+      if (s.hl.indexOf(k) !== -1) { d.className = "hl"; }
+      h.appendChild(d);
+    });
+    var r = document.getElementById("route"); r.innerHTML = "";
+    HOPS.forEach(function(name, k){
+      if (k > 0) { var a = document.createElement("span"); a.className = "arrow"; a.textContent = ">"; r.appendChild(a); }
+      var b = document.createElement("div"); b.className = "hop" + (k < s.hops ? " on" : " dim") + (k === s.now ? " now" : "");
+      b.textContent = name; r.appendChild(b);
+    });
+    var tb = document.getElementById("tb"); tb.innerHTML = "";
+    ROWS.forEach(function(row, k){
+      var tr = document.createElement("tr");
+      var shown = s.rows.indexOf(k) !== -1;
+      tr.className = shown ? "" : "hide";
+      var vals = row.slice();
+      if (k === 0 && s.skew) { vals = ["Sender's program (Date)", "14:26:58 +0530", "08:56:58"]; tr.className = "warn"; }
+      vals.forEach(function(v){ var td = document.createElement("td"); td.textContent = v; tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
