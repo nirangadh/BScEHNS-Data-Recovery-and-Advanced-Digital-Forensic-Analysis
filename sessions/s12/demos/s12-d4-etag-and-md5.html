@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S12-D4 ETag and MD5 | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+/* Stage styles for this demo */
+
+.lanes{display:flex;flex-direction:column;gap:.7rem}
+.lane{border:1px solid var(--hairline);border-radius:10px;padding:.6rem .7rem}
+.lane h3{margin:0 0 .45rem;font-size:.8rem;letter-spacing:.08em;color:var(--sage-dark)}
+.lane h3.p{color:var(--plum-dark)}
+.cells{display:flex;flex-wrap:wrap;gap:5px}
+.cell{min-width:2.6rem;padding:.25rem .35rem;border-radius:6px;font-family:var(--mono);font-size:.72rem;text-align:center;background:#F4F6F2;color:var(--stone);border:1px dashed var(--hairline)}
+.cell.in{background:var(--sage-dark);color:#fff;border:1px solid var(--sage-dark)}
+.cell.me{background:var(--plum-dark);color:#fff;border:1px solid var(--plum-dark)}
+.cell.wait{background:#fff;color:var(--plum-dark);border:1px dashed var(--plum)}
+.cell.lost{background:#3B3B3B;color:#fff;border:1px solid #3B3B3B}
+.cell.ok{background:#E3EEE6;color:var(--sage-dark);border:1px solid var(--sage)}
+.note{white-space:pre-wrap;font-family:var(--mono);font-size:.78rem;background:var(--surface);border-radius:8px;padding:.5rem .6rem;margin-top:.7rem;overflow-wrap:anywhere}
+.clock{font-weight:800;font-size:.95rem;margin:0 0 .6rem}
+.clock span{padding:.15rem .55rem;border-radius:999px;background:var(--ink);color:#fff}
+.verdict{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.6rem}
+.verdict div{flex:1 1 13rem;border-radius:8px;padding:.45rem .6rem;font-size:.85rem;background:#F4F6F2}
+.verdict b{display:block;font-size:.75rem;letter-spacing:.06em;color:var(--sage-dark)}
+.legend{font-size:.78rem;color:var(--stone);margin-top:.5rem}
+
+.cases{display:flex;flex-wrap:wrap;gap:.7rem}
+.case{flex:1 1 14rem;border:1px solid var(--hairline);border-radius:10px;padding:.6rem .7rem}
+.case h3{margin:0 0 .4rem;font-size:.8rem;letter-spacing:.06em;color:var(--sage-dark)}
+.case.dim{opacity:.4}
+.kv{font-family:var(--mono);font-size:.72rem;overflow-wrap:anywhere;margin:.25rem 0}
+.kv b{font-family:var(--font);display:block;font-size:.72rem;color:var(--stone)}
+.res{font-weight:800;margin-top:.4rem}
+.res.y{color:var(--sage-dark)}.res.n{color:var(--plum-dark)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 12 notes</a>
+  <h1>S12-D4: ETag and MD5</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> the ETag equals the MD5 hash value of the content only for a single-part upload with SSE-S3; a multipart upload or SSE-KMS gives an ETag that matches no local MD5.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="note" id="content" style="margin:0 0 .7rem;white-space:pre-wrap"></div>
+    <div class="cases">
+      <div class="case" id="c1"><h3>ONE PIECE, SSE-S3</h3><div id="b1"></div></div>
+      <div class="case" id="c2"><h3>THREE PARTS (MULTIPART), SSE-S3</h3><div id="b2"></div></div>
+      <div class="case" id="c3"><h3>ONE PIECE, SSE-KMS</h3><div id="b3"></div></div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The same content gave three different ETags. Only the single-part upload with SSE-S3 had an ETag equal to the MD5 value of the content; the multipart ETag was built from the parts' MD5 values and ended in -3, and the SSE-KMS ETag was unrelated. A SHA-256 value of a downloaded copy matched in every case. This is section 6: your incident files were small single-part SSE-S3 uploads, so in the lab each ETag matches one local file, and where an ETag cannot be compared you compare downloaded copies instead.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var MD5 = "235dcdae8f666cfff0c976cc2d518666";
+  var PARTS = ["592eac0e5fd3b1499144b76dabeee8c0", "985d0d5cfd37cd5702a29e86e0095ad0", "3516196776049802c8e6acd98ba645d5"];
+  var MP = "2e9ec6c691af51495db285a4152ce771-3", KMS = "7c0f3e9a1d54b28e6fa1c39d0b7e5a42";
+  var SHA = "66915ab9979608a64065849e9022082f529c44c92d4a74b91e81a15cc71984c6";
+  var STEPS = [
+    { caption: "One small file of 112 bytes, uploaded to S3 three different ways. Its MD5 hash value, calculated on your computer, is shown first. Every value here is real for this content, except the SSE-KMS ETag, which is random by design.", state: { n: 0 } },
+    { caption: "Uploaded in one piece, with S3-managed keys (SSE-S3), as your incident script did. S3's ETag is exactly the MD5 value of the content. The match proves that the bucket holds what you uploaded.", state: { n: 1 } },
+    { caption: "Uploaded as a multipart upload in three parts (real parts are at least 5 MB, except the last; shrunk here to show the arithmetic). S3 takes the MD5 value of each part...", state: { n: 2 } },
+    { caption: "...joins the three 16-byte values, takes the MD5 value of that, and adds a hyphen and the number of parts. The same content now has an ETag that matches no MD5 value of the file.", state: { n: 3 } },
+    { caption: "Uploaded in one piece, but encrypted with an AWS KMS key (SSE-KMS). The ETag is not an MD5 value at all. Nothing about it can be compared with your local file.", state: { n: 4 } },
+    { caption: "When the ETag cannot be compared, download the version by its version ID and compare SHA-256 values. That works for all three uploads, because it compares the content itself. Read what you just saw below.", state: { n: 5 } }
+  ];
+  function kv(k, v){ return '<p class="kv"><b>' + k + "</b>" + v + "</p>"; }
+  function render(s){
+    document.getElementById("content").textContent = "SYNTHETIC TEACHING FILE - NB6018CEM\nfile: pricing-plan.txt   version: 3\nline 1: price list for the north region\n\nmd5sum on your computer: " + MD5;
+    document.getElementById("c1").className = "case" + (s.n === 1 || s.n === 5 ? "" : " dim");
+    document.getElementById("c2").className = "case" + (s.n === 2 || s.n === 3 || s.n === 5 ? "" : " dim");
+    document.getElementById("c3").className = "case" + (s.n === 4 || s.n === 5 ? "" : " dim");
+    document.getElementById("b1").innerHTML = s.n >= 1 ? kv("ETag", MD5) + '<p class="res y">Equals the MD5 value: match</p>' + (s.n === 5 ? kv("SHA-256 of a download", SHA) : "") : "";
+    var b2 = "";
+    if (s.n >= 2) { b2 += kv("MD5 of part 1 (bytes 1 to 40)", PARTS[0]) + kv("MD5 of part 2 (bytes 41 to 80)", PARTS[1]) + kv("MD5 of part 3 (bytes 81 to 112)", PARTS[2]); }
+    if (s.n >= 3) { b2 += kv("ETag = MD5 of the three joined values, then -3", MP) + '<p class="res n">Not the MD5 value of the content</p>'; }
+    if (s.n === 5) { b2 += kv("SHA-256 of a download", SHA); }
+    document.getElementById("b2").innerHTML = b2;
+    document.getElementById("b3").innerHTML = s.n >= 4 ? kv("ETag", KMS) + '<p class="res n">Unrelated to the content\'s MD5 value</p>' + (s.n === 5 ? kv("SHA-256 of a download", SHA) : "") : "";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
