@@ -1,0 +1,154 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S14-D5 The attribution ladder | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.8rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.75rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.dim{opacity:.35}
+.hl{outline:2px solid var(--plum);background:var(--plum-tint)}
+.lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;color:var(--stone);margin:.2rem 0 .35rem}
+.ladder{display:flex;flex-direction:column-reverse;gap:.35rem}
+.rung{display:grid;grid-template-columns:9.5rem 1fr;gap:.6rem;align-items:center;border:2px solid var(--hairline);border-radius:10px;padding:.4rem .6rem;transition:background .25s,border-color .25s}
+@media (max-width:560px){.rung{grid-template-columns:1fr}}
+.rung b{font-size:.84rem}
+.rung span{font-size:.78rem}
+.rung.on{border-color:var(--sage-dark);background:var(--surface)}
+.rung.weak{border-color:var(--plum);background:var(--plum-tint)}
+.rung.off{opacity:.5}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 14 notes</a>
+  <h1>S14-D5: The attribution ladder</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> each step from a message to a person needs its own evidence, and when one source is missing, the step it supported loses its support.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl">FROM THE MESSAGE (BOTTOM) TO A PERSON (TOP)</p>
+    <div class="ladder" id="ladder"></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>You climbed from a message to a person one rung at a time, and every rung lit only when its own evidence arrived: the store, the provider's sign-in records, the internet provider's record, the laptop, the logon records, and finally evidence from outside every computer. When a source was missing, its rung went dark and the report had to say so; without evidence at the top, the sentence about a person could not be written.</p>
+<p>This is section 8 of the notes and the pivotal idea of the session: online identity is a mask, and attribution links the mask to a person step by step. In your attribution note, each step names its evidence, and the step where the evidence ends is stated, not skipped.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var RUNGS = [
+    ["The message", "A message to a competitor, recovered from a mail store"],
+    ["An account", ""],
+    ["A sign-in", ""],
+    ["A connection", ""],
+    ["A device", ""],
+    ["A user account", ""],
+    ["A person", ""]
+  ];
+  var EV = {
+    acc: "The store of maya@example.org held it; it was sent from that account",
+    sign: "The provider's sign-in records: a sign-in at 08:41 UTC from 203.0.113.140 (legal process)",
+    conn: "The internet provider's record: that address, at that second, was a home connection in Maya's name (legal process)",
+    dev: "The store sits on the laptop issued to Maya; its hash value is in the register",
+    usr: "The store is under the Windows profile maya; logon records show it logged on at 08:39 UTC",
+    per: "Her phone approved the sign-in's second factor; the office door log shows her badge used at 08:30 UTC"
+  };
+  var STEPS = [
+    { caption: "The bottom rung is the evidence itself: a message to a competitor, recovered from a mail store. Every rung above it is a step towards a person, and each step needs evidence of its own.", state: { on: [0], weak: [], txt: {} } },
+    { caption: "The store belongs to the account maya@example.org, and the message was sent from it. That reaches the account rung. The name in the address is not evidence: anyone can make an account with any name.", state: { on: [0, 1], weak: [], txt: { 1: "acc" } } },
+    { caption: "The mail provider's sign-in records, obtained through legal process, show a sign-in to that account at 08:41 UTC from the address 203.0.113.140. That reaches the sign-in rung.", state: { on: [0, 1, 2], weak: [], txt: { 1: "acc", 2: "sign" } } },
+    { caption: "The internet provider's record, also through legal process, shows that this address, at that second, belonged to a home connection in Maya's name. A connection is shared by everyone in a household.", state: { on: [0, 1, 2, 3], weak: [], txt: { 1: "acc", 2: "sign", 3: "conn" } } },
+    { caption: "The store itself sits on the laptop issued to Maya, under her Windows profile, and the logon records show the profile logged on two minutes before the sign-in. The device and user-account rungs now have their own evidence.", state: { on: [0, 1, 2, 3, 4, 5], weak: [], txt: { 1: "acc", 2: "sign", 3: "conn", 4: "dev", 5: "usr" } } },
+    { caption: "The top rung needs evidence from outside every computer. Her phone approved the second factor of the sign-in, and the office door log shows her badge eleven minutes earlier. Two independent sources now point to one person, each with its own limits: a phone can be lent, a badge can be borrowed.", state: { on: [0, 1, 2, 3, 4, 5, 6], weak: [], txt: { 1: "acc", 2: "sign", 3: "conn", 4: "dev", 5: "usr", 6: "per" } } },
+    { caption: "Now suppose the internet provider had kept no record of the address. The connection rung loses its evidence. The rungs above it still stand on other evidence, the laptop and the logon, but the link between the provider's sign-in and Maya's home is gone, so the report must say that the origin of the sign-in cannot be shown.", state: { on: [0, 1, 2, 4, 5, 6], weak: [3], txt: { 1: "acc", 2: "sign", 4: "dev", 5: "usr", 6: "per" } } },
+    { caption: "Remove the phone and the badge as well. Everything up to the user account still stands, and the report can say so. The person rung now has no evidence at all: the computer's records end at the account, and the sentence about a person cannot be written.", state: { on: [0, 1, 2, 4, 5], weak: [3, 6], txt: { 1: "acc", 2: "sign", 4: "dev", 5: "usr" } } }
+  ];
+  function render(s){
+    var l = document.getElementById("ladder"); l.innerHTML = "";
+    RUNGS.forEach(function(r, k){
+      var d = document.createElement("div");
+      d.className = "rung " + (s.on.indexOf(k) !== -1 ? "on" : (s.weak.indexOf(k) !== -1 ? "weak" : "off"));
+      var b = document.createElement("b"); b.textContent = r[0];
+      var t = document.createElement("span");
+      t.textContent = k === 0 ? r[1] : (s.txt[k] ? EV[s.txt[k]] : (s.weak.indexOf(k) !== -1 ? "No evidence for this step" : ""));
+      d.appendChild(b); d.appendChild(t); l.appendChild(d);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

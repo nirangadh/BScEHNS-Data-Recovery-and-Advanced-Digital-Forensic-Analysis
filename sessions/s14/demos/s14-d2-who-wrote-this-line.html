@@ -1,0 +1,161 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S14-D2 Who wrote this line? | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.8rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.75rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.dim{opacity:.35}
+.hl{outline:2px solid var(--plum);background:var(--plum-tint)}
+.lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;color:var(--stone);margin:.2rem 0 .35rem}
+.hdr{font-family:var(--mono);font-size:.76rem;line-height:1.45;margin:0}
+.hdr div{padding:.18rem .4rem;border-radius:5px;margin:.12rem 0;border-left:5px solid transparent;white-space:pre-wrap;overflow-wrap:anywhere;transition:background .25s,border-color .25s}
+.hdr div.snd{border-left-color:var(--plum);background:var(--plum-tint)}
+.hdr div.srv{border-left-color:var(--sage-dark);background:var(--surface)}
+.hdr div.flag{outline:2px solid var(--plum-dark)}
+.key{display:flex;flex-wrap:wrap;gap:.5rem;margin:.7rem 0 0;font-size:.78rem}
+.key span{padding:.1rem .5rem;border-radius:6px}
+.verdict{margin-top:.7rem;font-weight:700;font-size:.9rem;min-height:1.5em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 14 notes</a>
+  <h1>S14-D2: Who wrote this line?</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> some header lines are written by the sender's program and can say anything, others are added by receiving servers, so a forged From line is caught by the lines the sender could not write.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="lbl" id="which">THE MESSAGE</p>
+    <div class="hdr" id="hdr"></div>
+    <div class="key"><span class="tag t-plum">Written by the sender's program</span><span class="tag t-ok">Added by a receiving server</span></div>
+    <p class="verdict" id="verdict"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>You sorted every header line by its author. The sender's program wrote From, To, Subject, Date, Message-ID and Reply-To, and could have made any of them say anything. The receiving server added Return-Path, the Received line and the results of SPF, DKIM and DMARC. In the forged message the sender's lines told one story, and the server's lines contradicted it.</p>
+<p>This is section 4 of the notes. In a report, name the line each fact comes from and who wrote it: a fact from a line the sender wrote is the sender's claim.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var HONEST = [
+    ["srv", "Return-Path: <ravi@example.org>"],
+    ["srv", "Authentication-Results: mx.example.com; spf=pass smtp.mailfrom=example.org;\n    dkim=pass header.d=example.org; dmarc=pass header.from=example.org"],
+    ["srv", "Received: from mail.example.org ([198.51.100.25]) by mx.example.com; 09:14:07 +0000"],
+    ["snd", "From: Ravi Perera <ravi@example.org>"],
+    ["snd", "To: Asha Silva <asha@example.com>"],
+    ["snd", "Subject: Draft budget"],
+    ["snd", "Date: Tue, 3 Mar 2026 14:43:58 +0530"],
+    ["snd", "Message-ID: <a1c9f2e7.4410@laptop.example.org>"]
+  ];
+  var FORGED = [
+    ["srv", "Return-Path: <invoice@example.net>"],
+    ["srv", "Authentication-Results: mx.example.com; spf=pass smtp.mailfrom=example.net;\n    dkim=none; dmarc=fail header.from=example.com"],
+    ["srv", "Received: from out.example.net ([203.0.113.90]) by mx.example.com; 11:02:41 +0000"],
+    ["snd", "From: Finance Office <finance@example.com>"],
+    ["snd", "To: Asha Silva <asha@example.com>"],
+    ["snd", "Subject: Urgent: new bank details"],
+    ["snd", "Date: Tue, 3 Mar 2026 11:02:39 +0000"],
+    ["snd", "Reply-To: <payments@example.net>"]
+  ];
+  var STEPS = [
+    { caption: "An honest message from an invented company. Every line looks the same in an email program: a name, a colon and a value. The question is who wrote each one.", state: { msg: "h", show: "", flag: [], v: "" } },
+    { caption: "These lines were written by the sender's own program: From, To, Subject, Date and Message-ID. The sender could have typed anything into any of them.", state: { msg: "h", show: "snd", flag: [], v: "" } },
+    { caption: "These lines were added by the receiving server after the message arrived: Return-Path, from the delivery envelope, the Received line, and the results of its checks. The sender did not write them.", state: { msg: "h", show: "all", flag: [], v: "" } },
+    { caption: "In this message the two kinds agree. The From domain, example.org, is the domain that passed SPF and DKIM, and DMARC passed for it.", state: { msg: "h", show: "all", flag: [0, 1, 3], v: "The server-written lines support the From line." } },
+    { caption: "Now a second message. Its From line says the finance office of example.com, the reader's own company. That line was written by the sender's program.", state: { msg: "f", show: "snd", flag: [3], v: "" } },
+    { caption: "The receiving server recorded the envelope sender in Return-Path: invoice@example.net, a different domain. That alone is a reason to look, not yet a finding.", state: { msg: "f", show: "all", flag: [0, 3], v: "" } },
+    { caption: "The receiving server's checks decide it. SPF passed for example.net, the envelope's domain, not for example.com. There is no DKIM signature, and DMARC failed for example.com, the domain shown to the reader.", state: { msg: "f", show: "all", flag: [1, 3], v: "The From line is the sender's claim, and the lines the sender could not write contradict it." } },
+    { caption: "One more line was written by the sender: Reply-To. Any answer would go to payments@example.net, not to the finance office. Every line the forger controlled tells the same false story; every line the server added tells the true one.", state: { msg: "f", show: "all", flag: [0, 1, 7], v: "Forged From caught: trust each fact only as far as you trust whoever wrote its line." } }
+  ];
+  function render(s){
+    var src = s.msg === "h" ? HONEST : FORGED;
+    document.getElementById("which").textContent = s.msg === "h" ? "MESSAGE 1: AN HONEST MESSAGE" : "MESSAGE 2: THE SAME KIND OF HEADER, FROM A FORGER";
+    var h = document.getElementById("hdr"); h.innerHTML = "";
+    src.forEach(function(p, k){
+      var d = document.createElement("div"); d.textContent = p[1];
+      var cls = "";
+      if (s.show === "all" || (s.show === "snd" && p[0] === "snd")) { cls = p[0]; }
+      if (s.flag.indexOf(k) !== -1) { cls += " flag"; }
+      d.className = cls; h.appendChild(d);
+    });
+    document.getElementById("verdict").textContent = s.v;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

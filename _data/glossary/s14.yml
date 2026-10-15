@@ -1,0 +1,49 @@
+# _data/glossary/s14.yml - the words first taught in Session 14.
+# Earlier terms used and not redefined here: header (S3), packet header (S7), feature (S3), artefact (S5),
+# time zone offset (S5), UTC (S5), IP address (S7), attribution (S7), jurisdiction (S11),
+# server access log (S11), multi-factor authentication (S11), user agent (S13), finding (S13), limitation (S13).
+legal-process:
+  term: "legal process"
+  def: "A formal legal order, such as a court order, that obliges a provider to hand over its records about an account or an address."
+peer-to-peer:
+  term: "peer-to-peer"
+  def: "A way of sharing files in which computers send them directly to each other, with no central server that holds them."
+email-header:
+  term: "email header"
+  def: "The named lines at the top of an email message that record who sent it, to whom, when, and which mail servers carried it."
+mail-server:
+  term: "mail server"
+  def: "A computer that receives email for its users and passes messages on to other mail servers."
+received-header:
+  term: "Received line"
+  def: "A line that a mail server adds at the top of an email header when it receives the message, naming where it came from, the server itself and the time."
+message-id:
+  term: "Message-ID"
+  def: "A unique label that the sending program or the first server gives an email, which stays the same in every copy of that message."
+return-path:
+  term: "Return-Path"
+  def: "The header line that the last receiving server adds to record the sender address used during delivery, to which failure notices are sent."
+email-authentication:
+  term: "email authentication"
+  def: "Checks such as SPF, DKIM and DMARC that a receiving server makes to test whether a message really came through the domain that it names."
+webmail:
+  term: "webmail"
+  def: "Email that a person reads and writes in a web browser on the provider's website, so the mailbox stays on the provider's servers."
+mail-store:
+  term: "mail store"
+  def: "The file or database in which an email program keeps its mailboxes on the computer, such as Outlook's PST or OST file."
+browser-history:
+  term: "browser history"
+  def: "The browser's record of the web addresses that were visited, with the time of each visit."
+cookie:
+  term: "cookie"
+  def: "A small piece of data that a website asks the browser to keep and send back on later visits, often to remember a sign-in."
+cache:
+  term: "cache"
+  def: "Copies of web pages, pictures and scripts that a browser keeps on the disk so that it can show them again quickly."
+private-browsing:
+  term: "private browsing"
+  def: "A browser mode that keeps no history, cookies or cache in the user's profile after the window is closed."
+access-log:
+  term: "access log"
+  def: "A file in which a web server writes one line for each request it answers: the address, the time, the request, the result and the size."
