@@ -56,6 +56,8 @@ Session 11 built the cloud drop, switched its records on and ran the scripted in
 
 **Why today's first request is deliberate.** Since the close of Session 11, nobody has touched the case bucket. That silence matters: every request recorded after the incident is now yours, made today, on purpose. Your requests will be recorded too, by the very records you switched on. That is not a problem, as long as you write down when you made them and from where, before anyone else has to work it out. Section 3 explains how.
 
+**Why you collect twice.** Session 12 follows Session 11 on the same day, so when you start collecting, the incident is only about an hour old. CloudTrail's files will be there. Many server access log files will not. So today's lab makes two collections: the first now, in class, and a second one later, at least several hours after the incident and before Session 13 opens. Both are part of your evidence.
+
 ## 1. Acquisition without an image
 
 ### The idea
@@ -149,7 +151,7 @@ Now the hard part. Suppose the access-log files have stopped arriving. **Is the 
 
 So you do not claim completeness. You state it as a limitation, in words like these: *"Server access log files were listed at [time, UTC] and collected at [time, UTC]; [N] files had arrived. A second collection at [time, UTC] found [M]. AWS delivers these logs on a best-effort basis, so records of some requests may be missing."* A careful reader can then judge the gap for themselves.
 
-**If records are still missing today.** Never wait silently, and never collect "when it looks finished". Record what is missing and when you looked, collect what is there, and collect again later into a new folder, recording that too. The lab shows how.
+**Records will still be missing today.** About an hour after the incident, expect CloudTrail to hold the whole incident and the access logs to hold little or none of it. Never wait silently, and never collect "when it looks finished". Record what is missing and when you looked, collect what is there, and collect again later into a new folder, recording that too. The lab plans this as its last part, Part I.
 
 <div class="box mixups" markdown="1">
 
@@ -215,7 +217,7 @@ Here is the trap. **Part 1 of the incident was also run from Kali, as `nb6018-an
 
 {% include demo.html id="S12-D2" %}
 
-The demo shows one more effect. Your access-log lines arrive hours later. So a collection made today does not hold the lines of today's collection, but a collection made tomorrow will. If you collect twice, the second collection contains the record of the first.
+The demo shows one more effect. Your access-log lines arrive hours later. So your first collection, in class, cannot hold the lines of its own requests, but your second collection, hours later in Part I, will: the second collection contains the record of the first.
 
 <div class="box metaphor" markdown="1">
 
@@ -286,12 +288,12 @@ The folder layout keeps the roles apart:
      listings/  trail/  access-logs/  validation/
      case/history/  case/head/  case/recovered/  case/history-after/
      manifest-sha256.txt
-  evidence/c2-<time>/         a later collection, only if one is needed
+  evidence/c2-<time>/         the second collection, made later (Part I)
   records/                    your own tables and the custody record and register
   work/                       working copies: decompressed and ordered
 ```
 
-If records are still arriving, a later collection goes into its own new folder, `c2-...`. It never adds to `c1` and never replaces anything in it. Two collections of the same bucket at two times are two items of evidence, each with its own hash values. Where their files overlap, matching hash values also show that those files did not change between the two collections, which is useful for the server access logs, because they have no other check.
+The second collection goes into its own new folder, `c2-...`. It never adds to `c1` and never replaces anything in it. Two collections of the same bucket at two times are two items of evidence, each with its own hash values. Where their files overlap, matching hash values also show that those files did not change between the two collections, which is useful for the server access logs, because they have no other check.
 
 The working copies in `work/` are different. You may delete them and make them again from the originals at any time, and you never report from a file in `work/` without checking it against the manifest.
 
@@ -532,7 +534,7 @@ That sentence is the lab. Every step either makes a copy, verifies it, or adds t
 
 Your task in one line: from your Kali VM, check what has landed since the incident, collect both logs and the case bucket's history, metadata and deleted file, hash and record every item as it arrives, validate the CloudTrail files, and leave every bucket exactly as you found it.
 
-You need the Kali VM with the AWS CLI that you configured in Session 11, and your folder `~/nb6018-cw/s11/` with `names.sh`, `config-log.txt` and `incident/`. The Windows VM and REMnux stay off. Allow about two hours.
+You need the Kali VM with the AWS CLI that you configured in Session 11, and your folder `~/nb6018-cw/s11/` with `names.sh`, `config-log.txt` and `incident/`. The Windows VM and REMnux stay off. Allow about two hours in class for Parts A to H, and about fifteen minutes later for Part I, the second collection, which you run at least several hours after the incident and before Session 13 opens.
 
 <div class="box safety" markdown="1">
 
@@ -627,13 +629,13 @@ The LMS carries this session's blank custody record and evidence register, the r
 
    <div class="box expect" markdown="1">
 
-   Two files with a few hundred lines in `trail-landed.tsv` (log files under `CloudTrail/`, and hourly digest files under `CloudTrail-Digest/`, for several Regions) and some lines in `access-logs-landed.tsv`, each key starting with `case/` and a date and time. The seal line reports two files.
+   Two files: a few hundred lines in `trail-landed.tsv` (log files under `CloudTrail/`, and hourly digest files under `CloudTrail-Digest/`, for several Regions), and few or no lines in `access-logs-landed.tsv`, each key starting with `case/` and a date and time. The seal line reports two files.
 
    </div>
 
    <div class="box trouble" markdown="1">
 
-   If `access-logs-landed.tsv` holds only the word `None`, no access-log file has arrived yet. That is a finding, not a failure: keep the file, carry on, and follow "If records are still arriving" after Part H. If `trail-landed.tsv` holds `None`, check in the console that the trail is still **Logging**, and tell the lecturer.
+   If `access-logs-landed.tsv` holds only the word `None`, no access-log file has arrived yet. About an hour after the incident, that is normal. It is a finding, not a failure: keep the file, carry on, and collect again in Part I. If `trail-landed.tsv` holds `None`, check in the console that the trail is still **Logging**, and tell the lecturer.
 
    </div>
 
@@ -654,7 +656,7 @@ The LMS carries this session's blank custody record and evidence register, the r
 
    <div class="box expect" markdown="1">
 
-   CloudTrail files that landed within minutes of the incident's start, and more every few minutes through it. Access-log files that landed later and less regularly, perhaps continuing for hours after the end of part 2. Your exact times and counts are your own evidence. Do not open any file yet.
+   CloudTrail files that landed within minutes of the incident's start, and more every few minutes through it. Few or no access-log files for the incident yet: Part I will show how many arrive in the following hours. Your exact times and counts are your own evidence. Do not open any file yet.
 
    </div>
 
@@ -812,7 +814,7 @@ The LMS carries this session's blank custody record and evidence register, the r
 
     <div class="box trouble" markdown="1">
 
-    If the CloudTrail file shows unreadable characters, it is still compressed: check that the path ends in `.json`. If the access-log file is empty, no access-log file had arrived: see "If records are still arriving".
+    If the CloudTrail file shows unreadable characters, it is still compressed: check that the path ends in `.json`. If the access-log file is empty, no access-log file had arrived yet: that is normal today, and Part I collects them.
 
     </div>
 
@@ -1006,22 +1008,87 @@ The LMS carries this session's blank custody record and evidence register, the r
 
     </div>
 
-### If records are still arriving: collect again, and record that too
+### Part I: the second collection, later
 
-If step 3 or step 4 showed few or no access-log files, collect again later, at least a few hours after the incident's end, and as often as you need. A later collection goes into a new folder and never changes `c1`:
+Run this part at least several hours after the incident, for example in the evening of Day 6, and in any case before Session 13 opens. It collects both log buckets again into a new folder, validates the CloudTrail files again, and compares the two collections. It makes no request to the case bucket.
 
-```bash
-source ~/nb6018-cw/s12/s12-env.sh
-C2="$S12/evidence/c2-$(date -u +%Y%m%dT%H%MZ)"; mkdir -p "$C2"/{listings,access-logs}
-clog "second collection start; Kali public address: $(curl -s https://checkip.amazonaws.com)"
-aws s3api list-objects-v2 --bucket "$LOGS" --region "$REGION" --query 'Contents[].[LastModified,Size,Key]' --output text | sort > "$C2/listings/access-logs-landed.tsv"
-seal "$C2" listings
-aws s3 sync "s3://$LOGS/" "$C2/access-logs/" --region "$REGION" --no-progress --only-show-errors
-seal "$C2" access-logs
-clog "second collection end: $(find "$C2/access-logs" -type f | wc -l) access-log files"
-```
+{: start="18"}
+18. **Collect both log buckets again, into `c2`.**
 
-Enter `c2` as a new item in the register, with its own custody entries. Then compare the two manifests: files that both collections hold should have the same SHA-256 values, and the new files are the ones that arrived in between. Some of them will hold the lines of today's own requests to the case bucket. Do the same for the trail bucket if your CloudTrail files were still arriving.
+    ```bash
+    source ~/nb6018-cw/s12/s12-env.sh
+    C2="$S12/evidence/c2-$(date -u +%Y%m%dT%H%MZ)"
+    mkdir -p "$C2"/{listings,trail,access-logs,validation}
+    clog "second collection start; folder $C2"
+    clog "Kali public address at start: $(curl -s https://checkip.amazonaws.com)"
+    aws s3api list-objects-v2 --bucket "$TRAIL" --region "$REGION" --query 'Contents[].[LastModified,Size,Key]' --output text | sort > "$C2/listings/trail-landed.tsv"
+    aws s3api list-objects-v2 --bucket "$LOGS" --region "$REGION" --query 'Contents[].[LastModified,Size,Key]' --output text | sort > "$C2/listings/access-logs-landed.tsv"
+    seal "$C2" listings
+    aws s3 sync "s3://$TRAIL/" "$C2/trail/" --region "$REGION" --no-progress --only-show-errors
+    clog "sync end: s3://$TRAIL/ to c2 trail/"
+    seal "$C2" trail
+    aws s3 sync "s3://$LOGS/" "$C2/access-logs/" --region "$REGION" --no-progress --only-show-errors
+    clog "sync end: s3://$LOGS/ to c2 access-logs/"
+    seal "$C2" access-logs
+    ```
+
+    <div class="box expect" markdown="1">
+
+    Four seal lines. `c2/trail/` holds more files than `c1/trail/`, and `c2/access-logs/` holds the access-log files that have arrived since the first collection. Some of them hold the lines of your own first collection's requests to the case bucket, as section 3 explained.
+
+    </div>
+
+    <div class="box trouble" markdown="1">
+
+    If the access-log folder still holds few files, it is still early: run Part I again later into a third folder, `c3`, in the same way, and record it. Each collection is its own item.
+
+    </div>
+
+19. **Validate again, then compare the two collections.**
+
+    ```bash
+    TRAIL_ARN=$(aws cloudtrail describe-trails --trail-name-list "$TRAIL_NAME" --region "$REGION" --query 'trailList[0].TrailARN' --output text)
+    VSTART=$(grep -m 1 'trail nb6018-trail created' ~/nb6018-cw/s11/config-log.txt | cut -c1-20)
+    for r in $(ls "$C2"/trail/AWSLogs/*/CloudTrail/); do
+      aws cloudtrail validate-logs --trail-arn "$TRAIL_ARN" --start-time "$VSTART" --verbose --region "$r" > "$C2/validation/validate-$r.txt" 2>&1
+      clog "validate-logs (c2) region $r: $(tail -n 2 "$C2/validation/validate-$r.txt" | tr '\n' ' ')"
+    done
+    seal "$C2" validation
+    awk '$2 ~ /^(trail|access-logs)\// { if (NR == FNR) { h[$2] = $1; next } if ($2 in h) { if (h[$2] == $1) same++; else { diff++; print "DIFFERENT: " $2 } } else new++ }
+         END { print same + 0 " files identical in c1 and c2; " diff + 0 " different; " new + 0 " new in c2" }' \
+      "$C1/manifest-sha256.txt" "$C2/manifest-sha256.txt" | tee "$S12/records/c1-c2-compare.txt"
+    clog "c1 and c2 compared: $(tail -n 1 "$S12/records/c1-c2-compare.txt")"
+    clog "Kali public address at end: $(curl -s https://checkip.amazonaws.com)"
+    ( cd "$C2" && sha256sum -c --quiet manifest-sha256.txt ) && clog "c2 manifest re-checked: every file matches"
+    chmod a-w "$C2/manifest-sha256.txt" "$C2"
+    clog "second collection end; c2 manifest SHA-256 $(sha256sum "$C2/manifest-sha256.txt" | cut -d' ' -f1)"
+    ```
+
+    <div class="box expect" markdown="1">
+
+    Every validation summary valid, now covering files that the first run could not, because they had not yet been listed in a digest. Then one line such as `214 files identical in c1 and c2; 0 different; 38 new in c2`, with your own numbers: every log file of the first collection is unchanged in the second, and the new files arrived in between. Because this run checks, in the bucket, the same files that the first collection holds, it also covers the `c1` files that the first run left unchecked. And for the server access logs, the same hash value in two collections made hours apart is the only integrity check they ever get.
+
+    </div>
+
+    <div class="box trouble" markdown="1">
+
+    If any line says `DIFFERENT`, stop and record it exactly, with the time: a delivered log file should never change. Tell the lecturer, and do not delete either copy. If the summary says `0 files identical`, `$C1` was empty because `s12-env.sh` was not sourced in this terminal: run `source ~/nb6018-cw/s12/s12-env.sh` and repeat the `awk` command.
+
+    </div>
+
+20. **Complete the records.** Enter `c2` in the register as new items (S12-009 listings, S12-010 CloudTrail files, S12-011 access-log files, S12-012 validation results), with their custody entries and the c2 manifest's value. Then finish `records/two-clocks.md`: for each record, how many files had landed at the first collection and how many at the second, with both times, and your completeness sentence in the form of section 2.
+
+    <div class="box expect" markdown="1">
+
+    A register and a custody record that a stranger could follow from the first request in Part A to the last seal in Part I, with no gap.
+
+    </div>
+
+    <div class="box trouble" markdown="1">
+
+    If you made a third collection, add it in the same way, with its own item numbers. Never merge two collections into one item.
+
+    </div>
 
 ### Checkpoint
 
@@ -1037,7 +1104,8 @@ Judge your own work against this table. It is formative and is not marked here, 
 | 6 | Nine ETags matched to the nine local files | `records/etag-match.tsv` |
 | 7 | Three versions of `pricing-plan.txt` recovered by version ID, each hashed and identical to its local copy | `case/recovered/`; register S12-007 |
 | 8 | The bucket's history identical before and after | The `diff` line in the collection log |
-| 9 | Custody record and register complete, with no gap and no entry written later without being marked late | `records/` |
+| 9 | A second collection, at least several hours after the incident: both logs, sealed, validated again, and compared with the first | `evidence/c2-.../`, `records/c1-c2-compare.txt` |
+| 10 | Custody record and register complete, with no gap and no entry written later without being marked late | `records/` |
 
 ### If you have time
 
@@ -1052,7 +1120,7 @@ A short check follows this session. Its date is on the LMS. You pass it when all
 | Row | It is true when | Your proof |
 |---|---|---|
 | Ready | Every row of the Session 11 readiness checklist is true | `~/nb6018-cw/s11/readiness/` and the checklist |
-| Collected | Both logs collected, hashed on arrival and validated, with the custody record and register complete | The checkpoint table above, rows 1 to 4 and 9 |
+| Collected | Both logs collected twice, hashed on arrival and validated, with the two collections compared and the custody record and register complete | The checkpoint table above, rows 1 to 4, 9 and 10 |
 | Recovered | The deleted file recovered by version ID, with its version ID and a SHA-256 value that matches the local copy | `case/recovered/`, step 15 |
 
 If a row is false, use the time before the check: the catch-up route below covers each part.
@@ -1063,11 +1131,12 @@ This session collects your coursework evidence, so you cannot skip it, but you c
 
 1. **Read sections 1 to 7 and run the five demos** (about 70 minutes). Answer each quick check before you open the answer.
 2. **Do not touch the case bucket before you start the lab.** No console look, no listing. The rule from Session 11 still holds.
-3. **Do the lab in one sitting** (about two hours), from Part A. Waiting longer than the class did is not a problem: more of the access logs will have arrived.
-4. **Tick the checkpoint table** and keep every file.
-5. **If you are blocked**, write to the lecturer through the LMS with the step number and the exact error message, with your account ID masked.
+3. **Do Parts A to H in one sitting** (about two hours). Collecting later than the class did is not a problem: more of the access logs will have arrived, and your collection log says when you collected.
+4. **Run Part I at least several hours after Part H.** It validates the newest CloudTrail files again and shows whether more access-log files arrived, so you need it even if you collect late.
+5. **Tick the checkpoint table** and keep every file.
+6. **If you are blocked**, write to the lecturer through the LMS with the step number and the exact error message, with your account ID masked.
 
-**If you missed Session 11 as well,** do Session 11 first, completely, using its own catch-up list: build the environment, verify it, and run the incident. Then wait. Do not collect on the same day as the incident: give the server access logs at least several hours, and a night if you can. Read this page while you wait.
+**If you missed Session 11 as well,** do Session 11 first, completely, using its own catch-up list: build the environment, verify it, and run the incident. Then follow the class's rhythm: start this page's lab about an hour after the incident at the earliest, and run Part I at least several hours after that. Read this page while you wait.
 
 **If your environment is broken** and cannot be repaired in time, the lecturer can give you the unit's reference collection to practise the method on. It lets you learn the steps, but it is not your evidence: your coursework needs a collection from your own environment.
 
@@ -1171,4 +1240,4 @@ Unpacking writes a different file with different bytes, made by the analyst's to
 
 ## Coming next
 
-You now hold a verified copy of everything your environment recorded, with a record that says how each piece arrived. Session 13 opens the logs. You will parse the CloudTrail files, set them beside the server access logs, find your own collection in both and set it aside, rebuild the incident's timeline, and begin writing your findings in the report template.
+You now hold a verified copy of everything your environment recorded, with a record that says how each piece arrived. Session 13 opens the logs. You will parse the CloudTrail files, set them beside the server access logs, find your own collection in both and set it aside, rebuild the incident's timeline, and begin writing your findings in the report template. Before it opens, run Part I.

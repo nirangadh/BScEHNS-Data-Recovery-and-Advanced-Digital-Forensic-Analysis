@@ -93,7 +93,7 @@ button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
 
   <section class="saw" id="saw" hidden>
     <h2>WHAT YOU JUST SAW</h2>
-    <p>CloudTrail's records landed within minutes and the access-log records over hours, in bursts, and one never arrived. A collection holds only what had landed when you looked, so the question 'is it complete?' has no yes for the access logs: only a time and a count. This is section 2's two clocks in your own account. In the lab you list before you collect, record the time and the count, and collect again later into a new folder if records are still arriving.</p>
+    <p>CloudTrail's records landed within minutes and the access-log records over hours, in bursts, and one never arrived. A collection holds only what had landed when you looked, so the question 'is it complete?' has no yes for the access logs: only a time and a count. This is section 2's two clocks in your own account. In the lab you list before you collect, record the time and the count, and collect again hours later, in Part I, into a new folder.</p>
   </section>
 </main>
 <script>
@@ -103,12 +103,12 @@ button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
   var R = [[1,4,95],[3,5,95],[5,4,160],[7,6,160],[9,5,160],[11,4,160],[13,5,230],[15,7,null],[17,5,230],[19,4,410],[21,5,410],[22,9,410]];
   var STEPS = [
     { caption: "The incident: twelve requests to the case bucket, from 09:01 to 09:22 UTC. Nothing has been collected yet. Move the collection time forward and watch what a collection at that time would hold.", state: { t: 22 } },
-    { caption: "A collection at 09:30. CloudTrail files have landed for almost every request already, within minutes. Not one server access log file has landed. A report written from this collection would hold one record and none of the other.", state: { t: 30 } },
+    { caption: "A collection at 10:20, about an hour after the incident, as in your lab. CloudTrail files have landed for every request, within minutes of each. Not one server access log file has landed. A report written from this collection alone would hold one record and none of the other.", state: { t: 80 } },
     { caption: "At 10:40 the first access-log file has landed, with two requests in it. CloudTrail is now complete for these twelve requests, as far as anyone can tell. The access logs are clearly not.", state: { t: 100 } },
     { caption: "At 13:00 more access-log files have landed. The pattern is irregular: files arrive in bursts, hours apart, as best-effort delivery allows.", state: { t: 240 } },
     { caption: "At 17:00 no new file has arrived for hours. It looks finished. Is it complete? The analyst cannot tell. A file could still be on its way, or a record could have been lost.", state: { t: 480 } },
     { caption: "Only this demo can show you the truth: the record of request 8 was never delivered. In your own account you would never see this square. That is why completeness is stated as a limitation, never claimed.", state: { t: 480, truth: true } },
-    { caption: "The honest record: what was seen, and when. A first collection at 09:30 and a second at 17:00, each with its own time and count. A reader can judge the gap from those facts. Read what you just saw below.", state: { t: 480, truth: true, two: true } }
+    { caption: "The honest record: what was seen, and when. A first collection at 10:20 and a second at 17:00, each with its own time and count. A reader can judge the gap from those facts. Read what you just saw below.", state: { t: 480, truth: true, two: true } }
   ];
   function hm(m){ var h = 9 + Math.floor(m / 60), mm = m % 60; return (h < 10 ? "0" : "") + h + ":" + (mm < 10 ? "0" : "") + mm; }
   function render(state){
@@ -128,7 +128,7 @@ button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
     document.getElementById("vct").textContent = nct === 12 ? "No gap visible; AWS says delivery is typical, not guaranteed." : nct + " of 12 so far; more expected within minutes.";
     document.getElementById("vsal").textContent = nsal === 0 ? "Nothing has landed yet." : nsal + " of 12 seen. Cannot be known: best-effort delivery.";
     var n = "Listed at " + hm(state.t) + " UTC: CloudTrail records for " + nct + " requests; access-log records for " + nsal + " requests.";
-    if (state.two) { n = "c1, collected 09:30 UTC: CloudTrail 11 of 12, access logs 0. c2, collected 17:00 UTC: CloudTrail 12, access logs 11. Access logs are best-effort; records may be missing."; }
+    if (state.two) { n = "c1, collected 10:20 UTC: CloudTrail 12 of 12, access logs 0. c2, collected 17:00 UTC: CloudTrail 12, access logs 11. Access logs are best-effort; records may be missing."; }
     document.getElementById("note").textContent = n;
   }
   /* Engine: do not edit below this line. */
