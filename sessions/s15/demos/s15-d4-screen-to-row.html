@@ -1,0 +1,228 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S15-D4 From the screen to the row | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.78rem}
+.lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;color:var(--stone);margin:.2rem 0 .35rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.72rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.panel{border:1px solid var(--hairline);border-radius:10px;padding:.6rem;min-width:0}
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
+@media (max-width:700px){.chain{grid-template-columns:1fr 1fr}}
+.cell{border:2px solid var(--hairline);border-radius:10px;padding:.5rem;min-height:7.5rem;transition:background .25s,border-color .25s;min-width:0}
+.cell.on{border-color:var(--plum);background:var(--plum-tint)}
+.cell.done{border-color:var(--sage-dark);background:var(--surface)}
+.cell p{margin:.15rem 0;font-size:.76rem;overflow-wrap:anywhere}
+.addr{font-family:var(--mono);font-size:.78rem;border:1px solid var(--hairline);border-radius:14px;padding:.2rem .5rem;background:#fff}
+.calc{margin:.7rem 0 0;font-family:var(--mono);font-size:.78rem;line-height:1.6;overflow-wrap:anywhere}
+.calc div{padding:.05rem .3rem;border-radius:4px}
+.calc .now{background:var(--plum-tint)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 15 notes</a>
+  <h1>S15-D4: From the screen to the row</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> one visit on the phone's screen is traced to a file, a table, a row and a number, and the number becomes a time in UTC only when you know which clock wrote it.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="chain">
+      <div class="cell" id="c0"><p class="lbl">1. THE SCREEN</p><p class="addr">mlb.com</p><p>Typed in Opera on 13 July 2024, 16:12 by the researcher's notes, which use Eastern Daylight Time, UTC-4</p></div>
+      <div class="cell" id="c1"><p class="lbl">2. THE FILE</p><p class="mono">Dump/data/data/com.opera.browser/app_opera/History</p><p>A SQLite database, as in Chrome</p></div>
+      <div class="cell" id="c2"><p class="lbl">3. THE TABLE</p><p class="mono">urls</p><p>One row per address, with a visit count, a typed count and the last visit time</p></div>
+      <div class="cell" id="c3"><p class="lbl">4. THE ROW</p><p class="mono">id 1 | https://mlb.com/ | typed_count 1 | last_visit_time 13365375162964931</p></div>
+    </div>
+    <div class="calc" id="calc"></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>One act on the screen, typing an address, was followed into one file, one table, one row and one number. The number became a time only after you knew its clock: microseconds since 1601 in UTC, converted to 20:12:42 UTC, which agrees with the researcher's 16:12 at UTC-4.</p>
+<p>This is section 7 of the notes and Part F of the lab, where you run the same conversion yourself. Write the file, the raw value and the clock with every time in your findings.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var STEPS = [
+ {
+  "caption": "Start on the screen. The researcher typed mlb.com into Opera's address bar. His notes give the time as 16:12 on 13 July 2024, in Eastern Daylight Time, which is UTC-4. That is a person's record. Now find the phone's record of the same act.",
+  "state": {
+   "on": 0,
+   "done": [],
+   "calc": 0
+  }
+ },
+ {
+  "caption": "ALEAPP's report names the source: Opera's History file in its private folder. Opera is built on Chromium, so its History is the same kind of SQLite database as Chrome's in Session 14.",
+  "state": {
+   "on": 1,
+   "done": [
+    0
+   ],
+   "calc": 0
+  }
+ },
+ {
+  "caption": "Inside the database, the table urls holds one row for each address that was visited, with how often it was visited and typed.",
+  "state": {
+   "on": 2,
+   "done": [
+    0,
+    1
+   ],
+   "calc": 0
+  }
+ },
+ {
+  "caption": "The row for https://mlb.com/ has a typed count of 1: the address was typed, not clicked. Its time is the number 13365375162964931. A number is not yet a time: you need its clock.",
+  "state": {
+   "on": 3,
+   "done": [
+    0,
+    1,
+    2
+   ],
+   "calc": 1
+  }
+ },
+ {
+  "caption": "Seventeen digits: Chromium's clock, microseconds since 1 January 1601, in UTC. Divide by one million to get seconds since 1601.",
+  "state": {
+   "on": 3,
+   "done": [
+    0,
+    1,
+    2
+   ],
+   "calc": 2
+  }
+ },
+ {
+  "caption": "Subtract 11644473600, the seconds between 1601 and 1970. The result is an ordinary Unix time, seconds since 1970.",
+  "state": {
+   "on": 3,
+   "done": [
+    0,
+    1,
+    2
+   ],
+   "calc": 3
+  }
+ },
+ {
+  "caption": "That Unix time is 13 July 2024 at 20:12:42 UTC, with a fraction of a second.",
+  "state": {
+   "on": 3,
+   "done": [
+    0,
+    1,
+    2
+   ],
+   "calc": 4
+  }
+ },
+ {
+  "caption": "Compare with the person's record: 16:12 at UTC-4 is 20:12 UTC. The phone's record and the researcher's notes agree. In the same second, the browser also wrote rows for addresses the user never typed, which section 8 of the notes returns to.",
+  "state": {
+   "on": -1,
+   "done": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "calc": 5
+  }
+ }
+];
+  var CALC = ["13365375162964931 microseconds since 1 January 1601, UTC", "/ 1,000,000  =  13365375162.964931 seconds since 1601", "- 11644473600 seconds from 1601 to 1970  =  1720901562.964931 seconds since 1970", "= 2024-07-13 20:12:42.964931 UTC", "Researcher's notes: 16:12 EDT, UTC-4  =  20:12 UTC.  The two agree."];
+  function render(s){
+    for (var k = 0; k < 4; k++) {
+      var el = document.getElementById("c" + k);
+      el.classList.toggle("on", k === s.on); el.classList.toggle("done", s.done.indexOf(k) !== -1);
+    }
+    var c = document.getElementById("calc"); c.innerHTML = "";
+    for (var j = 0; j < s.calc; j++) {
+      var d = document.createElement("div"); d.textContent = CALC[j];
+      if (j === s.calc - 1) { d.className = "now"; } c.appendChild(d);
+    }
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

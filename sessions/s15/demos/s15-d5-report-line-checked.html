@@ -1,0 +1,223 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S15-D5 A report line, checked | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.78rem}
+.lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;color:var(--stone);margin:.2rem 0 .35rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.72rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.panel{border:1px solid var(--hairline);border-radius:10px;padding:.6rem;min-width:0}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}
+@media (max-width:700px){.cards{grid-template-columns:1fr}}
+.card{border:2px solid var(--hairline);border-radius:10px;padding:.55rem;transition:background .25s,border-color .25s,opacity .25s;min-width:0}
+.card.on{border-color:var(--plum);background:var(--plum-tint)}
+.card.done{border-color:var(--sage-dark);background:var(--surface)}
+.card.out{opacity:.35}
+.card p{margin:.2rem 0;font-size:.78rem;overflow-wrap:anywhere}
+.field{font-family:var(--mono);font-size:.76rem;padding:.15rem .3rem;border-radius:4px}
+.field.mark{outline:2px solid var(--plum);background:#fff}
+.verdict{margin:.7rem 0 0;font-size:.85rem;font-weight:700;min-height:1.4em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 15 notes</a>
+  <h1>S15-D5: A report line, checked</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a parser's report line is compared with the value in the source file, and the check shows what the parser added that the source never held.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="cards">
+      <div class="card" id="k0"><p class="lbl">THE REPORT LINE (ALEAPP)</p>
+        <p>Calculator Lock - Notes</p>
+        <p class="field" id="f-rep">Note Date: 2024-02-04 00:00:00+00:00</p>
+        <p class="field">Note Date (as stored): 04-02-2024</p>
+        <p class="field">Title: My Secret Note</p></div>
+      <div class="card" id="k1"><p class="lbl">THE SOURCE (READ-ONLY)</p>
+        <p class="mono">.../com.calculator.lock.hide.photo.video/databases/note_contact.db</p>
+        <p class="field">Table Note, column note_date, type TEXT</p>
+        <p class="field" id="f-src">note_date = '04-02-2024'</p></div>
+      <div class="card" id="k2"><p class="lbl">THE RESEARCHER'S RECORD</p>
+        <p>Note "My Secret Note" created on 4 February 2024 at 12:41</p>
+        <p class="field" id="f-doc">12:41 at UTC-5 (Eastern Standard Time) = 17:41 UTC</p></div>
+    </div>
+    <p class="verdict" id="verdict"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>A report line said midnight UTC. The source file, opened read-only, held only the text 04-02-2024: a date, written day first, with no time and no clock. The parser had added midnight to sort the row, and the researcher's record put the note at 17:41 UTC; the date is also only the date of the latest save.</p>
+<p>This is section 9 of the notes. Use the report to find evidence and the source file to state it. In the lab you check two report lines yourself, and the "If you have time" task repeats this one.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var STEPS = [
+ {
+  "caption": "ALEAPP's report for the calculator vault shows one note. Its first column, Note Date, says 2024-02-04 00:00:00+00:00: midnight UTC on 4 February 2024. It looks like a precise time. A report line is a claim: check it in the source.",
+  "state": {
+   "on": 0,
+   "done": [],
+   "out": [
+    1,
+    2
+   ],
+   "mark": "f-rep",
+   "verdict": "Claim: the note's time is midnight UTC on 4 February 2024."
+  }
+ },
+ {
+  "caption": "The report's 'located at' line names the source: note_contact.db in the app's private folder. Copy it out with its journal, record its hash value and open it read-only. The table Note has a column note_date, declared as text.",
+  "state": {
+   "on": 1,
+   "done": [
+    0
+   ],
+   "out": [
+    2
+   ],
+   "mark": "",
+   "verdict": "Source found and opened read-only."
+  }
+ },
+ {
+  "caption": "The value is the text 04-02-2024. That is all the source holds: a date, with no time and no time zone. Midnight and UTC are not in the file. The report's second column, 'as stored', shows the same text.",
+  "state": {
+   "on": 1,
+   "done": [
+    0
+   ],
+   "out": [
+    2
+   ],
+   "mark": "f-src",
+   "verdict": "The source holds a date only. No time, no clock."
+  }
+ },
+ {
+  "caption": "Is it 4 February or 2 April? The text alone cannot say. ALEAPP's notes for this module explain that the app writes this date day first, and the researcher's record has a note made on 4 February 2024. So: 4 February.",
+  "state": {
+   "on": 2,
+   "done": [
+    0,
+    1
+   ],
+   "out": [],
+   "mark": "",
+   "verdict": "Day first: 4 February 2024, supported by the parser's notes and the researcher's record."
+  }
+ },
+ {
+  "caption": "The researcher's record gives the time: 12:41 in Eastern Standard Time, UTC-5, which is 17:41 UTC. The report's midnight is almost eighteen hours away from it. The parser added midnight so the row could be sorted with the others; it was never a recorded time.",
+  "state": {
+   "on": 2,
+   "done": [
+    0,
+    1
+   ],
+   "out": [],
+   "mark": "f-doc",
+   "verdict": "Midnight UTC was added by the parser. The note was written at 17:41 UTC by the researcher's record."
+  }
+ },
+ {
+  "caption": "One more limit, from the parser's notes: the app rewrites this date each time the note is saved, so it is the date of the latest save, not necessarily the day the note was first written. Write the finding as the source supports it: the note's database holds the date 4 February 2024, as text, with no time.",
+  "state": {
+   "on": -1,
+   "done": [
+    0,
+    1,
+    2
+   ],
+   "out": [],
+   "mark": "",
+   "verdict": "Finding: date of latest save 4 February 2024 (stored as 04-02-2024), no time recorded."
+  }
+ }
+];
+  function render(s){
+    for (var k = 0; k < 3; k++) {
+      var el = document.getElementById("k" + k);
+      el.classList.toggle("on", k === s.on); el.classList.toggle("done", s.done.indexOf(k) !== -1); el.classList.toggle("out", s.out.indexOf(k) !== -1);
+    }
+    ["f-rep", "f-src", "f-doc"].forEach(function(id){ document.getElementById(id).classList.toggle("mark", id === s.mark); });
+    document.getElementById("verdict").textContent = s.verdict;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
