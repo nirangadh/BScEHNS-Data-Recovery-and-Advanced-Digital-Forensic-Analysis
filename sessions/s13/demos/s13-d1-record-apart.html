@@ -1,0 +1,158 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S13-D1 Taking a record apart | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.82rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.75rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.dim{opacity:.35}
+.rec{font-family:var(--mono);font-size:.8rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.rec span.f{border-radius:4px;padding:0 2px;transition:background .25s}
+.rec span.f.hl{background:var(--plum-tint);outline:2px solid var(--plum)}
+.q{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem}
+.q b{border:2px solid var(--hairline);border-radius:999px;padding:.15rem .7rem;font-size:.8rem}
+.q b.on{border-color:var(--plum);background:var(--plum-tint)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 13 notes</a>
+  <h1>S13-D1: Taking a record apart</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> one CloudTrail event answers who, what, when, from where, with which program and which request, each from its own field.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="q"><b data-q="who">Who?</b><b data-q="what">What?</b><b data-q="back">What came back?</b><b data-q="when">When?</b><b data-q="where">From where?</b><b data-q="prog">Which program?</b><b data-q="req">Which request?</b></div>
+    <pre class="rec" id="rec"></pre>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>One event answered six questions, each from its own field: who from <code>userIdentity</code>, what from <code>eventName</code> and <code>requestParameters</code>, when from <code>eventTime</code>, from where from <code>sourceIPAddress</code>, with which program from <code>userAgent</code>, and which request from <code>requestID</code>. A management event fills the same fields differently. This is Section 1 of the notes; in the lab, your jq filter chooses exactly these fields from every event.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var DATA = {
+    put: [["", "{"],
+      ["who", '  "userIdentity": { "type": "IAMUser",\n     "arn": "arn:aws:iam::********3333:user/nb6018-analyst",\n     "accessKeyId": "AKIA************0001" },'],
+      ["when", '  "eventTime": "2026-10-14T09:12:05Z",'],
+      ["what", '  "eventSource": "s3.amazonaws.com",\n  "eventName": "PutObject",'],
+      ["where", '  "sourceIPAddress": "203.0.113.24",'],
+      ["prog", '  "userAgent": "[aws-cli/2.31.4 ... md/command#s3.cp]",'],
+      ["what2", '  "requestParameters": { "bucketName": "nb6018-case-ab-4821",\n     "key": "staging/client-list.csv" },'],
+      ["back", '  "responseElements": { "x-amz-server-side-encryption": "AES256",\n     "x-amz-version-id": "EMnY9tlicZLhCUJwnHBdHIyvNLVlRXFw" },'],
+      ["req", '  "requestID": "CA9ED085EBCC042E",\n  "eventID": "0b6e6f3c-1f2a-4d2a-9c1e-5a1b2c3d4e5f",'],
+      ["cat", '  "readOnly": false,\n  "eventCategory": "Data"'], ["", "}"]],
+    mgmt: [["", "{"],
+      ["who", '  "userIdentity": { "type": "IAMUser",\n     "arn": "arn:aws:iam::********3333:user/nb6018-analyst",\n     "accessKeyId": "AKIA************0001" },'],
+      ["when", '  "eventTime": "2026-10-14T08:02:41Z",'],
+      ["what", '  "eventSource": "s3.amazonaws.com",\n  "eventName": "GetBucketVersioning",'],
+      ["where", '  "sourceIPAddress": "203.0.113.24",'],
+      ["prog", '  "userAgent": "[aws-cli/2.31.4 ... md/command#s3api.get-bucket-versioning]",'],
+      ["what2", '  "requestParameters": { "bucketName": "nb6018-case-ab-4821",\n     "versioning": "" },'],
+      ["back", '  "responseElements": null,'],
+      ["req", '  "requestID": "4F1C7A2D9E0B3C55",\n  "eventID": "5d2e8a91-77c4-4b0e-8f21-3a6c9d0e1b47",'],
+      ["cat", '  "readOnly": true,\n  "eventCategory": "Management"'], ["", "}"]]
+  };
+  var STEPS = [
+    { caption: "This is one CloudTrail data event from an invented account: one upload to the case bucket. Each step lights the fields that answer one question.", state: { rec: "put", hl: [], q: "" } },
+    { caption: "Who? userIdentity names an IAM user, its ARN and the access key that signed the request. An AKIA key is a long-term key. The record names an account, not a person.", state: { rec: "put", hl: ["who"], q: "who" } },
+    { caption: "What? eventSource and eventName say the service and the action: S3, PutObject. requestParameters says what was asked: this bucket, this key.", state: { rec: "put", hl: ["what", "what2"], q: "what" } },
+    { caption: "What came back? responseElements holds S3's answer for a request that changes something. For an upload, it holds the version ID that S3 gave the new version.", state: { rec: "put", hl: ["back"], q: "back" } },
+    { caption: "When? eventTime is when AWS completed the request, in UTC, by the clock of the AWS computer that served it. It ends in Z.", state: { rec: "put", hl: ["when"], q: "when" } },
+    { caption: "From where? sourceIPAddress is the address the request came from: here a documentation address standing in for the analyst's own network.", state: { rec: "put", hl: ["where"], q: "where" } },
+    { caption: "Which program? userAgent is the text the program sent about itself: the AWS CLI, its version and the command. The program chose it, so it is a claim.", state: { rec: "put", hl: ["prog"], q: "prog" } },
+    { caption: "Which request? requestID is the code S3 gave this one request; the access log keeps the same code. eventID is CloudTrail's own label for the event.", state: { rec: "put", hl: ["req"], q: "req" } },
+    { caption: "The last two fields say what sort of record this is: eventCategory Data, readOnly false. A data event about content, and a request that changed something.", state: { rec: "put", hl: ["cat"], q: "" } },
+    { caption: "Now a management event from the same account: GetBucketVersioning. Same fields, filled differently: eventCategory Management, readOnly true, no key, and responseElements null because nothing changed.", state: { rec: "mgmt", hl: ["what", "what2", "back", "cat"], q: "" } },
+    { caption: "Every event has the same shape. Learn which field answers which question once, and every record in your evidence can be read the same way.", state: { rec: "put", hl: ["who", "what", "what2", "back", "when", "where", "prog", "req"], q: "all" } }
+  ];
+  function esc(s){ return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function render(state){
+    var html = DATA[state.rec].map(function(p){
+      var on = state.hl.indexOf(p[0]) !== -1;
+      return '<span class="f' + (on ? " hl" : "") + '">' + esc(p[1]) + "</span>";
+    }).join("\n");
+    document.getElementById("rec").innerHTML = html;
+    document.querySelectorAll(".q b").forEach(function(b){
+      var q = b.getAttribute("data-q");
+      b.classList.toggle("on", state.q === "all" || state.q === q);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

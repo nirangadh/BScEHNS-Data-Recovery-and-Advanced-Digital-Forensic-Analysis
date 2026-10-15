@@ -1,0 +1,144 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S13-D4 Lifting out the analyst | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.82rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.75rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.dim{opacity:.35}
+.tl{position:relative}
+.ev{display:grid;grid-template-columns:5.2rem 1fr auto;gap:.5rem;align-items:center;border-bottom:1px solid var(--hairline);padding:.28rem .2rem;font-size:.78rem;transition:opacity .3s,background .3s}
+.ev .mono{white-space:nowrap}
+.ev.win{background:var(--plum-tint)}
+.ev.out{opacity:.35}
+.counts{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;font-size:.82rem}
+.counts span{border:1px solid var(--hairline);border-radius:8px;padding:.2rem .5rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 13 notes</a>
+  <h1>S13-D4: Lifting out the analyst</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> the collection log's window tags the analyst's own requests, a check removes any that do not fit, and tagged rows leave the incident's view without leaving the file.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="tl" id="tl"></div>
+    <div class="counts" id="counts"></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The collection log gave the window; the window gave a first tag; the check by address and kind of request removed one row that the analyst never made. Tagged rows left the incident's view but stayed in the file, so the counts add up and nothing is hidden. This is Section 6 of the notes. Without a collection log written at the time, the window, and every tag, would be a guess.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var EV = [
+    { t: "09:12:05", d: "PutObject client-list.csv from 203.0.113.24", k: "inc" },
+    { t: "09:13:07", d: "PutObject design-notes.txt from 203.0.113.24", k: "inc" },
+    { t: "09:27:32", d: "ListObjects staging/ from 198.51.100.73", k: "inc" },
+    { t: "09:27:41", d: "GetObject client-list.csv from 198.51.100.73", k: "inc" },
+    { t: "09:28:44", d: "DeleteObject pricing-plan.txt from 198.51.100.73", k: "inc" },
+    { t: "10:40:31", d: "ListObjectVersions staging/ from 203.0.113.24", k: "mine" },
+    { t: "10:41:12", d: "HeadObject client-list.csv, by version ID, from 203.0.113.24", k: "mine" },
+    { t: "10:41:14", d: "HeadObject design-notes.txt, by version ID, from 203.0.113.24", k: "mine" },
+    { t: "10:42:02", d: "GetObject pricing-plan.txt, by version ID, from 203.0.113.24", k: "mine" },
+    { t: "10:44:30", d: "PutObject notes.txt from 203.0.113.24", k: "odd" },
+    { t: "10:47:55", d: "ListObjectVersions staging/ from 203.0.113.24", k: "mine" }
+  ];
+  var STEPS = [
+    { caption: "Eleven rows from an invented case bucket, in time order. All come from the same IAM user. Some are the incident, some are the analyst's own collection, and nothing in the rows says which.", state: { win: false, tag: false, check: false, view: false } },
+    { caption: "The collection log says: collection c1 started at 10:39:53 and ended at 10:51:20, from 203.0.113.24. That window is drawn over the rows.", state: { win: true, tag: false, check: false, view: false } },
+    { caption: "Every row inside the window gets the tag analyst-c1 for now. Six rows.", state: { win: true, tag: true, check: false, view: false } },
+    { caption: "Check each tagged row: right address, and a kind of request the collection made. The PutObject at 10:44:30 fails: the collection never uploaded anything. Its tag is removed; it needs its own explanation.", state: { win: true, tag: true, check: true, view: false } },
+    { caption: "The incident's view hides the five tagged rows. They are dimmed, not deleted. The unexplained upload stays in view, because it is not the analyst's.", state: { win: true, tag: true, check: true, view: true } },
+    { caption: "Count both ways: eleven rows in the file, five set aside as the analyst's, and six in the incident's view: five incident requests and one unexplained upload. A stranger can check every one of those numbers.", state: { win: true, tag: true, check: true, view: true, sum: true } }
+  ];
+  function render(state){
+    document.getElementById("tl").innerHTML = EV.map(function(e){
+      var inWin = state.win && e.t >= "10:39:53" && e.t <= "10:51:20";
+      var tagged = state.tag && inWin && (!state.check || e.k === "mine");
+      var tag = tagged ? '<span class="tag t-plum">analyst-c1</span>' : (state.check && e.k === "odd" ? '<span class="tag t-stone">unexplained</span>' : "");
+      var cls = "ev" + (inWin ? " win" : "") + (state.view && tagged ? " out" : "");
+      return '<div class="' + cls + '"><span class="mono">' + e.t + "Z</span><span>" + e.d + "</span>" + tag + "</div>";
+    }).join("");
+    var c = document.getElementById("counts");
+    c.innerHTML = state.sum ? "<span>In the file: 11</span><span>Set aside: 5</span><span>Unexplained: 1</span><span>Incident view: 6</span>" : "";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

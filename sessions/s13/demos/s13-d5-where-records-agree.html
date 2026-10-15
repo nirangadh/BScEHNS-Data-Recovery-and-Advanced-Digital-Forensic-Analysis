@@ -1,0 +1,147 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S13-D5 Where the records agree | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.82rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.75rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.dim{opacity:.35}
+.tracks{display:grid;gap:.45rem}
+.trk{display:grid;grid-template-columns:7rem 1fr;gap:.4rem;align-items:center;font-size:.78rem}
+.lane{position:relative;height:1.7rem;background:#F1F2EF;border-radius:6px}
+.dot{position:absolute;top:.3rem;width:1.1rem;height:1.1rem;margin-left:-.55rem;border-radius:50%;background:var(--sage-dark);transition:opacity .25s}
+.dot.miss{background:#fff;border:2px dashed var(--plum)}
+.cursor{position:absolute;top:-.2rem;bottom:-.2rem;width:2px;background:var(--plum)}
+.verdict{margin-top:.8rem;font-size:.84rem;min-height:3.2em}
+.bar{display:flex;height:.9rem;border-radius:5px;overflow:hidden;margin-top:.5rem}
+.bar i{display:block;height:100%}
+.bar .firm{background:var(--sage-dark)}.bar .gap{background:repeating-linear-gradient(45deg,var(--plum-tint),var(--plum-tint) 4px,#fff 4px,#fff 8px)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 13 notes</a>
+  <h1>S13-D5: Where the records agree</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a timeline built from three sources holds firm where they agree and shows a stated gap wherever one source is silent.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="tracks" id="tracks"></div>
+    <div class="bar" id="bar"></div>
+    <p class="verdict" id="verdict"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Each event was tested against three records, two written by AWS and one by you. Where all three agreed, the timeline was firm; where one was silent, the silence became a stated gap with a reason, not a missing row. The last event showed the hard case: without your own log, the two provider records had to test each other. This is Section 8 of the notes and its pivotal idea: a timeline is an argument built from records you did not write; it holds only where they agree, and its gaps must be stated.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var E = [
+    { x: 6,  lab: "09:12 upload client-list.csv", own: 1, ct: 1, sal: 1, v: "Three sources agree: your command at 09:12:04, CloudTrail at 09:12:05, the access log at 09:12:05. Firm." },
+    { x: 20, lab: "09:13 upload design-notes.txt", own: 1, ct: 1, sal: 1, v: "Three sources agree again, a second apart. Firm." },
+    { x: 46, lab: "09:27 listing", own: 1, ct: 0, sal: 1, v: "Your log and the access log agree; CloudTrail is silent. A coverage question for this trail: stated as a gap with its reason." },
+    { x: 58, lab: "09:27 download pricing-plan.txt", own: 1, ct: 1, sal: 0, v: "Your log and CloudTrail agree; no access-log line was delivered by the latest collection. Firm on two sources; the missing line is stated." },
+    { x: 70, lab: "09:28 delete pricing-plan.txt", own: 1, ct: 1, sal: 1, v: "Three sources agree. The delete marker's time, from the bucket's history, can be set beside them too. Firm." },
+    { x: 90, lab: "10:44 upload notes.txt", own: 0, ct: 1, sal: 1, v: "Both AWS records agree, but your own log has no command. In a real case there is no own log at all: here the two provider records must test each other." }
+  ];
+  var STEPS = [
+    { caption: "Three tracks over the same hour: your own incident log at the top, then CloudTrail, then the access log. Dots are records; dashed circles are places where a source is silent.", state: { k: -1 } }
+  ];
+  E.forEach(function(e, k){ STEPS.push({ caption: e.lab + ": " + e.v, state: { k: k } }); });
+  STEPS.push({ caption: "The finished timeline: firm where the sources agree, with each gap marked and stated. The argument holds only where the records agree, and the gaps are part of it.", state: { k: 99 } });
+  function lane(name, key, state){
+    var dots = E.map(function(e, k){
+      var shown = state.k === 99 || k <= state.k;
+      if (!shown) { return ""; }
+      return '<span class="dot' + (e[key] ? "" : " miss") + '" style="left:' + e.x + '%"></span>';
+    }).join("");
+    var cur = (state.k >= 0 && state.k < E.length) ? '<span class="cursor" style="left:' + E[state.k].x + '%"></span>' : "";
+    return '<div class="trk"><span>' + name + '</span><div class="lane">' + dots + cur + "</div></div>";
+  }
+  function render(state){
+    document.getElementById("tracks").innerHTML = lane("Your own log", "own", state) + lane("CloudTrail", "ct", state) + lane("Access log", "sal", state);
+    var bar = "";
+    if (state.k === 99) {
+      bar = E.map(function(e){ var firm = e.own + e.ct + e.sal === 3; return '<i class="' + (firm ? "firm" : "gap") + '" style="flex:1"></i>'; }).join("");
+    }
+    document.getElementById("bar").innerHTML = bar;
+    document.getElementById("verdict").textContent = state.k === 99 ? "Firm: 3 events on three sources. Stated gaps: 3, each with its reason." : "";
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
