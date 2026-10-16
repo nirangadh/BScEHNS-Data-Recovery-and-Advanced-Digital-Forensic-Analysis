@@ -1,0 +1,207 @@
+<!doctype html>
+<!-- NB6018CEM demo template. Code: MIT licence. Content: CC BY-NC-SA 4.0.
+     Save as sessions/sNN/demos/sNN-dK-short-name.html. One file, no external scripts, works offline.
+     Rules: one mechanism per demo; keyboard operable; respects reduced motion; ends with "What you just saw".
+     Edit only: the <title>, the header text, STEPS, the stage markup, render(), and the "What you just saw" panel. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S15-D2 Before and after first unlock | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.mono{font-family:var(--mono);font-size:.78rem}
+.lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;color:var(--stone);margin:.2rem 0 .35rem}
+.tag{display:inline-block;border-radius:6px;padding:.05rem .4rem;font-size:.72rem;font-weight:700;font-family:var(--font)}
+.t-ok{background:var(--surface);color:var(--sage-dark);border:1px solid var(--sage)}
+.t-plum{background:var(--plum-tint);color:var(--plum-dark);border:1px solid var(--plum)}
+.t-stone{background:#F1F2EF;color:var(--stone);border:1px solid var(--hairline)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.panel{border:1px solid var(--hairline);border-radius:10px;padding:.6rem;min-width:0}
+.statebar{display:flex;flex-wrap:wrap;gap:.35rem;margin:0 0 .7rem}
+.st{border:2px solid var(--hairline);border-radius:9px;padding:.25rem .55rem;font-size:.78rem;font-weight:700;color:var(--stone)}
+.st.on{border-color:var(--plum);background:var(--plum-tint);color:var(--plum-dark)}
+.tile{border:2px solid var(--hairline);border-radius:9px;padding:.45rem .55rem;margin:.35rem 0;transition:background .25s,border-color .25s}
+.tile b{display:block;font-size:.8rem}
+.tile span{font-size:.75rem}
+.tile .why{display:block;font-family:var(--mono);font-size:.7rem;color:var(--stone);margin-top:.15rem;overflow-wrap:anywhere}
+.tile.open{border-color:var(--sage-dark);background:var(--surface)}
+.tile.shut{border-color:var(--plum);background:#fff}
+.tile .lock{float:right;font-size:.7rem;font-weight:700}
+.keys{font-size:.8rem;margin:.6rem 0 0;font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 15 notes</a>
+  <h1>S15-D2: Before and after first unlock</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> the device state decides which keys are in memory, and so which files can be read, on Android and on an iPhone.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="statebar" id="bar">
+      <span class="st" data-s="off">Switched off</span>
+      <span class="st" data-s="bfu">Started, before first unlock</span>
+      <span class="st" data-s="unlocked">Unlocked</span>
+      <span class="st" data-s="afu">Screen locked, after first unlock</span>
+    </div>
+    <div class="two">
+      <div class="panel">
+        <p class="lbl">ANDROID (THE TEST PHONE)</p>
+        <div class="tile" id="a-de"><span class="lock"></span><b>Device-encrypted storage</b><span>Alarms, some system settings, the phone's own SMS store</span><span class="why">data/user_de/0/com.android.providers.telephony/databases/mmssms.db</span></div>
+        <div class="tile" id="a-ce"><span class="lock"></span><b>Credential-encrypted storage</b><span>Almost all app data: messages, history, notes</span><span class="why">data/data/ch.threema.app/databases/threema4.db</span></div>
+      </div>
+      <div class="panel">
+        <p class="lbl">IPHONE</p>
+        <div class="tile" id="i-d"><span class="lock"></span><b>Class D: no protection</b><span>Files the app did not protect</span></div>
+        <div class="tile" id="i-c"><span class="lock"></span><b>Class C: until first user authentication</b><span>The default for app data</span></div>
+        <div class="tile" id="i-a"><span class="lock"></span><b>Class A: complete protection</b><span>Files an app marked for the strictest class</span></div>
+      </div>
+    </div>
+    <p class="keys" id="keys"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>You moved one phone through its states. Before first unlock, only the keys that need no passcode exist; after the first unlock, nearly all keys stay in memory until the phone restarts, even with the screen locked; a restart or a flat battery throws them away again.</p>
+<p>This is section 3 of the notes. The state of the phone at seizure decides what any extraction can hold, so it belongs in the extraction's record. The test phone was extracted after first unlock, which is why its app folders are readable.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  var STEPS = [
+ {
+  "caption": "The phone is switched off. Every file in the user data is encrypted, and no key is in memory. Nothing on either phone can be read, however the extraction is made.",
+  "state": {
+   "s": "off",
+   "open": [],
+   "keys": "Keys in memory: none"
+  }
+ },
+ {
+  "caption": "The phone starts, but nobody has entered the passcode. This is before first unlock. The phone can make only the keys that do not need the passcode: Android's device-encrypted storage and the iPhone's class D. So the phone can ring an alarm and receive an SMS, but almost all app data stays locked.",
+  "state": {
+   "s": "bfu",
+   "open": [
+    "a-de",
+    "i-d"
+   ],
+   "keys": "Keys in memory: device-encrypted storage (Android), class D (iPhone)"
+  }
+ },
+ {
+  "caption": "The owner enters the passcode for the first time. The phone combines it with its hardware key and makes the remaining keys. Now everything can be read: Android's credential-encrypted storage, and the iPhone's classes C and A.",
+  "state": {
+   "s": "unlocked",
+   "open": [
+    "a-de",
+    "a-ce",
+    "i-d",
+    "i-c",
+    "i-a"
+   ],
+   "keys": "Keys in memory: all of them"
+  }
+ },
+ {
+  "caption": "The screen locks again. This is after first unlock. Android keeps its credential-encrypted keys in memory, and the iPhone keeps class C. Only the iPhone's class A key is thrown away shortly after locking. A phone in this state, in a pocket, still receives messages, and a full file system extraction can read most app data.",
+  "state": {
+   "s": "afu",
+   "open": [
+    "a-de",
+    "a-ce",
+    "i-d",
+    "i-c"
+   ],
+   "keys": "Keys in memory: all except class A (iPhone)"
+  }
+ },
+ {
+  "caption": "The battery runs flat, or someone restarts the phone, or an iPhone that has not been unlocked for three days restarts by itself. The keys made at the first unlock are gone. The phone is back before first unlock, and only the passcode can bring the keys back. That is why a seized phone is kept powered.",
+  "state": {
+   "s": "bfu",
+   "open": [
+    "a-de",
+    "i-d"
+   ],
+   "keys": "Keys in memory: device-encrypted storage (Android), class D (iPhone)"
+  }
+ }
+];
+  var TILES = ["a-de", "a-ce", "i-d", "i-c", "i-a"];
+  function render(s){
+    document.querySelectorAll(".st").forEach(function(el){ el.classList.toggle("on", el.getAttribute("data-s") === s.s); });
+    TILES.forEach(function(id){
+      var el = document.getElementById(id), on = s.open.indexOf(id) !== -1;
+      el.classList.toggle("open", on); el.classList.toggle("shut", !on);
+      el.querySelector(".lock").textContent = on ? "READABLE" : "LOCKED";
+    });
+    document.getElementById("keys").textContent = s.keys;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

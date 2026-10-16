@@ -1,0 +1,55 @@
+# _data/glossary/s15.yml - the words first taught in Session 15.
+# Earlier sessions' terms (acquisition, forensic image, hash value, partition, volume, file system,
+# metadata, unallocated space, encryption, encryption key, full-disk encryption, file-level encryption,
+# file signature, artefact, timeline, UTC, time zone offset, attribution, mail store) are used, never redefined.
+extraction:
+  term: "extraction"
+  def: "The mobile form of an acquisition: getting the data out of a phone, or out of a service that holds its data, into a file that can be examined."
+logical-extraction:
+  term: "logical extraction"
+  def: "An extraction of the data that a phone or its backup service is designed to share, such as a backup of contacts, messages and some apps' data."
+full-file-system-extraction:
+  term: "full file system extraction"
+  def: "An extraction of every file of the user's data, including each app's private folder, made by software that gains extra rights on the running phone."
+physical-extraction:
+  term: "physical extraction"
+  def: "A bit-for-bit copy of a phone's storage, including space that no file uses, which on a modern phone is mostly encrypted."
+before-first-unlock:
+  term: "before first unlock"
+  def: "The state of a phone that has been switched on but not yet unlocked with its passcode, so the keys for most of the user's data do not exist yet."
+after-first-unlock:
+  term: "after first unlock"
+  def: "The state of a phone that has been unlocked at least once since it started, so the keys for most of the user's data stay in memory even when the screen locks."
+file-based-encryption:
+  term: "file-based encryption"
+  def: "Android's encryption of the user data partition, in which every file and file name is encrypted with its own key, some keys available after start-up and others only after the first unlock."
+app-sandbox:
+  term: "app sandbox"
+  def: "The private folder and identity that the operating system gives each app, so that no other app can read the app's files."
+package-name:
+  term: "package name"
+  def: "The unique name of an Android app, written like a web address backwards, such as ch.threema.app, which also names the app's private folder."
+f2fs:
+  term: "F2FS"
+  def: "Flash-Friendly File System, a file system designed for flash storage, used for the user data partition of many Android phones."
+apfs-container:
+  term: "APFS container"
+  def: "The area of an Apple device's storage that holds several APFS volumes, which share its free space between them."
+data-protection-class:
+  term: "data protection class"
+  def: "The rule on an iPhone that decides when a file's key is available: always, after the first unlock, or only while the phone is unlocked."
+app-container:
+  term: "app container"
+  def: "On an iPhone, the folder that holds one app's program or data, named with a long generated ID instead of the app's name."
+sqlite-database:
+  term: "SQLite database"
+  def: "A whole database kept in one ordinary file, with tables of rows, used by most apps on phones and computers to store their records."
+property-list:
+  term: "property list"
+  def: "Apple's file format for settings and small records, which holds named values as XML text or in a compact binary form."
+shared-preferences:
+  term: "shared preferences"
+  def: "An Android app's settings, kept as named values in XML files in the shared_prefs folder of the app's private folder."
+parser:
+  term: "parser"
+  def: "A program that reads files in formats it knows and turns their contents into readable records, such as the tables of a report."
