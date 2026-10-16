@@ -1,0 +1,260 @@
+<!doctype html>
+<!-- NB6018CEM S16-D3. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built by sessions/s16/demo-source/build-demos.py in the private repository. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S16-D3 Three ways to open one database | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.files{width:100%;border-collapse:collapse;font-size:.85rem}
+.files th,.files td{border:1px solid var(--hairline);padding:.35rem .45rem;text-align:left;vertical-align:top}
+.files th{background:var(--ink);color:#fff;font-weight:700}
+.files td.mono{font-family:var(--mono);overflow-wrap:anywhere}
+.files td.changed{background:var(--plum-tint);font-weight:700}
+.files td.gone{background:#eee;color:var(--stone);font-weight:700}
+.sees{margin-top:.6rem;padding:.5rem .6rem;border-left:4px solid var(--sage);background:var(--surface);font-size:.9rem}
+.how{font-weight:700;color:var(--plum-dark);margin:0 0 .4rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 16 notes</a>
+  <h1>S16-D3: Three ways to open one database</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> on the test phone's own files, how a database is opened decides what survives.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="how" id="how"></p>
+    <table class="files"><thead><tr><th>File</th><th>Size (bytes)</th><th>SHA-256 (first 10)</th></tr></thead><tbody id="rows"></tbody></table>
+    <div class="sees" id="sees"></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>On the test phone's own files, an ordinary open checkpointed the write-ahead log into the database and deleted it, so the newest data looked fine while every older version was lost. A read-only open kept the database and the log, and changed only the shm file, which holds no evidence of its own. An open that ignored the log showed no tables, because this app's whole database lives in its log.</p>
+    <p>For the investigation: hash before you open, open only copies, open them read-only, and copy every companion file with its name unchanged. Write any change you see, with its cause. Back to section 4 of the notes.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* STEPS: each step is a caption (the full meaning, in words) and a state for render(). */
+  var STEPS = [
+    {
+      "caption": "Three files of Private Photo Vault, copied from the test phone's set with their names unchanged: the database file of one page, the write-ahead log and its shm index. Their sizes and hash values are recorded before anything opens them.",
+      "state": {
+        "how": "As copied, before any tool opens them",
+        "rows": [
+          [
+            "ppv.db",
+            "4,096",
+            "f8046fb652",
+            ""
+          ],
+          [
+            "ppv.db-wal",
+            "168,952",
+            "3142192302",
+            ""
+          ],
+          [
+            "ppv.db-shm",
+            "32,768",
+            "c46452d9a3",
+            ""
+          ]
+        ],
+        "sees": "Not opened yet. These are the values in your hash list."
+      }
+    },
+    {
+      "caption": "First copy: opened with an ordinary read-write open, browsed, then closed. On close, SQLite ran a checkpoint. The database file grew from 4,096 to 81,920 bytes and has a new hash value. The write-ahead log and the shm file were deleted.",
+      "state": {
+        "how": "Copy 1: ordinary open, then close",
+        "rows": [
+          [
+            "ppv.db",
+            "81,920",
+            "b058d8c19c",
+            "changed"
+          ],
+          [
+            "ppv.db-wal",
+            "deleted",
+            "-",
+            "gone"
+          ],
+          [
+            "ppv.db-shm",
+            "deleted",
+            "-",
+            "gone"
+          ]
+        ],
+        "sees": "The newest data: 3 rows in MediaFile, 2 in Album. Every older version that only the log held is gone, and nothing on the screen says so."
+      }
+    },
+    {
+      "caption": "Second copy: opened read-only, browsed, closed. The database file and the log are unchanged. The shm file has the same size but a new hash value, because a reader writes its read marks there.",
+      "state": {
+        "how": "Copy 2: read-only open, then close",
+        "rows": [
+          [
+            "ppv.db",
+            "4,096",
+            "f8046fb652",
+            ""
+          ],
+          [
+            "ppv.db-wal",
+            "168,952",
+            "3142192302",
+            ""
+          ],
+          [
+            "ppv.db-shm",
+            "32,768",
+            "f50d5d0798",
+            "changed"
+          ]
+        ],
+        "sees": "The same newest data, with the log intact for recovery. Record the shm file's change and its reason in your notes."
+      }
+    },
+    {
+      "caption": "Third copy: opened in a way that ignores the log, as an 'immutable' open does, or as happens when only ppv.db was copied. Nothing changes on disk. But SQLite reads the one-page database file alone, and it holds no tables at all.",
+      "state": {
+        "how": "Copy 3: the log ignored, or not copied",
+        "rows": [
+          [
+            "ppv.db",
+            "4,096",
+            "f8046fb652",
+            ""
+          ],
+          [
+            "ppv.db-wal",
+            "168,952",
+            "3142192302",
+            ""
+          ],
+          [
+            "ppv.db-shm",
+            "32,768",
+            "c46452d9a3",
+            ""
+          ]
+        ],
+        "sees": "No tables. An examiner would report that the app held nothing, because the whole database lives in the log."
+      }
+    },
+    {
+      "caption": "Side by side: only the read-only open both keeps the evidence and shows it. That is why the rule is copy the companions, hash first, open copies read-only, never checkpoint. Values are the unit's run on copies of the test phone's own files, SQLite 3.45.1.",
+      "state": {
+        "how": "Summary",
+        "rows": [
+          [
+            "Ordinary open",
+            "log folded in and deleted",
+            "evidence lost",
+            "gone"
+          ],
+          [
+            "Read-only open",
+            "only the shm file changes",
+            "evidence kept",
+            ""
+          ],
+          [
+            "Log ignored",
+            "nothing changes",
+            "no tables shown",
+            "changed"
+          ]
+        ],
+        "sees": "Copy with companions, hash, open copies read-only, never checkpoint."
+      }
+    }
+  ];
+  /* render(): draw the stage for one state. Replace with the demo's own drawing. */
+  function render(state){
+    document.getElementById("how").textContent = state.how;
+    var tb = document.getElementById("rows"); tb.innerHTML = "";
+    state.rows.forEach(function(r){
+      var tr = document.createElement("tr");
+      [0,1,2].forEach(function(k){
+        var td = document.createElement("td"); td.textContent = r[k];
+        if (k === 2) { td.className = "mono"; }
+        if (k > 0 && r[3]) { td.className += " " + r[3]; }
+        tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+    document.getElementById("sees").textContent = state.sees;
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
