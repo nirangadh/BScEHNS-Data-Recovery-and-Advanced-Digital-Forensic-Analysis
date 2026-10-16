@@ -1,0 +1,63 @@
+# _data/glossary/s17.yml - the words first taught in Session 17.
+# Earlier sessions' terms (forensically sound, chain of custody, incident response, containment, eradication,
+# system recovery, post-incident activity, lessons learned, disaster recovery, order of volatility, anti-forensics,
+# wiping, timeline, UTC, attribution, finding, limitation, recommendation, executive summary, provenance,
+# reproducibility, multi-factor authentication, legal process, correlation) are used, never redefined.
+# "Hypothesis" is used as Session 8 explained it in its text.
+corroboration:
+  term: "corroboration"
+  def: "Support for one event from a second record that was written independently of the first, so that the two records agree without depending on each other."
+independent-source:
+  term: "independent source"
+  def: "A record written by a different program, person or machine from another record, so that a mistake or change in one does not appear in the other."
+absence-of-evidence:
+  term: "absence of evidence"
+  def: "The fact that no record of an event was found; on its own it does not show that the event did not happen."
+host-isolation:
+  term: "host isolation"
+  def: "Cutting a computer off from every network while it keeps running, so that an attacker loses contact with it and its memory is not lost."
+privileged-account:
+  term: "privileged account"
+  def: "A user account with the right to change a system's settings, software or other accounts, such as an administrator account."
+phishing-resistant-authentication:
+  term: "phishing-resistant authentication"
+  def: "A way of signing in, such as a security key, that checks the real address of the site, so a fake page cannot pass on the sign-in to the real site."
+admissibility:
+  term: "admissibility"
+  def: "Whether a court allows a piece of evidence to be heard and used in a case."
+expert-witness:
+  term: "expert witness"
+  def: "A person whom a court allows to give opinions in court because of special knowledge, and who must help the court, not the side that pays."
+witness-of-fact:
+  term: "witness of fact"
+  def: "A person who tells a court only what they saw, heard or did, without giving opinions."
+tool-validation:
+  term: "tool validation"
+  def: "Testing a method or tool on data with a known answer before it is used on evidence, to show that it gives correct results and where it fails."
+error-rate:
+  term: "error rate"
+  def: "How often a method or tool gives a wrong result, measured by testing it where the right answer is already known."
+disclosure:
+  term: "disclosure"
+  def: "Giving the other side in a case the material that may weaken your own side's case or help theirs, as the rules require."
+mutual-legal-assistance:
+  term: "mutual legal assistance"
+  def: "The formal way one country asks another to collect or hand over evidence for its own investigation or trial."
+scope-of-authority:
+  term: "scope of authority"
+  def: "The written limits of what an examiner is allowed to search, copy and examine in an engagement."
+proportionality:
+  term: "proportionality"
+  def: "The rule that an intrusion into people's data should go no further than the purpose of the investigation needs."
+collateral-data:
+  term: "collateral data"
+  def: "Data that an examiner sees during a case but that has nothing to do with the question being investigated."
+data-minimisation:
+  term: "data minimisation"
+  def: "Keeping and using only the personal data that a task really needs, and no more."
+retention-period:
+  term: "retention period"
+  def: "How long evidence or personal data may be kept before it must be returned or destroyed safely."
+confirmation-bias:
+  term: "confirmation bias"
+  def: "The habit of noticing and trusting information that supports what we already believe, and overlooking what does not."
