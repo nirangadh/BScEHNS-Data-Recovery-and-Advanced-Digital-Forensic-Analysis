@@ -1,0 +1,66 @@
+# _data/glossary/s16.yml - the words first taught in Session 16.
+# Earlier sessions' terms (header, unallocated space, file slack, overwrite, data recovery, file carving,
+# file signature, hash value, working copy, evidence register, timeline, UTC, finding, limitation,
+# recommendation, report template, SQLite database, parser, extraction, app sandbox) are used, never redefined.
+# "Page" alone is Session 6's memory page, "frame" Session 7's network frame and "snapshot" Session 0's VM
+# snapshot, so this session's words carry their own names: database page, WAL frame, volume shadow copy.
+database-page:
+  term: "database page"
+  def: "One of the equal-sized blocks that a SQLite database file is divided into, numbered from 1, each holding one part of the database."
+b-tree:
+  term: "B-tree"
+  def: "The tree of database pages that SQLite uses to keep each table or index in order, so that a row can be found in a few steps."
+cell:
+  term: "cell"
+  def: "One stored entry on a database page, such as one row of a table, found through a list of positions at the top of the page."
+freeblock:
+  term: "freeblock"
+  def: "A space inside a database page that was given back when a cell was deleted, and which keeps the old bytes until it is reused or cleaned."
+freelist:
+  term: "freelist"
+  def: "SQLite's list of whole database pages that hold no live data and wait to be reused."
+rollback-journal:
+  term: "rollback journal"
+  def: "A companion file in which SQLite keeps the old copy of each page it is about to change, so that a failed change can be undone."
+write-ahead-log:
+  term: "write-ahead log"
+  def: "A companion file, ending in -wal, in which SQLite writes new versions of pages first, before they are copied into the database file."
+wal-frame:
+  term: "WAL frame"
+  def: "One entry in a write-ahead log: a short header and a full copy of one database page as it was after a change."
+checkpoint:
+  term: "checkpoint"
+  def: "The moment SQLite copies the newest page versions from the write-ahead log into the database file, after which the log can be reused."
+shm-file:
+  term: "shm file"
+  def: "The companion file, ending in -shm, that works as an index of the write-ahead log, telling SQLite which frame holds the newest version of each page."
+vacuum:
+  term: "vacuum"
+  def: "A SQLite command that rebuilds the whole database file without its free space, so that deleted data in it is gone."
+auto-vacuum:
+  term: "auto-vacuum"
+  def: "A database setting that gives free pages back to the file system after changes, so that the freelist stays empty."
+secure-delete:
+  term: "secure delete"
+  def: "A setting of the program that uses SQLite which fills deleted data with zeros at once, instead of leaving the old bytes in place."
+app-level-encryption:
+  term: "app-level encryption"
+  def: "Encryption that an app applies to its own files with its own key, on top of the encryption the phone gives every file."
+volume-shadow-copy:
+  term: "volume shadow copy"
+  def: "A copy that Windows keeps of how a volume was at an earlier moment, used for restore points and earlier versions of files."
+executive-summary:
+  term: "executive summary"
+  def: "The first section of a report, written last, that tells a reader who reads nothing else what happened, how sure the writer is, and what should change."
+exhibit-reference:
+  term: "exhibit reference"
+  def: "The identifier of an item in the evidence register, such as S16-001, written beside every statement that rests on that item."
+provenance:
+  term: "provenance"
+  def: "The recorded history of where an item, a figure or a screenshot came from and how it was made."
+reproducibility:
+  term: "reproducibility"
+  def: "The quality of a method written so fully that another examiner, with the same evidence and tools, would get the same result."
+citation-style:
+  term: "citation style"
+  def: "A fixed set of rules, such as APA 7 or IEEE, for how a report points to its sources in the text and lists them at the end."
