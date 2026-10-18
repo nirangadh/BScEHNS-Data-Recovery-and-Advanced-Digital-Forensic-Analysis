@@ -1,0 +1,271 @@
+<!doctype html>
+<!-- NB6018CEM S18-D4. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built by sessions/s18/demo-source/build-demos.py in the private repository. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S18-D4 How do you know? | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.pill{display:inline-block;border-radius:999px;padding:.05rem .55rem;font-weight:700;font-size:.74rem;border:1px solid var(--hairline);background:#fff;white-space:nowrap}
+.pill.met{background:var(--sage-dark);color:#fff;border-color:var(--sage-dark)}
+.pill.miss{background:#fff;color:var(--plum-dark);border-color:var(--plum)}
+.label{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin:0 0 .35rem}
+.card{border:1px solid var(--hairline);border-radius:10px;padding:.7rem .8rem;background:#fff}
+.frag{transition:background .25s}
+.frag.new{background:var(--plum-tint);border-radius:4px}
+.frag.pad{color:var(--stone);text-decoration:line-through}
+.mono{font-family:var(--mono);font-size:.85em}
+
+.talk{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.8rem;font-size:.88rem}
+.q,.a{border-radius:10px;padding:.4rem .6rem;max-width:92%}
+.q{background:var(--ink);color:#fff;align-self:flex-start}
+.a{background:var(--surface);border:1px solid var(--hairline);align-self:flex-end}
+.a.fluent{background:var(--plum-tint);border-color:var(--plum)}
+.chain{display:flex;flex-wrap:wrap;gap:.35rem;align-items:stretch}
+.lk{flex:1 1 8rem;border:2px solid var(--hairline);border-radius:9px;padding:.35rem .5rem;background:#fff;font-size:.76rem;transition:border-color .25s,background .25s}
+.lk .tt{display:block;font-weight:800;font-size:.8rem}
+.lk.ok{border-color:var(--sage-dark);background:var(--surface)}
+.lk.stop{border-color:var(--plum);background:var(--plum-tint)}
+.lk.stop .tt::after{content:" (chain stops)";color:var(--plum-dark)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 18 notes</a>
+  <h1>S18-D4: How do you know?</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> each answer must point one step closer to the evidence, and a fluent answer that points at nothing stops the chain.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="talk" id="talk"></div>
+    <p class="label">The chain from claim to evidence</p>
+    <div class="chain" id="chain"></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>Each "how do you know?" moved the claim one step closer to the evidence: from the sentence to a row, from the row to a file, from the file to its sealed hash value, and to the student's own logs. The fluent answer stopped the chain at the file, because it pointed at a reputation, not at anything that could be opened.</p>
+    <p>For the viva: walk this chain for every finding before the day, aloud, with your folders open. Where it stops is what you prepare. The account, address and values are invented, as on the Session 13 page. Back to section 4 of the notes.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* STEPS: each step is a caption (the full meaning, in words) and a state for render(). */
+  var STEPS = [
+    {
+      "caption": "A rehearsal. The student states a finding from her report: one file was deleted from CloudShell, at a time in UTC. Her partner asks the only question of the exercise.",
+      "state": {
+        "talk": [
+          [
+            "a",
+            "staging/pricing-plan.txt was deleted from CloudShell at 09:31:47 UTC."
+          ],
+          [
+            "q",
+            "How do you know?"
+          ]
+        ],
+        "ok": 1,
+        "stop": ""
+      }
+    },
+    {
+      "caption": "She points to the joined row: the operation, the key, the address and the request ID, found in both AWS records. The claim now rests on a row.",
+      "state": {
+        "talk": [
+          [
+            "q",
+            "How do you know?"
+          ],
+          [
+            "a",
+            "It is a DeleteObject row in my joined file, from 198.51.100.73, with the same request ID in CloudTrail and the access log."
+          ],
+          [
+            "q",
+            "How do you know that row is from the records?"
+          ]
+        ],
+        "ok": 2,
+        "stop": ""
+      }
+    },
+    {
+      "caption": "The row names its source: the CloudTrail file it came from. The row rests on a file.",
+      "state": {
+        "talk": [
+          [
+            "q",
+            "How do you know that row is from the records?"
+          ],
+          [
+            "a",
+            "The last column of the row names the CloudTrail file it was parsed from."
+          ],
+          [
+            "q",
+            "How do you know that file is the one AWS delivered?"
+          ]
+        ],
+        "ok": 3,
+        "stop": ""
+      }
+    },
+    {
+      "caption": "The file rests on a hash value: its sealed original is in the manifest, and the working copy was checked against it. The file rests on the seal.",
+      "state": {
+        "talk": [
+          [
+            "q",
+            "How do you know that file is the one AWS delivered?"
+          ],
+          [
+            "a",
+            "Its original is sealed with its SHA-256 value in the manifest, and my working copy matched it before I analysed it."
+          ],
+          [
+            "q",
+            "How do you know it was not one of your own requests?"
+          ]
+        ],
+        "ok": 4,
+        "stop": ""
+      }
+    },
+    {
+      "caption": "Last, her own records: the time falls outside both collection windows, and the address is the one her part 2 log recorded in CloudShell, a second before. Every link points to a file she can open. The chain is complete.",
+      "state": {
+        "talk": [
+          [
+            "q",
+            "How do you know it was not one of your own requests?"
+          ],
+          [
+            "a",
+            "It is outside both windows in my collection log, and the address is the CloudShell address in part2-log.txt, where the rm ran at 09:31:46."
+          ]
+        ],
+        "ok": 5,
+        "stop": ""
+      }
+    },
+    {
+      "caption": "Now the same exchange, with a different answer at the second question. It is fluent and confident, and it points at nothing: no file, no column, no value.",
+      "state": {
+        "talk": [
+          [
+            "q",
+            "How do you know that row is from the records?"
+          ],
+          [
+            "fluent",
+            "It came from CloudTrail, which is AWS's official audit service, so it is reliable and accurate."
+          ]
+        ],
+        "ok": 2,
+        "stop": "file"
+      }
+    },
+    {
+      "caption": "The chain stops at the file. The answer may even be true, but nothing in it can be checked, so the claim above it rests on her word. That is the step to prepare: find the column, open the manifest, say it aloud.",
+      "state": {
+        "talk": [
+          [
+            "fluent",
+            "It came from CloudTrail, which is AWS's official audit service, so it is reliable and accurate."
+          ],
+          [
+            "q",
+            "Which file, and how do you know it is unchanged?"
+          ]
+        ],
+        "ok": 2,
+        "stop": "file"
+      }
+    }
+  ];
+  /* render(): draw the stage for one state. Replace with the demo's own drawing. */
+  var LINKS = [{"k": "claim", "t": "The claim", "d": "staging/pricing-plan.txt was deleted from CloudShell at 09:31:47 UTC."}, {"k": "row", "t": "The row", "d": "Joined row: DeleteObject, staging/pricing-plan.txt, 198.51.100.73, request ID 7F3B2A91C0D4E658, in both records."}, {"k": "file", "t": "The file", "d": "Its last column names the CloudTrail file it came from, in the c2 working copy."}, {"k": "hash", "t": "The hash value", "d": "That file's sealed original is in manifest-sha256.txt, and the working copy matched it at the start of analysis."}, {"k": "own", "t": "Your own log", "d": "Outside both collection windows; 198.51.100.73 is the CloudShell address in part2-log.txt, where the rm command ran at 09:31:46."}];
+  function render(state){
+    var t = document.getElementById("talk"); t.innerHTML = "";
+    state.talk.forEach(function(m){
+      var d = document.createElement("div");
+      d.className = m[0] === "q" ? "q" : (m[0] === "fluent" ? "a fluent" : "a");
+      d.textContent = (m[0] === "q" ? "Partner: " : "Student: ") + m[1]; t.appendChild(d);
+    });
+    var c = document.getElementById("chain"); c.innerHTML = "";
+    LINKS.forEach(function(l, i){
+      var d = document.createElement("div");
+      d.className = "lk" + (l.k === state.stop ? " stop" : (i < state.ok ? " ok" : ""));
+      var tt = document.createElement("span"); tt.className = "tt"; tt.textContent = (i + 1) + ". " + l.t; d.appendChild(tt);
+      var dd = document.createElement("span"); dd.textContent = (i < state.ok) ? l.d : (l.k === state.stop ? "No file named." : "Not reached."); d.appendChild(dd);
+      c.appendChild(d);
+    });
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

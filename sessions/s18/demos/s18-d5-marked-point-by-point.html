@@ -1,0 +1,222 @@
+<!doctype html>
+<!-- NB6018CEM S18-D5. Code: MIT licence. Content: CC BY-NC-SA 4.0. Built by sessions/s18/demo-source/build-demos.py in the private repository. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S18-D5 A short answer, marked point by point | NB6018CEM demo</title>
+<style>
+@font-face{font-family:"Open Sans";font-weight:400;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:800;font-display:swap;src:url("../../../assets/fonts/open-sans-latin-800-normal.woff2") format("woff2")}
+:root{--bg:#F7F8F4;--surface:#E8F0EA;--ink:#31423B;--sage:#6E8472;--sage-dark:#4F6356;--plum:#8A4E8F;--plum-dark:#6E3D72;--plum-tint:#F1E8F2;--stone:#5C6B63;--hairline:#CBD6CE;
+--font:"Open Sans","Segoe UI",Roboto,Calibri,sans-serif;--mono:Consolas,Menlo,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:var(--ink);color:#fff;padding:1rem 1.1rem}
+header a{color:#E8F0EA;font-weight:600;font-size:.88rem}
+header h1{margin:.3rem 0 0;font-size:1.3rem;line-height:1.25}
+.bars{display:flex;gap:5px;margin-top:.6rem}.bars i{height:5px;border-radius:2px}.bars i:first-child{width:46px;background:var(--sage)}.bars i:last-child{width:22px;background:var(--plum)}
+main{max-width:52rem;margin:0 auto;padding:1rem 1.1rem 2.5rem}
+.what{margin:0 0 1rem}
+.stage{background:#fff;border:1px solid var(--hairline);border-radius:14px;padding:1rem;min-height:14rem;overflow-x:auto}
+.caption{min-height:3.2em;margin:.9rem 0;font-size:1.02rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+button{font:inherit;font-weight:700;border-radius:9px;padding:.55rem 1rem;cursor:pointer;border:1px solid var(--sage-dark);background:#fff;color:var(--sage-dark)}
+button.primary{background:var(--sage-dark);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.count{color:var(--stone);font-size:.9rem;margin-left:auto}
+.dots{display:flex;gap:6px;margin:.8rem 0 0}.dots span{width:10px;height:10px;border-radius:50%;background:var(--hairline)}.dots span.on{background:var(--plum)}
+.saw{background:var(--surface);border-left:5px solid var(--sage);border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin-top:1.4rem}
+.saw h2{margin:0 0 .3rem;font-size:.8rem;letter-spacing:.12em;color:var(--sage-dark)}
+.saw[hidden]{display:none}
+.hint{font-size:.85rem;color:var(--stone);margin-top:.6rem}
+.pill{display:inline-block;border-radius:999px;padding:.05rem .55rem;font-weight:700;font-size:.74rem;border:1px solid var(--hairline);background:#fff;white-space:nowrap}
+.pill.met{background:var(--sage-dark);color:#fff;border-color:var(--sage-dark)}
+.pill.miss{background:#fff;color:var(--plum-dark);border-color:var(--plum)}
+.label{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin:0 0 .35rem}
+.card{border:1px solid var(--hairline);border-radius:10px;padding:.7rem .8rem;background:#fff}
+.frag{transition:background .25s}
+.frag.new{background:var(--plum-tint);border-radius:4px}
+.frag.pad{color:var(--stone);text-decoration:line-through}
+.mono{font-family:var(--mono);font-size:.85em}
+
+.qn{font-size:.9rem;margin:0 0 .6rem}
+.qn .cw{background:var(--ink);color:#fff;border-radius:4px;padding:0 .3rem;font-weight:700}
+.qn .dm{border-bottom:3px solid var(--plum);transition:border-color .25s}
+.qn .dm.miss{border-bottom-color:var(--plum);background:var(--plum-tint)}
+.ans .s{display:block;padding:.2rem .3rem;border-radius:5px;margin:.15rem 0;transition:background .25s}
+.ans .s.zero{color:var(--stone)}
+.ans .s.zero::after{content:"  (no mark point)";font-size:.75rem;color:var(--plum-dark)}
+.ans .s.new{background:var(--plum-tint)}
+.pts{display:flex;flex-direction:column;gap:.3rem;margin-top:.7rem}
+.pt{display:flex;gap:.5rem;align-items:flex-start;font-size:.82rem}
+.score{font-weight:800;font-size:1.05rem;margin-top:.6rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="../">Back to Session 18 notes</a>
+  <h1>S18-D5: A short answer, marked point by point</h1>
+  <div class="bars" aria-hidden="true"><i></i><i></i></div>
+</header>
+<main>
+  <p class="what"><strong>What this shows:</strong> a short answer earns whole marks only as its mark points appear, so padding earns nothing and an unanswered demand costs a mark.</p>
+
+  <div class="stage" id="stage" aria-hidden="true">
+    <p class="qn"><span class="cw">Explain</span> Autopsy lists a deleted file with its full name, size and dates. When the examiner exports it, its hash value does not match the client's original. <span class="dm" id="dm1">Explain how both facts can be true</span>, and <span class="dm" id="dm2">what the examiner can still report</span>. <em>(3 marks; Session 2 quiz, Q5)</em></p>
+    <p class="label">The answer, as written</p>
+    <div class="card ans" id="ans"></div>
+    <p class="label" style="margin-top:.8rem">The published mark points</p>
+    <div class="pts" id="pts"></div>
+    <p class="score" id="score"></p>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <div class="controls">
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+    <button type="button" id="restart">Start again</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Keyboard: the left and right arrow keys move between steps.</p>
+
+  <section class="saw" id="saw" hidden>
+    <h2>WHAT YOU JUST SAW</h2>
+    <p>The score moved only when a sentence made a mark point: the mechanism earned two, the second demand earned the third, and the padding earned nothing. The marks were whole marks, one for each point, and the final answer was two sentences long.</p>
+    <p>For the phase test: read the command word, count the demands, and plan one point for each mark before you write. The question and its points are the published ones from the Session 2 quiz. Back to section 7 of the notes.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  /* STEPS: each step is a caption (the full meaning, in words) and a state for render(). */
+  var STEPS = [
+    {
+      "caption": "A published question from Session 2's quiz. The command word is \"explain\", so each mark needs a reason, not only a fact. The question has two demands, underlined: how both facts can be true, and what can still be reported. Three marks: about three distinct points.",
+      "state": {
+        "s": [],
+        "pts": [],
+        "new": "",
+        "miss": []
+      }
+    },
+    {
+      "caption": "A first attempt. It mentions damage and deletion, but it gives no mechanism: which part survived, which part was lost, and why. It matches no mark point. Zero marks.",
+      "state": {
+        "s": [
+          "s0"
+        ],
+        "pts": [],
+        "new": "s0",
+        "zero": [
+          "s0"
+        ],
+        "miss": [
+          "dm1",
+          "dm2"
+        ]
+      }
+    },
+    {
+      "caption": "Rewritten. One sentence now names both parts and the mechanism: the record survived, the clusters were reused, so the content differs. It earns mark points 1 and 2. Two marks.",
+      "state": {
+        "s": [
+          "s1"
+        ],
+        "pts": [
+          "p1",
+          "p2"
+        ],
+        "new": "s1",
+        "miss": [
+          "dm2"
+        ]
+      }
+    },
+    {
+      "caption": "A sentence is added to sound thorough. The answer is longer, and the score does not move: the sentence makes no point the marker is looking for. Still two marks.",
+      "state": {
+        "s": [
+          "s1",
+          "s2"
+        ],
+        "pts": [
+          "p1",
+          "p2"
+        ],
+        "new": "s2",
+        "zero": [
+          "s2"
+        ],
+        "miss": [
+          "dm2"
+        ]
+      }
+    },
+    {
+      "caption": "The padding goes, and the second demand is answered: what the examiner can still report, and the limit stated. That is mark point 3. Three marks, in two sentences.",
+      "state": {
+        "s": [
+          "s1",
+          "s3"
+        ],
+        "pts": [
+          "p1",
+          "p2",
+          "p3"
+        ],
+        "new": "s3",
+        "miss": []
+      }
+    }
+  ];
+  /* render(): draw the stage for one state. Replace with the demo's own drawing. */
+  var POINTS = [{"k": "p1", "t": "(1) the record and the content are stored separately and are lost separately"}, {"k": "p2", "t": "(2) the clusters were reused, so the content differs"}, {"k": "p3", "t": "(3) the record is still evidence that the file existed, and the limit is stated in the report"}], SENT = {"s0": "Autopsy is a very good tool, but files can get damaged when they are deleted, which happens a lot in forensics.", "s1": "The file's record in the index survived, but the clusters it points to were later given to other files, so the exported content is not the original.", "s2": "This is a very important issue for all examiners in every case.", "s3": "The examiner can still report that a file with this name, size and dates existed and was deleted, and must state that its content could not be recovered intact."};
+  function render(state){
+    var a = document.getElementById("ans"); a.innerHTML = "";
+    if (!state.s.length) { a.textContent = "Not written yet."; }
+    state.s.forEach(function(k){
+      var s = document.createElement("span"); s.className = "s" + ((state.zero || []).indexOf(k) !== -1 ? " zero" : "") + (k === state.new ? " new" : "");
+      s.textContent = SENT[k]; a.appendChild(s);
+    });
+    ["dm1", "dm2"].forEach(function(id){ document.getElementById(id).classList.toggle("miss", state.miss.indexOf(id) !== -1); });
+    var p = document.getElementById("pts"); p.innerHTML = "";
+    POINTS.forEach(function(pt){
+      var d = document.createElement("div"); d.className = "pt"; var on = state.pts.indexOf(pt.k) !== -1;
+      var pill = document.createElement("span"); pill.className = "pill " + (on ? "met" : "miss"); pill.textContent = on ? "1 mark" : "0"; d.appendChild(pill);
+      var t = document.createElement("span"); t.textContent = pt.t; d.appendChild(t); p.appendChild(d);
+    });
+    var unanswered = state.miss.length ? "; unanswered demand: " + state.miss.map(function(id){ return document.getElementById(id).textContent; }).join(" and ") : "";
+    document.getElementById("score").textContent = state.pts.length + " of 3 marks" + (state.s.length ? unanswered : "");
+  }
+  /* Engine: do not edit below this line. */
+  var i = 0, cap = document.getElementById("caption"), cnt = document.getElementById("count"),
+      back = document.getElementById("back"), next = document.getElementById("next"),
+      saw = document.getElementById("saw"), dots = document.getElementById("dots");
+  STEPS.forEach(function(){ dots.appendChild(document.createElement("span")); });
+  function show(){
+    render(STEPS[i].state);
+    cap.textContent = STEPS[i].caption;
+    cnt.textContent = "Step " + (i + 1) + " of " + STEPS.length;
+    back.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+    saw.hidden = i !== STEPS.length - 1;
+    Array.prototype.forEach.call(dots.children, function(d, k){ d.classList.toggle("on", k <= i); });
+  }
+  function go(n){ i = Math.max(0, Math.min(STEPS.length - 1, n)); show(); }
+  back.addEventListener("click", function(){ go(i - 1); });
+  next.addEventListener("click", function(){ go(i + 1); });
+  document.getElementById("restart").addEventListener("click", function(){ go(0); next.focus(); });
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") { return; }
+    if (e.key === "ArrowRight") { go(i + 1); } else if (e.key === "ArrowLeft") { go(i - 1); }
+  });
+  show();
+})();
+</script>
+</body>
+</html>
