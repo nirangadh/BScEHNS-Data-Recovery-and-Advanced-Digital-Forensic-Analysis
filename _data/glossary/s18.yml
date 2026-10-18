@@ -1,0 +1,34 @@
+# _data/glossary/s18.yml - the words FIRST taught in Session 18.
+# Earlier sessions' terms (finding, limitation, recommendation, report template, executive summary, exhibit reference,
+# provenance, reproducibility, citation style, chain of custody, log delivery latency, best-effort delivery,
+# record coverage) are used, never redefined.
+rubric:
+  term: "rubric"
+  def: "A table that a marker uses to judge work: it lists what is judged and describes what work at each level looks like."
+assessment-criterion:
+  term: "assessment criterion"
+  def: "One quality of the work that a rubric judges on its own, such as how well each claim is supported."
+mark-band:
+  term: "mark band"
+  def: "A range of marks in a rubric, with a description of the work that earns a mark in that range."
+band-descriptor:
+  term: "band descriptor"
+  def: "The words in a rubric that describe what work in one mark band shows."
+word-budget:
+  term: "word budget"
+  def: "A plan that shares the total length of a report between its sections before you write them."
+viva:
+  term: "viva"
+  def: "A short spoken examination in which you explain your own work and answer questions about it."
+peer-review:
+  term: "peer review"
+  def: "Reading a classmate's draft against an agreed checklist and giving feedback on it, without copying or rewriting it."
+command-word:
+  term: "command word"
+  def: "The verb in a question, such as state, explain or compare, that tells you what kind of answer earns the marks."
+mark-point:
+  term: "mark point"
+  def: "One idea that a marker looks for in an answer and rewards with one whole mark."
+academic-integrity:
+  term: "academic integrity"
+  def: "Doing your work honestly and showing clearly where any idea, text or help in it came from."
