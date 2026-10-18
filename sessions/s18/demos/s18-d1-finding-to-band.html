@@ -48,9 +48,9 @@ button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
 .band.on{border-color:var(--sage-dark);background:var(--surface)}
 .band .bt{font-weight:800;font-size:.9rem}
 .band .bt span{font-weight:700;font-size:.74rem;color:var(--sage-dark);margin-left:.4rem}
-.band ul{margin:.3rem 0 0;padding-left:1.1rem;font-size:.8rem}
-.band li.ok::marker{content:"met  "}
-.band li.no::marker{content:"missing  "}
+.band ul{list-style:none;margin:.35rem 0 0;padding:0;font-size:.8rem}
+.band li{display:flex;gap:.45rem;align-items:baseline;margin:.15rem 0}
+.band li .st{flex:0 0 auto;min-width:4.4rem;text-align:center}
 .band li.ok{color:var(--sage-dark)}.band li.no{color:var(--plum-dark)}
 .wc{font-size:.78rem;color:var(--stone);margin-top:.5rem}
 @media (max-width:620px){.grid1{grid-template-columns:minmax(0,1fr)}}
@@ -187,11 +187,16 @@ button:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
       if (band.k === best) { var m = document.createElement("span"); m.textContent = "fully met"; t.appendChild(m); }
       d.appendChild(t);
       var ul = document.createElement("ul");
-      if (!band.need.length) { var li0 = document.createElement("li"); li0.className = "ok"; li0.textContent = "The finding is stated"; ul.appendChild(li0); }
+      function item(text, ok){
+        var li = document.createElement("li"); li.className = ok ? "ok" : "no";
+        var st = document.createElement("span"); st.className = "pill st " + (ok ? "met" : "miss"); st.textContent = ok ? "met" : "missing";
+        var tx = document.createElement("span"); tx.textContent = text;
+        li.appendChild(st); li.appendChild(tx); ul.appendChild(li);
+      }
+      if (!band.need.length) { item("The finding is stated", true); }
       ELS.forEach(function(e){
         if (band.need.indexOf(e.k) === -1) { return; }
-        var li = document.createElement("li"); var ok = state.on.indexOf(e.k) !== -1;
-        li.className = ok ? "ok" : "no"; li.textContent = e.t; ul.appendChild(li);
+        item(e.t, state.on.indexOf(e.k) !== -1);
       });
       d.appendChild(ul); b.appendChild(d);
     });
